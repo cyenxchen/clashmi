@@ -116,15 +116,23 @@ class _VersionUpdateScreenState
     _installing = true;
     setState(() {});
     try {
-      await VPNService.stop();
+      if (Platform.isAndroid) {
+        Log.i(
+          "VersionUpdateScreen.checkReplace Android install start $installer",
+        );
+        await AppInstaller.installApk(installer);
+        Log.i(
+          "VersionUpdateScreen.checkReplace Android install intent dispatched $installer",
+        );
+      } else {
+        await VPNService.stop();
+      }
       if (Platform.isWindows) {
         await launchUrl(Uri(path: installer, scheme: 'file'));
         await ServicesBinding.instance.exitApplication(AppExitType.required);
       } else if (Platform.isMacOS) {
         await launchUrl(Uri(path: installer, scheme: 'file'));
         await ServicesBinding.instance.exitApplication(AppExitType.required);
-      } else if (Platform.isAndroid) {
-        await AppInstaller.installApk(installer);
       } else if (Platform.isLinux) {
         if (!mounted) {
           return;
@@ -186,7 +194,7 @@ class _VersionUpdateScreenState
       setState(() {});
     }
     _installing = false;
-    if (!mounted) {
+    if (mounted) {
       setState(() {});
     }
   }
