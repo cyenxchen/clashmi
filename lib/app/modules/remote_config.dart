@@ -79,7 +79,7 @@ class RemoteConfig {
   static const String kDefaultConfig =
       "https://dot.$kDefaultHost/clashmi_config.json";
   static const String kDefaultAutoUpdate =
-      "https://dot.$kDefaultHost/clashmi_autoupdate.json";
+      "https://api.github.com/repos/cyenxchen/clashmi/releases";
 
   static const String kDefaultGetTranffic =
       "https://$kDefaultHost/page/sponsor#list";
@@ -87,9 +87,10 @@ class RemoteConfig {
   static const String kDefaultTutorial = "https://$kDefaultHost/guide/";
   static const String kDefaultFaq = "https://$kDefaultHost/guide/faq/";
 
-  static const String kDefaultDownload = "https://$kDefaultHost/download/";
+  static const String kDefaultDownload =
+      "https://github.com/cyenxchen/clashmi/releases";
   static const String kDefaultTelegram = "https://t.me/ClashMiApp";
-  static const String kDefaultFollow = "https://github.com/KaringX/clashmi";
+  static const String kDefaultFollow = "https://github.com/cyenxchen/clashmi";
   static const String kDefaultDonate = "http://$kDefaultHost/donate";
   static const String kDefaultDoc = "https://wiki.metacubex.one/config/";
   static const String kDefaultHtmlTools = "https://tools.karing.app/";
