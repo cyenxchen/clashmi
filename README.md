@@ -1,110 +1,25 @@
-<h1 align="center">
-  <img src="./assets/demo/icon_256.png" alt="Clash Mi" width="256" />
-  <br>
-  Clash Mi - 又一款mihomo核心的代理工具
-  <br>
-</h1>
+# Clash Mi (个人自用版本)
 
-<h3 align="center">
-基于 <a href="https://github.com/flutter/flutter">flutter</a> 的 <a href="https://github.com/MetaCubeX/mihomo">mihomo(clash.meta)</a> 图形用户界面。
-</h3>
+个人自用版本,相比原版区别如下:
 
+## 1. 内核 bridge 切换为开源实现
+- 改用同级目录的 `clashmi_vpn_service` 包(基于 gomobile + `cyenxchen/mihomo`)替代原版闭源的 `libclash_vpn_service`。
+- 替换了 Dart 侧 import 与 Android 侧自动生成的插件注册;移除了 iOS / macOS / Windows 上闭源 bridge 的生成注册。
+- VPN 启动配置补传 IPv6 选项,并在准备阶段输出 core 路径日志,便于启动失败时溯源。
 
-## 特点
-- 内置Mihomo内核
-    - 基于最新且持续更新的Mihomo(Clash.Meta)内核. 内核及客户端均持续更新维护，放心使用.
-- 操作简单
-    - 支持metacubex的推荐配置, 内核基于yaml配置运行. 小白用户使用机场订阅即可使用.
-- 自带[zashboard面板](https://github.com/Zephyruso/zashboard)
-    - web面板 或许你更加熟悉.
-- 官网/用户手册: [clashmi.app](https://clashmi.app)
+## 2. 当前仅支持 Android arm64-v8a
+- 开源 bridge MVP 只提供 arm64 原生核心,因此 Android 构建与打包限定为 `arm64-v8a`。
+- iOS / macOS / Windows / Linux 需要后续补齐对应原生 bridge 实现后才能恢复完整内核运行能力。
+- 系统要求中的非 Android 平台暂不可用。
 
-##### 注意: 
-- **Clash Mi或KaringX未在任何视频平台开设过任何频道**
-- [Clash Mi唯一官网](https://clashmi.app): https://clashmi.app
-	- **请勿相信其他网址提供的信息、下载二次打包的软件**
+## 3. 应用更新源改为本仓库 GitHub Releases
+- 默认更新与下载入口指向 `cyenxchen/clashmi` 的 Releases feed,不再走原版官网。
+- 新增解析 GitHub Releases assets 为自动更新模型的逻辑:
+  - 过滤非正式 stable tag、AppImage 资产、`.sha256` / 签名等 sidecar 文件。
+  - 兼容 Flutter `build name+build number` 的四段版本号与普通三段 tag。
+  - 通过分页拉取 GitHub Releases,并避免对 GitHub 请求附加签名 query。
+- 增加针对 GitHub Releases 与旧版 JSON 的解析器测试。
 
-## 推广
-<details>
-<summary>查看所有推广
+---
 
-
-
-### ✈️推荐机场
-
-[🐶狗狗加速 —— 技术流机场 Doggygo VPN](https://2.x31415926.top/redir.html?url=aHR0cHM6Ly93d3cuZGc2LnRvcC8jL3JlZ2lzdGVyP2NvZGU9bEZINGlpOUQ=&i=3eb&t=1723644053)
-
-- 高性能海外机场，海外团队，无跑路风险
-- 专属链接注册送 3 天，每天 1G 流量 [免费试用](https://2.x31415926.top/redir.html?url=aHR0cHM6Ly93d3cuZGc2LnRvcC8jL3JlZ2lzdGVyP2NvZGU9bEZINGlpOUQ=&i=3eb&t=1723644053)
-- 优惠套餐每月仅需 15.8 元，160G 流量，年付 8 折
-- 全球首家支持`Hysteria2` 协议，集群负载均衡设计，高速专线，极低延迟，无视晚高峰，4K 秒开
-- 解锁流媒体及 ChatGPT
-
-[👉更多机场优惠 每日更新](https://2.x31415926.top/)
-
-</summary>
-
-### 🤝机场合作招募
-- 👉[联系方式与合作形式](https://karing.app/blog/isp/cooperation)👈
-</details>
-
-
-
-
-## 安装
-- **IOS AppStore**: （搜索关键词：clash mi）
-  - https://apps.apple.com/us/app/clash-mi/id6744321968
-- **IOS TestFlight**:
-  - https://testflight.apple.com/join/bjHXktB3
-- **MacOS/Android/Windows/Linux**:
-  - https://clashmi.app/download
-  - https://github.com/KaringX/clashmi/releases/latest
-  - ```sh
-    brew install clash-mi
-    ```
-
-
-### 系统要求
-
-- IOS >= 15
-- MacOS >= 12 (Intel, Apple Silicon)
-- Android >= 8  (arm64-v8a)
-- Windows >= 10 （amd64）
-- Linux （amd64）
-
-> 当前开源 VPN bridge MVP 只实现 Android arm64-v8a；iOS/macOS/Windows/Linux
-> 需要后续补齐对应原生实现后再恢复完整内核运行能力。
-
-### 常见问题
-
-> [FAQ|cn](https://clashmi.app/guide/faq)
-
-
-### 截图
-
-<div align="center">
-  <img src="./assets/demo/home.png" alt="app: home" width="50%" />
-  </br></br>
-</div>
-
-## 提交需求/bug
-- [欢迎报告bug及需求！](https://github.com/KaringX/clashmi/issues)
-- [ClashMiApp 电报群](https://t.me/ClashMiApp)
-
-
-## 捐赠
-- [请开发者喝一杯](https://clashmi.app/donate)
-
-## Projects 
-
-### 致谢: Clash Mi 基于或受到这些项目的启发：
-
-- [flutter](https://flutter.dev/)：使构建美观应用变得轻松快捷.
-- [mihomo](https://github.com/MetaCubeX/mihomo)：另一款 clash核心.
-- [zashboard](https://github.com/Zephyruso/zashboard): 使用 Clash API 的仪表板.
-
-
-### Karing Team:
-- [Karing](https://karing.app): https://karing.app
-- [Clash Mi](https://clashmi.app/): https://clashmi.app/
-- [sing-poet](https://github.com/KaringX/sing-poet)
+> 原版项目: <https://github.com/KaringX/clashmi> · 官网: <https://clashmi.app>
