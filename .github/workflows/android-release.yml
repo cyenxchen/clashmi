@@ -298,22 +298,15 @@ jobs:
           Source: ${GITHUB_REPOSITORY}@${TARGET_SHA}"
 
           if gh release view "${TAG_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
-            echo "Release ${TAG_NAME} exists; uploading ${ASSET_NAME} with clobber"
-            gh release upload "${TAG_NAME}" \
-              "${ASSET_PATH}#Android arm64-v8a APK" \
-              "${SHA256_PATH}#${SHA256_NAME}" \
-              --repo "${GITHUB_REPOSITORY}" \
-              --clobber
+            echo "Release ${TAG_NAME} exists; updating metadata"
             gh release edit "${TAG_NAME}" \
               --repo "${GITHUB_REPOSITORY}" \
               --notes "${notes}" \
               $([[ "${PRERELEASE}" == "true" ]] && echo "--prerelease" || echo "--latest")
           else
-            echo "Creating release ${TAG_NAME} with ${ASSET_NAME}"
+            echo "Creating release ${TAG_NAME}"
             release_args=(
               "${TAG_NAME}"
-              "${ASSET_PATH}#Android arm64-v8a APK"
-              "${SHA256_PATH}#${SHA256_NAME}"
               --repo "${GITHUB_REPOSITORY}"
               --target "${TARGET_SHA}"
               --title "${TAG_NAME}"
@@ -326,6 +319,13 @@ jobs:
             fi
             gh release create "${release_args[@]}"
           fi
+
+          echo "Uploading ${ASSET_NAME} and ${SHA256_NAME}"
+          gh release upload "${TAG_NAME}" \
+            "${ASSET_PATH}" \
+            "${SHA256_PATH}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --clobber
 
       - name: Skip scheduled release
         if: steps.upstream.outputs.skip_release == 'true'
