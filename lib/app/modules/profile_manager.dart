@@ -18,7 +18,7 @@ import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/profile_decrypt_utils.dart';
 import 'package:intl/intl.dart';
 
-import 'package:libclash_vpn_service/state.dart';
+import 'package:clashmi_vpn_service/state.dart';
 import 'package:path/path.dart' as path;
 import 'package:tuple/tuple.dart';
 

@@ -20,10 +20,9 @@ import 'package:clashmi/app/utils/network_utils.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
-import 'package:libclash_vpn_service/proxy_manager.dart';
-import 'package:libclash_vpn_service/state.dart';
-import 'package:libclash_vpn_service/vpn_service.dart';
-import 'package:libclash_vpn_service/vpn_service_platform_interface.dart';
+import 'package:clashmi_vpn_service/proxy_manager.dart';
+import 'package:clashmi_vpn_service/state.dart';
+import 'package:clashmi_vpn_service/vpn_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as path;
 
@@ -213,6 +212,7 @@ class VPNService {
         !overwriteFinal;
     config.wake_lock = appSetting.wakeLock;
     config.auto_connect_at_boot = appSetting.autoConnectAtBoot;
+    config.enable_ipv6 = setting.IPv6 == true;
     var bundleIdentifier = AppUtils.getBundleId(_systemExtension);
     var uiServerAddress = name;
     var uiLocalizedDescription = vpnName;
@@ -222,7 +222,7 @@ class VPNService {
         uiLocalizedDescription = "$uiLocalizedDescription (system)";
       }
     }
-    FlutterVpnService.prepareConfig(
+    await FlutterVpnService.prepareConfig(
       config: config,
       tunnelServicePath: PathUtils.serviceExePath(),
       configFilePath: configFilePath,
@@ -232,6 +232,9 @@ class VPNService {
       uiServerAddress: uiServerAddress,
       uiLocalizedDescription: uiLocalizedDescription,
       excludePorts: excludePorts,
+    );
+    Log.i(
+      "VPNService.prepareConfig ok core=${config.core_path} finalPatch=${config.core_path_patch_final}",
     );
     File confFile = File(configFilePath);
     bool reinstall = false;

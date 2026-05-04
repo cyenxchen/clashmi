@@ -5,7 +5,8 @@ import "dart:io";
 import "package:clashmi/app/utils/app_utils.dart";
 import "package:clashmi/app/utils/file_utils.dart";
 import "package:path/path.dart" as path;
-import "package:libclash_vpn_service/vpn_service.dart";
+import "package:path_provider/path_provider.dart";
+import "package:clashmi_vpn_service/vpn_service.dart";
 
 class PathUtils {
   static String _appAssetsDir = "";
@@ -61,7 +62,15 @@ class PathUtils {
 
       return sharedDirectory.path;
     }
-    return "";
+    try {
+      final supportDirectory = await getApplicationSupportDirectory();
+      if (!await supportDirectory.exists()) {
+        await supportDirectory.create(recursive: true);
+      }
+      return supportDirectory.path;
+    } catch (err, stacktrace) {
+      return "";
+    }
   }
 
   static Future<String> profileDir() async {

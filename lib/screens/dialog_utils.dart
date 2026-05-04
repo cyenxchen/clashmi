@@ -8,7 +8,7 @@ import 'package:clashmi/screens/theme_config.dart';
 import 'package:clashmi/screens/widgets/dropdown.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:libclash_vpn_service/vpn_service.dart';
+import 'package:clashmi_vpn_service/vpn_service.dart';
 import 'package:tuple/tuple.dart';
 
 //flutter showdialog setstate https://stackoverflow.com/questions/58977815/flutter-setstate-on-showdialog

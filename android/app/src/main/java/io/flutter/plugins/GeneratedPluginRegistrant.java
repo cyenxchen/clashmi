@@ -31,6 +31,11 @@ public final class GeneratedPluginRegistrant {
       Log.e(TAG, "Error registering plugin app_settings, com.spencerccf.app_settings.AppSettingsPlugin", e);
     }
     try {
+      flutterEngine.getPlugins().add(new com.cyenx.clashmi.clashmi_vpn_service.ClashmiVpnServicePlugin());
+    } catch (Exception e) {
+      Log.e(TAG, "Error registering plugin clashmi_vpn_service, com.cyenx.clashmi.clashmi_vpn_service.ClashmiVpnServicePlugin", e);
+    }
+    try {
       flutterEngine.getPlugins().add(new dev.fluttercommunity.plus.device_info.DeviceInfoPlusPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin device_info_plus, dev.fluttercommunity.plus.device_info.DeviceInfoPlusPlugin", e);
@@ -69,11 +74,6 @@ public final class GeneratedPluginRegistrant {
       flutterEngine.getPlugins().add(new io.flutter.plugins.imagepicker.ImagePickerPlugin());
     } catch (Exception e) {
       Log.e(TAG, "Error registering plugin image_picker_android, io.flutter.plugins.imagepicker.ImagePickerPlugin", e);
-    }
-    try {
-      flutterEngine.getPlugins().add(new io.nebula.vpn_service.VpnServicePlugin());
-    } catch (Exception e) {
-      Log.e(TAG, "Error registering plugin libclash_vpn_service, io.nebula.vpn_service.VpnServicePlugin", e);
     }
     try {
       flutterEngine.getPlugins().add(new com.sayegh.move_to_background.MoveToBackgroundPlugin());

@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:tuple/tuple.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:libclash_vpn_service/vpn_service.dart';
+import 'package:clashmi_vpn_service/vpn_service.dart';
 
 import 'theme_define.dart';
 

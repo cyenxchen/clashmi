@@ -37,8 +37,7 @@ class SecureStorageUtils {
   }
 
   static FlutterSecureStorage _initStorage() {
-    AndroidOptions getAndroidOptions() =>
-        const AndroidOptions(encryptedSharedPreferences: false);
+    AndroidOptions getAndroidOptions() => const AndroidOptions();
     return FlutterSecureStorage(aOptions: getAndroidOptions());
   }
 }

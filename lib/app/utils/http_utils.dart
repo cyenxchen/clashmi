@@ -17,8 +17,6 @@ import 'package:http/http.dart' as http;
 typedef DecodeCallback = String Function(String);
 
 abstract final class HttpUtils {
-  static const String _proxy = "PROXY 127.0.0.1:8888";
-
   static Future<String> getUserAgent() async {
     String version = AppUtils.getBuildinVersion();
     final coreVersion = AppUtils.getCoreVersion();

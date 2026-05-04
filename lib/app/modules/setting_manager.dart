@@ -13,7 +13,7 @@ import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/theme_define.dart';
 import 'package:clashmi/screens/widgets/text_field.dart';
 
-import 'package:libclash_vpn_service/proxy_manager.dart';
+import 'package:clashmi_vpn_service/proxy_manager.dart';
 
 class SettingConfigItemUI {
   String theme = ThemeDefine.kThemeLight;

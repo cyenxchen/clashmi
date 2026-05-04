@@ -68,9 +68,12 @@
 
 - IOS >= 15
 - MacOS >= 12 (Intel, Apple Silicon)
-- Android >= 8  (arm64-v8a, armeabi-v7a)
+- Android >= 8  (arm64-v8a)
 - Windows >= 10 （amd64）
 - Linux （amd64）
+
+> 当前开源 VPN bridge MVP 只实现 Android arm64-v8a；iOS/macOS/Windows/Linux
+> 需要后续补齐对应原生实现后再恢复完整内核运行能力。
 
 ### 常见问题
 
@@ -105,4 +108,3 @@
 - [Karing](https://karing.app): https://karing.app
 - [Clash Mi](https://clashmi.app/): https://clashmi.app/
 - [sing-poet](https://github.com/KaringX/sing-poet)
-

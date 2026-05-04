@@ -35,7 +35,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tray_manager/tray_manager.dart';
-import 'package:libclash_vpn_service/vpn_service.dart';
+import 'package:clashmi_vpn_service/vpn_service.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:windows_single_instance/windows_single_instance.dart';
 
@@ -518,8 +518,12 @@ class MyAppState extends State<MyApp>
     ];
 
     await trayManager.setContextMenu(Menu(items: items));
-    if (!Platform.isLinux) {
+    if (Platform.isWindows) {
+      // tray_manager has no replacement for the Windows-only foreground behavior yet.
+      // ignore: deprecated_member_use
       await trayManager.popUpContextMenu(bringAppToFront: true);
+    } else if (!Platform.isLinux) {
+      await trayManager.popUpContextMenu();
     }
   }
 

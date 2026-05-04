@@ -39,12 +39,16 @@ android {
         targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        ndk {
+            abiFilters.clear()
+            abiFilters += listOf("arm64-v8a")
+        }
     }
 
     buildTypes {
         val keystore = rootProject.file("./key.properties")
         val prop = Properties().apply { keystore.inputStream().use(this::load) }
-        named("debug") { ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86") } }
+        named("debug") {}
         named("profile") {
             signingConfig =
                     signingConfigs.create("profile") {
@@ -53,7 +57,6 @@ android {
                         keyAlias = prop.getProperty("keyAlias.release")
                         keyPassword = prop.getProperty("keyPassword.release")
                     }
-            ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64", "x86") }
         }
         named("release") {
             signingConfig =
@@ -63,19 +66,17 @@ android {
                         keyAlias = prop.getProperty("keyAlias.release")
                         keyPassword = prop.getProperty("keyPassword.release")
                     }
-            ndk {
-                abiFilters.clear()
-                abiFilters += listOf("armeabi-v7a", "arm64-v8a")
-                // debugSymbolLevel = 'FULL'
-            }
         }
     }
     splits {
         abi {
-            isEnable = true
-            isUniversalApk = true
-            reset()
-            include("armeabi-v7a", "arm64-v8a")
+            isEnable = false
+            isUniversalApk = false
+        }
+    }
+    packaging {
+        jniLibs {
+            excludes += setOf("lib/armeabi-v7a/**", "lib/x86/**", "lib/x86_64/**")
         }
     }
 }
