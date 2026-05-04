@@ -320,12 +320,34 @@ jobs:
             gh release create "${release_args[@]}"
           fi
 
-          echo "Uploading ${ASSET_NAME} and ${SHA256_NAME}"
-          gh release upload "${TAG_NAME}" \
-            "${ASSET_PATH}" \
-            "${SHA256_PATH}" \
-            --repo "${GITHUB_REPOSITORY}" \
-            --clobber
+          asset_exists() {
+            local asset_name="$1"
+            gh release view "${TAG_NAME}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --json assets \
+              --jq '.assets[].name' \
+              | grep -Fxq "${asset_name}"
+          }
+
+          upload_asset() {
+            local file_path="$1"
+            local asset_name="$2"
+            echo "Uploading ${asset_name}"
+            if gh release upload "${TAG_NAME}" \
+              "${file_path}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --clobber; then
+              return 0
+            fi
+            if asset_exists "${asset_name}"; then
+              echo "Upload reported a failure, but ${asset_name} exists on ${TAG_NAME}; continuing."
+              return 0
+            fi
+            return 1
+          }
+
+          upload_asset "${ASSET_PATH}" "${ASSET_NAME}"
+          upload_asset "${SHA256_PATH}" "${SHA256_NAME}"
 
       - name: Skip scheduled release
         if: steps.upstream.outputs.skip_release == 'true'
