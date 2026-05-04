@@ -252,33 +252,50 @@ class AutoUpdateManager {
       }
       Uri? uri = Uri.tryParse(_versionCheck.url);
       if (uri == null) {
+        Log.w(
+          "AutoUpdateManager.download invalid update url=${_versionCheck.url}",
+        );
         return;
       }
       if (_downloading) {
         return;
       }
       _downloading = true;
-      final result = await DownloadUtils.download(uri, downloadPath);
-      if (result.error != null) {
-        if (result.error!.message.contains("404")) {
-          _versionCheck.newVersion = false;
-          _versionCheck.version = "";
-          _versionCheck.url = "";
-          _versionCheck.sha256 = "";
+      Log.i(
+        "AutoUpdateManager.download start version=${_versionCheck.version} url=${_versionCheck.url} path=$downloadPath",
+      );
+      try {
+        final result = await DownloadUtils.download(uri, downloadPath);
+        if (result.error != null) {
+          Log.w(
+            "AutoUpdateManager.download failed version=${_versionCheck.version} error=${result.error!.message}",
+          );
+          if (result.error!.message.contains("404")) {
+            _versionCheck.newVersion = false;
+            _versionCheck.version = "";
+            _versionCheck.url = "";
+            _versionCheck.sha256 = "";
 
-          save();
+            save();
+          }
+        } else {
+          Log.i(
+            "AutoUpdateManager.download finished version=${_versionCheck.version} path=$downloadPath",
+          );
         }
-      }
-      if (_versionCheck.sha256.isNotEmpty) {
-        final hash = await CryptoUtils.getFileSha256(downloadPath);
-        if (hash != null) {
-          if (_versionCheck.sha256 != hash) {
+        if (_versionCheck.sha256.isNotEmpty) {
+          final hash = await CryptoUtils.getFileSha256(downloadPath);
+          if (hash != null && _versionCheck.sha256 != hash) {
+            Log.w(
+              "AutoUpdateManager.download sha256 mismatch version=${_versionCheck.version} expected=${_versionCheck.sha256} actual=$hash",
+            );
             await FileUtils.deletePath(downloadPath);
           }
         }
+        await _sanitizeMacOSInstaller(downloadPath);
+      } finally {
+        _downloading = false;
       }
-      await _sanitizeMacOSInstaller(downloadPath);
-      _downloading = false;
       Future.delayed(const Duration(milliseconds: 300), () async {
         for (var callback in onEventCheck) {
           callback();

@@ -256,7 +256,9 @@ jobs:
             --release \
             --target-platform android-arm64 \
             --build-name "${{ steps.version.outputs.build_name }}" \
-            --build-number "${{ steps.version.outputs.build_number }}"
+            --build-number "${{ steps.version.outputs.build_number }}" \
+            --dart-define "APP_VERSION_NAME=${{ steps.version.outputs.build_name }}" \
+            --dart-define "APP_VERSION_CODE=${{ steps.version.outputs.build_number }}"
 
       - name: Prepare release asset
         if: steps.upstream.outputs.skip_release != 'true'

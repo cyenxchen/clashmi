@@ -16,6 +16,7 @@ import 'package:clashmi/app/modules/zashboard.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/backup_and_sync_utils.dart';
 import 'package:clashmi/app/utils/file_utils.dart';
+import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/network_utils.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
@@ -58,8 +59,8 @@ class GroupHelper {
     if (!versionCheck.newVersion) {
       return;
     }
-    var remoteConfig = RemoteConfigManager.getConfig();
-    String url = remoteConfig.download.isEmpty
+    final remoteConfig = RemoteConfigManager.getConfig();
+    final url = versionCheck.url.isNotEmpty
         ? versionCheck.url
         : remoteConfig.download;
     if (AutoUpdateManager.isSupport()) {
@@ -76,6 +77,9 @@ class GroupHelper {
           ),
         );
       } else {
+        Log.i(
+          "GroupHelper.newVersionUpdate installer cache missing, open url=$url version=${versionCheck.version}",
+        );
         await UrlLauncherUtils.loadUrl(
           url,
           mode: LaunchMode.externalApplication,
