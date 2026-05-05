@@ -1,0 +1,22 @@
+{
+  "geosite.zip": {
+    "sha256": "0ee249036bbee7492e27fbe989d36b01ed9e2b55f4d79ec8adb66ae084f762c9",
+    "size": 1769152
+  },
+  "geoip.zip": {
+    "sha256": "975b784fad8bd8c293914092b5a8c186a783dcdd92e14b0dedbe2740515a75e3",
+    "size": 3852301
+  },
+  "ASN.mmdb": {
+    "sha256": "e07682cb2e1263c5555834cafd8aeecea3aa749e071a839eacebaab3581fe1b1",
+    "size": 11023745
+  },
+  "GeoSite.dat": {
+    "sha256": "a1d22299ba6bc92a1cd611154c07a4fe7e214d9a629c048530d65dd6ed36f985",
+    "size": 4152328
+  },
+  "GeoIP.dat": {
+    "sha256": "a405080a7cf35e3b024730a072937c0dc971e870da7d6616efba3caa693ca60a",
+    "size": 19306491
+  }
+}

@@ -129,11 +129,16 @@ flutter:
     - assets/txts/
     - assets/fonts/
     - assets/images/
+    - assets/datas/geodata_manifest.json
     - path: assets/datas/geoip.zip
     - path: assets/datas/geosite.zip
       platforms: [windows, linux, macos, android, ios]
     - path: assets/datas/ASN.mmdb
       platforms: [windows, linux, macos, android]
+    - path: assets/datas/GeoSite.dat
+      platforms: [android]
+    - path: assets/datas/GeoIP.dat
+      platforms: [android]
 
   fonts:
     - family: Emoji # from hiddify

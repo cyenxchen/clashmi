@@ -27,6 +27,9 @@
 -keep class io.flutter.plugins.**  { *; }
 -keep class io.nebula.vpn_service.**  { *; }
 -keep class com.nebula.clashmi.**  { *; }
+-keep class com.cyenx.clashmi.clashmi_vpn_service.** { *; }
+-keep class com.cyenx.clashmi.core.** { *; }
+-keep class go.** { *; }
 -dontwarn com.google.android.play.core.splitcompat.SplitCompatApplication
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallException
 -dontwarn com.google.android.play.core.splitinstall.SplitInstallManager

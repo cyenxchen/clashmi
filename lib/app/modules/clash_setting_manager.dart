@@ -14,6 +14,7 @@ import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 
 import 'package:clashmi_vpn_service/proxy_manager.dart';
@@ -21,6 +22,10 @@ import 'package:path/path.dart' as path;
 
 class ClashSettingManager {
   static final List<void Function()> onEventModeChanged = [];
+  static const _bundledGeoMetadataFileName = ".clashmi_bundled_geodata.json";
+  static const _bundledGeoManifestAssetPath =
+      "assets/datas/geodata_manifest.json";
+  static const _externalGeoMetadataPrefix = "external:";
   static const iNet4Address = "172.19.0.1/30";
   static const iNet6Address = "fdfe:dcbe:9876::1/126";
   static const dnsHijack = "0.0.0.0:53";
@@ -36,29 +41,235 @@ class ClashSettingManager {
 
   static Future<void> initGeo() async {
     final homePath = await PathUtils.profileDir();
-    final fileNameList = Platform.isIOS
-        ? ["geosite.zip", "geoip.zip"]
-        : ["geosite.zip", "geoip.zip", "ASN.mmdb"];
+    final fileNameList = [
+      "geosite.zip",
+      "geoip.zip",
+      if (!Platform.isIOS) "ASN.mmdb",
+      if (Platform.isAndroid) ...["GeoSite.dat", "GeoIP.dat"],
+    ];
 
     try {
+      final bundledGeoManifest = await _loadBundledGeoManifest();
+      final bundledGeoMetadata = await _loadBundledGeoMetadata(homePath);
+      var metadataChanged = false;
       for (final fileName in fileNameList) {
         final filePath = File(path.join(homePath, fileName));
-        final isExists = await filePath.exists();
-        if (isExists) {
+        final bundledAsset =
+            bundledGeoManifest[fileName] ??
+            await _loadBundledGeoAssetWithHash(fileName);
+        final bundledHash = bundledAsset.sha256;
+        final metadataValue = bundledGeoMetadata[fileName];
+        final previousBundledHash = _metadataBundledHash(metadataValue);
+        final exists = await filePath.exists();
+        var shouldCopy = !exists;
+        var reason = "missing";
+        int? localAgeDays;
+
+        if (exists && _metadataMatchesBundled(metadataValue, bundledHash)) {
+          Log.i(
+            "ClashSettingManager.initGeo skipped current local $fileName "
+            "reason=metadata-current path=$filePath size=${bundledAsset.size} "
+            "hash=${_shortHash(bundledHash)} metadata=${_metadataLabel(metadataValue)}",
+          );
+          continue;
+        }
+
+        if (exists &&
+            _isAndroidDat(fileName) &&
+            _isExternalGeoMetadata(metadataValue)) {
+          final nextMetadataValue = _externalGeoMetadataValue(bundledHash);
+          if (metadataValue != nextMetadataValue) {
+            bundledGeoMetadata[fileName] = nextMetadataValue;
+            metadataChanged = true;
+          }
+          Log.i(
+            "ClashSettingManager.initGeo preserved external DAT $fileName "
+            "reason=metadata-external path=$filePath bundled=${_shortHash(bundledHash)} "
+            "previous=${_shortHash(previousBundledHash)}",
+          );
+          continue;
+        }
+
+        if (exists) {
           final stat = await filePath.stat();
-          final dur = DateTime.now().difference(stat.modified);
-          if (dur.inDays < 7) {
+          localAgeDays = DateTime.now().difference(stat.modified).inDays;
+          final localHash = sha256
+              .convert(await filePath.readAsBytes())
+              .toString();
+          if (localHash == bundledHash) {
+            reason = "already current";
+          } else if (previousBundledHash != null &&
+              localHash == previousBundledHash) {
+            shouldCopy = true;
+            reason = "bundled asset updated";
+          } else if (previousBundledHash == null && _isAndroidDat(fileName)) {
+            reason = "metadata migration preserved existing DAT";
+          } else if (previousBundledHash == null && localAgeDays >= 7) {
+            shouldCopy = true;
+            reason = "metadata migration refresh after ${localAgeDays}d";
+          } else {
+            reason = previousBundledHash == null
+                ? "metadata migration kept recent local file"
+                : "local file changed outside bundled asset";
+          }
+
+          if (!shouldCopy && localHash != bundledHash) {
+            if (_isAndroidDat(fileName)) {
+              final nextMetadataValue = _externalGeoMetadataValue(bundledHash);
+              if (bundledGeoMetadata[fileName] != nextMetadataValue) {
+                bundledGeoMetadata[fileName] = nextMetadataValue;
+                metadataChanged = true;
+              }
+            }
+            // Unknown local geodata may come from an online update, so do not
+            // stamp it as bundled until the local copy is known bundled.
+            Log.i(
+              "ClashSettingManager.initGeo kept local $fileName reason=$reason "
+              "local=${_shortHash(localHash)} bundled=${_shortHash(bundledHash)} "
+              "previous=${_shortHash(previousBundledHash)} ageDays=$localAgeDays "
+              "metadata=${_isAndroidDat(fileName) ? "external" : "unchanged"}",
+            );
             continue;
           }
         }
 
-        final data = await rootBundle.load('assets/datas/$fileName');
-        List<int> bytes = data.buffer.asUint8List();
-        await filePath.writeAsBytes(bytes, flush: true);
+        if (shouldCopy) {
+          final bytes = await _loadBundledGeoAssetBytes(fileName);
+          await filePath.writeAsBytes(bytes, flush: true);
+        }
+        if (bundledGeoMetadata[fileName] != bundledHash) {
+          bundledGeoMetadata[fileName] = bundledHash;
+          metadataChanged = true;
+        }
+        Log.i(
+          "ClashSettingManager.initGeo ${shouldCopy ? "refreshed" : "verified"} bundled $fileName "
+          "reason=$reason path=$filePath size=${bundledAsset.size} hash=${_shortHash(bundledHash)}",
+        );
+      }
+      if (metadataChanged) {
+        await _saveBundledGeoMetadata(homePath, bundledGeoMetadata);
       }
     } catch (err) {
       Log.w("ClashSettingManager.initGeo exception ${err.toString()} ");
     }
+  }
+
+  static Future<Map<String, _BundledGeoAsset>> _loadBundledGeoManifest() async {
+    final raw = jsonDecode(
+      await rootBundle.loadString(_bundledGeoManifestAssetPath),
+    );
+    if (raw is! Map) {
+      throw const FormatException("bundled geodata manifest must be a map");
+    }
+
+    final manifest = <String, _BundledGeoAsset>{};
+    for (final entry in raw.entries) {
+      final value = entry.value;
+      if (value is! Map) {
+        continue;
+      }
+      final hash = value["sha256"]?.toString();
+      final size = int.tryParse(value["size"]?.toString() ?? "");
+      if (hash == null || hash.isEmpty || size == null) {
+        continue;
+      }
+      manifest[entry.key.toString()] = _BundledGeoAsset(
+        sha256: hash,
+        size: size,
+      );
+    }
+    return manifest;
+  }
+
+  static Future<_BundledGeoAsset> _loadBundledGeoAssetWithHash(
+    String fileName,
+  ) async {
+    Log.w(
+      "ClashSettingManager.initGeo manifest missing $fileName, hashing asset fallback",
+    );
+    final bytes = await _loadBundledGeoAssetBytes(fileName);
+    return _BundledGeoAsset(
+      sha256: sha256.convert(bytes).toString(),
+      size: bytes.length,
+    );
+  }
+
+  static Future<List<int>> _loadBundledGeoAssetBytes(String fileName) async {
+    final data = await rootBundle.load('assets/datas/$fileName');
+    return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+  }
+
+  static Future<Map<String, String>> _loadBundledGeoMetadata(
+    String homePath,
+  ) async {
+    final file = File(path.join(homePath, _bundledGeoMetadataFileName));
+    try {
+      if (!await file.exists()) {
+        return {};
+      }
+      final raw = jsonDecode(await file.readAsString());
+      if (raw is! Map) {
+        return {};
+      }
+      return raw.map(
+        (key, value) => MapEntry(key.toString(), value.toString()),
+      );
+    } catch (err) {
+      Log.w(
+        "ClashSettingManager.initGeo metadata load failed ${err.toString()}",
+      );
+      return {};
+    }
+  }
+
+  static Future<void> _saveBundledGeoMetadata(
+    String homePath,
+    Map<String, String> hashes,
+  ) async {
+    final file = File(path.join(homePath, _bundledGeoMetadataFileName));
+    try {
+      await file.writeAsString(jsonEncode(hashes), flush: true);
+      Log.i("ClashSettingManager.initGeo metadata saved $file");
+    } catch (err) {
+      Log.w(
+        "ClashSettingManager.initGeo metadata save failed ${err.toString()}",
+      );
+    }
+  }
+
+  static bool _isAndroidDat(String fileName) {
+    return fileName == "GeoSite.dat" || fileName == "GeoIP.dat";
+  }
+
+  static bool _isExternalGeoMetadata(String? value) {
+    return value?.startsWith(_externalGeoMetadataPrefix) ?? false;
+  }
+
+  static String _externalGeoMetadataValue(String bundledHash) {
+    return "$_externalGeoMetadataPrefix$bundledHash";
+  }
+
+  static String? _metadataBundledHash(String? value) {
+    if (value == null || _isExternalGeoMetadata(value)) {
+      return null;
+    }
+    return value;
+  }
+
+  static bool _metadataMatchesBundled(String? value, String bundledHash) {
+    return value == bundledHash ||
+        value == _externalGeoMetadataValue(bundledHash);
+  }
+
+  static String _metadataLabel(String? value) {
+    return _isExternalGeoMetadata(value) ? "external" : "bundled";
+  }
+
+  static String _shortHash(String? hash) {
+    if (hash == null || hash.isEmpty) {
+      return "-";
+    }
+    return hash.length <= 12 ? hash : hash.substring(0, 12);
   }
 
   static Future<void> reload() async {
@@ -568,4 +779,11 @@ class ClashSettingManager {
   static int getMixedPort() {
     return _setting.MixedPort ?? 7890;
   }
+}
+
+class _BundledGeoAsset {
+  const _BundledGeoAsset({required this.sha256, required this.size});
+
+  final String sha256;
+  final int size;
 }
