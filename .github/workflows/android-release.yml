@@ -349,6 +349,40 @@ jobs:
           upload_asset "${ASSET_PATH}" "${ASSET_NAME}"
           upload_asset "${SHA256_PATH}" "${SHA256_NAME}"
 
+      - name: Keep only the latest three releases
+        if: steps.upstream.outputs.skip_release != 'true'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KEEP_RELEASES: "3"
+        run: |
+          set -euo pipefail
+
+          releases_json="$(gh release list \
+            --repo "${GITHUB_REPOSITORY}" \
+            --limit 1000 \
+            --json tagName,createdAt \
+            --jq 'sort_by(.createdAt, .tagName) | reverse')"
+
+          release_count="$(jq 'length' <<< "${releases_json}")"
+          echo "Found ${release_count} GitHub releases; keeping the latest ${KEEP_RELEASES}."
+          if (( release_count <= KEEP_RELEASES )); then
+            echo "No old releases to delete."
+            exit 0
+          fi
+
+          echo "Keeping releases:"
+          jq -r ".[0:${KEEP_RELEASES}][] | \"- \" + .tagName + \" (\" + .createdAt + \")\"" <<< "${releases_json}"
+
+          mapfile -t old_tags < <(jq -r ".[${KEEP_RELEASES}:][].tagName" <<< "${releases_json}")
+          for tag in "${old_tags[@]}"; do
+            echo "Deleting old release and tag: ${tag}"
+            gh release delete "${tag}" \
+              --repo "${GITHUB_REPOSITORY}" \
+              --cleanup-tag \
+              --yes
+          done
+
       - name: Skip scheduled release
         if: steps.upstream.outputs.skip_release == 'true'
         run: echo "No upstream changes found; scheduled release skipped."
