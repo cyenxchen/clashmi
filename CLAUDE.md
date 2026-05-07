@@ -26,6 +26,18 @@ Requires Java 17 for Android builds. Android build pins NDK `28.2.13676358` and 
 - **State management**: Provider
 - **VPN service**: Native integration via `clashmi_vpn_service` (local sibling dependency at `../clashmi-vpn-service/`)
 - **Mihomo core**: Android MVP uses the Go/gomobile core artifacts in `../clashmi-vpn-service/android/`, built from `cyenxchen/mihomo`
+
+### 本地依赖链(同一父目录中并存)
+
+```
+clashmi (本仓库, Flutter app)
+  └─ pubspec.yaml: path: ../clashmi-vpn-service/   ← 路径依赖
+       clashmi-vpn-service (Flutter plugin)
+         └─ core/mihomo  ← git submodule,指向 cyenxchen/mihomo (Meta 分支)
+              ⇕ 与同级 ../mihomo 工作副本同源(同一 cyenxchen/mihomo fork)
+```
+
+调试或排查内核/桥接层问题时,通常需要同时打开 `../clashmi-vpn-service` 与 `../mihomo` 两个仓库;`../mihomo` 改动需先推到 `cyenxchen/mihomo` Meta 分支,再在 `clashmi-vpn-service` 中 `git submodule update --remote` 同步,最后才会反映到本 app。
 - **UI screens**: `lib/screens/` — flat layout (screens are top-level `.dart` files) plus `extension/` and `widgets/` subfolders
 - **i18n**: 9 locales via slang in `lib/i18n/` (ar, en, es, fa, ja, ko, ru, zh-CN, zh-TW)
 
