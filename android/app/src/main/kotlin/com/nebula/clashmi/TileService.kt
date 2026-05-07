@@ -9,19 +9,22 @@ import android.content.IntentFilter
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import android.util.Log
 import androidx.annotation.RequiresApi
 import java.io.File
 
 @RequiresApi(24)
 class TileService : TileService() {
     companion object {
-        const val profile_file_name = "vpn_profile.txt"
-        const val service_file_name = "service.json"
-        const val service_class_name = "io.nebula.vpn_service.ClashVpnServiceImpl"
-        const val ACTION_START = "vpn.service.START"
-        const val ACTION_STOP = "vpn.service.STOP"
-        const val ACTION_STOPED = "vpn.service.STOPED"
-        const val ACTION_START_RESULT = "vpn.service.START_RESULT"
+        private const val TAG = "ClashMiTileService"
+        private const val SERVICE_FILE_NAME = "service.json"
+        private const val SERVICE_CLASS_NAME =
+                "com.cyenx.clashmi.clashmi_vpn_service.ClashMiVpnService"
+        private const val ACTION_START = "com.cyenx.clashmi.clashmi_vpn_service.START"
+        private const val ACTION_STOP = "com.cyenx.clashmi.clashmi_vpn_service.STOP"
+        private const val ACTION_STATE_CHANGED =
+                "com.cyenx.clashmi.clashmi_vpn_service.STATE_CHANGED"
+        private const val EXTRA_STATE = "state"
     }
 
     private var receiverRegistered = false
@@ -32,12 +35,16 @@ class TileService : TileService() {
                         intent: Intent,
                 ) {
                     when (intent.action) {
-                        ACTION_START_RESULT -> {
-                            val err = intent.getStringExtra("err")
-                            updateTile(err == "")
-                        }
-                        ACTION_STOPED -> {
-                            updateTile(false)
+                        ACTION_STATE_CHANGED -> {
+                            val state = intent.getStringExtra(EXTRA_STATE)
+                            writeLog("stateChanged state=$state")
+                            when (state) {
+                                "connecting",
+                                "connected" -> updateTile(true)
+                                "disconnecting",
+                                "disconnected" -> updateTile(false)
+                                else -> update()
+                            }
                         }
                     }
                 }
@@ -46,11 +53,10 @@ class TileService : TileService() {
     override fun onCreate() {
         if (!receiverRegistered) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                var intentFilter = IntentFilter()
-                intentFilter.addAction(ACTION_STOPED)
-                intentFilter.addAction(ACTION_START_RESULT)
+                val intentFilter = IntentFilter()
+                intentFilter.addAction(ACTION_STATE_CHANGED)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED)
+                    registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
                 } else {
                     registerReceiver(receiver, intentFilter)
                 }
@@ -71,20 +77,21 @@ class TileService : TileService() {
     override fun onClick() {
         if (isRuning()) {
             var intent = Intent().apply { action = ACTION_STOP }
-            intent.setClassName(getPackageName(), service_class_name)
-            intent.putExtra("exitProcess", true)
+            intent.setClassName(getPackageName(), SERVICE_CLASS_NAME)
+            writeLog("onClick stop service")
             startService(intent)
-            // stopService(intent)
             updateTile(false)
             return
         }
 
         try {
+            writeLog("onClick start service")
             updateTile(true)
             startByService()
         } catch (e: Exception) {
             var stackTrace = e.getStackTrace().joinToString(separator = "\n")
-            writeLog("TileService onClick: exception: $e \n$stackTrace")
+            writeLog("onClick exception: $e \n$stackTrace")
+            update()
         }
     }
 
@@ -107,7 +114,7 @@ class TileService : TileService() {
     }
 
     private fun isValid(): Boolean {
-        return profileFile().exists() && serviceFile().exists()
+        return serviceFile().exists()
     }
 
     private fun update() {
@@ -116,6 +123,7 @@ class TileService : TileService() {
             return
         }
         val valid = if (isValid()) false else null
+        writeLog("update running=false valid=${valid != null}")
         updateTile(valid)
     }
 
@@ -127,13 +135,14 @@ class TileService : TileService() {
                         false -> Tile.STATE_INACTIVE
                         else -> Tile.STATE_UNAVAILABLE
                     }
+            writeLog("updateTile state=$state")
             updateTile()
         }
     }
 
     private fun startByService() {
         var intent = Intent().apply { action = ACTION_START }
-        intent.setClassName(getPackageName(), service_class_name)
+        intent.setClassName(getPackageName(), SERVICE_CLASS_NAME)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(intent)
         } else {
@@ -165,7 +174,7 @@ class TileService : TileService() {
 
     private fun isMainRuning(): Boolean = isServiceRuning(MainActivity::class.java.name)
 
-    private fun isRuning(): Boolean = isServiceRuning(service_class_name)
+    private fun isRuning(): Boolean = isServiceRuning(SERVICE_CLASS_NAME)
 
     private fun isServiceRuning(serviceName: String): Boolean {
         try {
@@ -181,7 +190,7 @@ class TileService : TileService() {
             }
         } catch (e: Exception) {
             var stackTrace = e.getStackTrace().joinToString(separator = "\n")
-            writeLog("TileService isServiceRuning: exception: $e \n$stackTrace")
+            writeLog("isServiceRuning exception: $e \n$stackTrace")
         }
 
         return false
@@ -201,15 +210,10 @@ class TileService : TileService() {
 
     private fun serviceFile(): File {
         val context = this as Context
-        return File(context.getFilesDir(), service_file_name)
-    }
-
-    private fun profileFile(): File {
-        val context = this as Context
-        return File(context.getFilesDir(), profile_file_name)
+        return File(context.getFilesDir(), SERVICE_FILE_NAME)
     }
 
     private fun writeLog(message: String) {
-        print("TileService writeLog: $message\n")
+        Log.i(TAG, message)
     }
 }

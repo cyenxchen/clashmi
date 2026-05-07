@@ -213,6 +213,9 @@ class VPNService {
     config.wake_lock = appSetting.wakeLock;
     config.auto_connect_at_boot = appSetting.autoConnectAtBoot;
     config.enable_ipv6 = setting.IPv6 == true;
+    Log.i(
+      "VPNService.prepareConfig ipv6=${setting.IPv6} enable_ipv6=${config.enable_ipv6}",
+    );
     var bundleIdentifier = AppUtils.getBundleId(_systemExtension);
     var uiServerAddress = name;
     var uiLocalizedDescription = vpnName;
