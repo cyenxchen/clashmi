@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ffi' as ffi;
 
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
@@ -789,9 +790,20 @@ class ProfilePatchManager {
         return corePath;
       }
 
-      String value = res.rawResult is String
-          ? res.rawResult
-          : YamlWriter(allowUnquotedStrings: true).write(res.rawResult);
+      String value = "";
+      if (res.rawResult is String) {
+        value = res.rawResult;
+      } else if (res.rawResult is Map) {
+        value = YamlWriter(allowUnquotedStrings: true).write(res.rawResult);
+      } else if (res.rawResult is ffi.Pointer) {
+        final data = flutterJs.convertValue<Map<String, dynamic>>(res);
+        value = YamlWriter(allowUnquotedStrings: true).write(data);
+      } else {
+        Log.w(
+          "evaluate ${patch.remark} rawResult type unsupport: ${res.rawResult.runtimeType}",
+        );
+        return corePath;
+      }
 
       String newCorePath = await PathUtils.serviceCorePatchPath();
       await File(newCorePath).writeAsString(value);

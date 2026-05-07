@@ -1072,7 +1072,7 @@
 				CODE_SIGN_ENTITLEMENTS = clashmiService/clashmiService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 803;
+				CURRENT_PROJECT_VERSION = 900;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = TNPM9PFX3W;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1087,7 +1087,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.0.22;
+				MARKETING_VERSION = 1.0.23;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nebula.clashmi.clashmiService;
@@ -1117,7 +1117,7 @@
 				CODE_SIGN_ENTITLEMENTS = clashmiService/clashmiService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 803;
+				CURRENT_PROJECT_VERSION = 900;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = TNPM9PFX3W;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1132,7 +1132,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.0.22;
+				MARKETING_VERSION = 1.0.23;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nebula.clashmi.clashmiService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1158,7 +1158,7 @@
 				CODE_SIGN_ENTITLEMENTS = clashmiService/clashmiService.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 803;
+				CURRENT_PROJECT_VERSION = 900;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = TNPM9PFX3W;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1173,7 +1173,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
-				MARKETING_VERSION = 1.0.22;
+				MARKETING_VERSION = 1.0.23;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.nebula.clashmi.clashmiService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
