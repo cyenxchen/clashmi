@@ -12,6 +12,7 @@ import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/http_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
+import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:flutter/widgets.dart';
 import 'package:path/path.dart' as path;
@@ -167,13 +168,23 @@ class ProfilePatchManager {
   static final List<void Function(String)> onEventRemove = [];
   static final List<void Function(String, bool)> onEventUpdate = [];
   static final Set<String> updating = {};
+  static Timer? _timerChecker;
   static bool _saving = false;
 
   static Future<void> init() async {
     await load();
+    if (PlatformUtils.isPC()) {
+      _timerChecker = Timer.periodic(const Duration(minutes: 30), (timer) {
+        updateByTicker();
+      });
+    }
   }
 
-  static Future<void> uninit() async {}
+  static Future<void> uninit() async {
+    _timerChecker?.cancel();
+    _timerChecker = null;
+  }
+
   static Future<void> reload() async {
     final dir = await PathUtils.profilePatchsDir();
     List<String> ids = [];

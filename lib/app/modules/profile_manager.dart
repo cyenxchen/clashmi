@@ -15,6 +15,7 @@ import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/http_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
+import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/app/utils/profile_decrypt_utils.dart';
 import 'package:intl/intl.dart';
 
@@ -309,6 +310,7 @@ class ProfileManager {
   static final List<void Function(String)> onEventRemove = [];
   static final List<void Function(String, bool)> onEventUpdate = [];
   static final Set<String> updating = {};
+  static Timer? _timerChecker;
   static bool _saving = false;
 
   static Future<void> init() async {
@@ -331,9 +333,18 @@ class ProfileManager {
     Future.delayed(const Duration(seconds: 30), () async {
       updateByTicker();
     });
+    if (PlatformUtils.isPC()) {
+      _timerChecker = Timer.periodic(const Duration(minutes: 30), (timer) {
+        updateByTicker();
+      });
+    }
   }
 
-  static Future<void> uninit() async {}
+  static Future<void> uninit() async {
+    _timerChecker?.cancel();
+    _timerChecker = null;
+  }
+
   static Future<void> reload() async {
     final dir = await PathUtils.profilesDir();
     List<String> ids = [];
