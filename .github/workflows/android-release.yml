@@ -34,7 +34,6 @@ on:
 
 permissions:
   contents: write
-  issues: write
 
 concurrency:
   group: android-release-${{ github.event_name }}-${{ github.ref }}
@@ -94,10 +93,32 @@ jobs:
           before="$(git rev-parse HEAD)"
           if ! git merge --no-edit upstream/main; then
             git merge --abort || true
-            title="Automatic upstream merge failed"
-            body="The scheduled Clash Mi upstream sync could not merge KaringX/clashmi into ${GITHUB_REPOSITORY}@${GITHUB_REF_NAME:-main}. Please resolve the conflict locally, then push a fixed commit."
-            gh issue create --repo "${GITHUB_REPOSITORY}" --title "${title}" --body "${body}" || true
-            echo "::error::Upstream merge failed; release stopped."
+            upstream_sha="$(git rev-parse upstream/main)"
+            origin_sha="${before}"
+            run_url="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            body=$(printf '%s\n' \
+              '**Automatic upstream merge failed**' \
+              '' \
+              "The scheduled Clash Mi upstream sync could not merge \`KaringX/clashmi@main\` (\`${upstream_sha}\`) into \`${GITHUB_REPOSITORY}@${GITHUB_REF_NAME:-main}\` (\`${origin_sha}\`)." \
+              '' \
+              'Resolve locally:' \
+              '```' \
+              'git fetch https://github.com/KaringX/clashmi.git main' \
+              'git merge FETCH_HEAD' \
+              '# resolve conflicts, then push to your fork main' \
+              '```' \
+              '' \
+              "Workflow run: ${run_url}")
+            # Commit comment notifies repo watchers; works even when Issues are disabled.
+            gh api "repos/${GITHUB_REPOSITORY}/commits/${origin_sha}/comments" \
+              -f body="${body}" >/dev/null 2>&1 \
+              || echo "::warning::Failed to post commit comment for merge-conflict notification"
+            {
+              echo "## :rotating_light: Upstream merge failed"
+              echo ""
+              echo "${body}"
+            } >> "${GITHUB_STEP_SUMMARY}"
+            echo "::error::Upstream merge failed; release stopped. See job summary and commit comment on ${origin_sha} for details."
             exit 1
           fi
 
