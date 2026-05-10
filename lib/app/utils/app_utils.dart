@@ -32,7 +32,7 @@ abstract final class AppUtils {
     if (versionName.isNotEmpty && versionCode.isNotEmpty) {
       return "$versionName.$versionCode";
     }
-    return "1.0.23.904";
+    return "1.0.23.905";
   }
 
   static String getId() {

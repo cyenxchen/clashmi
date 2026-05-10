@@ -4,6 +4,7 @@ import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/private/app_url_utils_private.dart';
 import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/did.dart';
+import 'package:clashmi/app/utils/install_date_utils.dart';
 import 'package:clashmi/app/utils/install_referrer_utils.dart';
 
 abstract final class AppUrlUtils {
@@ -25,7 +26,7 @@ abstract final class AppUrlUtils {
     String did = await Did.getDid();
     bool firstTime = await Did.getFirstTime();
     String installRefer = await InstallReferrerUtils.getString();
-
+    int installDate = await InstallDateUtils.getTS();
     installRefer = installRefer.replaceAll(" ", "").toLowerCase();
     String src =
         (WidgetsBinding.instance.platformDispatcher.locale.countryCode ?? "")
@@ -42,6 +43,7 @@ abstract final class AppUrlUtils {
       "new": Uri.encodeComponent(firstTime.toString()),
       "from": Uri.encodeComponent("clashmi"),
       "i_r": Uri.encodeComponent(installRefer),
+      "i_d": Uri.encodeComponent(installDate.toString()),
     };
 
     return AppUrlUtilsPrivate.signQueryParams2(

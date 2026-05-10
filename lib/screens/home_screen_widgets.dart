@@ -1039,14 +1039,27 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
         minVerticalPadding: 22,
         onTap: () async {
           String content = "";
+          final fileErrPath = await PathUtils.serviceStdErrorFilePath();
           final filePath = await PathUtils.serviceLogFilePath();
+          File file = File(fileErrPath);
+          final split = "\n-------------------------------\n";
+          if (await file.exists()) {
+            final errContent = await file.readAsString();
+            if (errContent.isNotEmpty) {
+              content += split;
+              content += errContent;
+            }
+          }
           final item = await FileUtils.readAsStringReverse(
             filePath,
             20 * 1024,
             false,
           );
           if (item != null) {
-            content = item.item1;
+            if (content.isNotEmpty) {
+              content += split;
+            }
+            content += item.item1;
           }
           if (!context.mounted) {
             return;
