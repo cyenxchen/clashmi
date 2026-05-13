@@ -230,6 +230,8 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
                       fit: BoxFit.fill,
                       child: Switch.adaptive(
                         value: _state == FlutterVpnServiceState.connected,
+                        activeThumbColor: Colors.white,
+                        activeTrackColor: ThemeDefine.kColorGreenBright,
                         focusNode: _focusNodeConnect,
                         onChanged: (bool value) async {
                           if (value) {

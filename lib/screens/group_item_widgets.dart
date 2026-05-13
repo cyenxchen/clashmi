@@ -181,7 +181,8 @@ class GroupItemSwitch extends StatelessWidget {
           width: 60,
           child: Switch.adaptive(
             value: options.switchValue ?? false,
-            activeThumbColor: ThemeDefine.kColorGreenBright,
+            activeThumbColor: Colors.white,
+            activeTrackColor: ThemeDefine.kColorGreenBright,
             onChanged: options.onSwitch,
           ),
         ),
