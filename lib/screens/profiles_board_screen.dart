@@ -10,7 +10,6 @@ import 'package:clashmi/screens/add_profile_by_import_from_file_screen.dart';
 import 'package:clashmi/screens/add_profile_by_scan_qrcode_screen.dart';
 import 'package:clashmi/screens/add_profile_by_url_screen.dart';
 import 'package:clashmi/screens/dialog_utils.dart';
-import 'package:clashmi/screens/login_screen.dart';
 import 'package:clashmi/screens/profiles_board_screen_widgets.dart';
 import 'package:clashmi/screens/theme_config.dart';
 import 'package:clashmi/screens/webview_helper.dart';
@@ -199,23 +198,6 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
           );
         },
       ),
-      //todo
-      if (!bool.fromEnvironment("dart.vm.product")) ...[
-        ListTile(
-          leading: const Icon(Icons.login_outlined),
-          title: Text(tcontext.loginScreen.login),
-          onTap: () async {
-            Navigator.of(context).pop();
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                settings: LoginScreen.routSettings(),
-                builder: (context) => LoginScreen(),
-              ),
-            );
-          },
-        ),
-      ],
       ListTile(
         leading: const Icon(Icons.add_link_outlined),
         title: Text(tcontext.meta.profileAddUrlOrContent),

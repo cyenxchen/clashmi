@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:clashmi/app/clash/clash_config.dart';
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/local_services/vpn_service.dart';
-import 'package:clashmi/app/modules/board_session_persistent_manager.dart';
 import 'package:clashmi/app/modules/diversion_template_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
 import 'package:clashmi/app/modules/profile_patch_manager.dart';
@@ -41,7 +38,6 @@ class _ProfilesSettingsEditScreenState
   final _textControllerRemark = TextEditingController();
   final _textControllerUrl = TextEditingController();
   late ProfileSetting _profile;
-  BoardSession? _currentSession;
   List<ClashProxiesNode> _nodes = [];
 
   @override
@@ -50,9 +46,6 @@ class _ProfilesSettingsEditScreenState
     _profile.userAgent = _profile.userAgent.isEmpty
         ? SettingManager.getConfig().userAgent()
         : _profile.userAgent;
-
-    _currentSession = BoardSessionPersistentManager.instance()
-        .getBySubscribeUrl(_profile.url);
 
     _textControllerRemark.value = _textControllerRemark.value.copyWith(
       text: _profile.remark,
@@ -129,7 +122,6 @@ class _ProfilesSettingsEditScreenState
                           child: Column(
                             children: [
                               TextFieldEx(
-                                enabled: _currentSession == null,
                                 controller: _textControllerRemark,
                                 textInputAction: _profile.isRemote()
                                     ? TextInputAction.next
@@ -145,7 +137,6 @@ class _ProfilesSettingsEditScreenState
                               _profile.isRemote()
                                   ? TextFieldEx(
                                       maxLines: 5,
-                                      enabled: _currentSession == null,
                                       controller: _textControllerUrl,
                                       decoration: InputDecoration(
                                         labelText: tcontext.meta.url,
@@ -519,10 +510,7 @@ class _ProfilesSettingsEditScreenState
       }
       widgets.add(
         ListTile(
-          title: Text(
-            "${i + 1} ${node.name}",
-            style: TextStyle(fontFamily: Platform.isWindows ? 'Emoji' : null),
-          ),
+          title: Text("${i + 1} ${node.name}"),
           subtitle: subtitle.isEmpty
               ? Text(node.type)
               : Row(

@@ -7,7 +7,6 @@ import 'dart:ui';
 import 'package:clashmi/app/clash/clash_config.dart';
 import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/auto_update_manager.dart';
-import 'package:clashmi/app/modules/board_provider_manager.dart';
 import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
 import 'package:clashmi/app/modules/profile_patch_manager.dart';
@@ -16,7 +15,6 @@ import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/modules/zashboard.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/backup_and_sync_utils.dart';
-import 'package:clashmi/app/utils/did.dart';
 import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/network_utils.dart';
@@ -44,7 +42,6 @@ import 'package:clashmi/screens/theme_define.dart';
 import 'package:clashmi/screens/themes.dart';
 import 'package:clashmi/screens/version_update_screen.dart';
 import 'package:clashmi/screens/webview_helper.dart';
-import 'package:clashmi/screens/widgets/sheet.dart';
 import 'package:clashmi/screens/widgets/text_field.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -1003,10 +1000,6 @@ class GroupHelper {
                   ClipboardData(text: setting.Secret ?? ""),
                 );
               } catch (e) {}
-            },
-            onLongPress: () async {
-              setting.Secret = Did.newUUID().substring(8, 24);
-              setstate?.call();
             },
           ),
         ),
@@ -2467,72 +2460,6 @@ class GroupHelper {
         settings: GroupScreen.routSettings("geo"),
         builder: (context) =>
             GroupScreen(title: "Geo RuleSet", getOptions: getOptions),
-      ),
-    );
-  }
-
-  static Future<void> showVpnProvider(
-    BuildContext context,
-    BoardProviderConfig provider,
-  ) async {
-    final tcontext = Translations.of(context);
-    var widgets = [
-      ListTile(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [Text(provider.name)],
-        ),
-      ),
-      if (provider.homeUrl.isNotEmpty) ...[
-        ListTile(
-          leading: const Icon(Icons.home_outlined),
-          title: Text(tcontext.meta.homePage),
-          onTap: () async {
-            Navigator.pop(context);
-            UrlLauncherUtils.loadUrl(provider.homeUrl);
-          },
-        ),
-      ],
-      if (provider.clientServiceUrl.isNotEmpty) ...[
-        ListTile(
-          leading: const Icon(Icons.contact_support_outlined),
-          title: Text(tcontext.meta.onlineCustomerService),
-          onTap: () async {
-            Navigator.pop(context);
-            UrlLauncherUtils.loadUrl(provider.clientServiceUrl);
-          },
-        ),
-      ],
-      if (provider.subscriptionChannelUrl.isNotEmpty) ...[
-        ListTile(
-          leading: const Icon(Icons.message_outlined),
-          title: Text(tcontext.meta.subscriptionChannel),
-          onTap: () async {
-            Navigator.pop(context);
-            UrlLauncherUtils.loadUrl(provider.subscriptionChannelUrl);
-          },
-        ),
-      ],
-    ];
-
-    showSheet(
-      context: context,
-      body: SizedBox(
-        height: 400,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-          child: Scrollbar(
-            child: ListView.separated(
-              itemBuilder: (BuildContext context, int index) {
-                return widgets[index];
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return const Divider(height: 1, thickness: 0.3);
-              },
-              itemCount: widgets.length,
-            ),
-          ),
-        ),
       ),
     );
   }

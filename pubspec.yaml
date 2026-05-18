@@ -103,12 +103,6 @@ dependencies:
   clashmi_vpn_service:
     path: ../clashmi-vpn-service/
 
-  board_service:
-    path: ../board-service/
-    #git:
-      #url: https://github.com/KaringX/board-service.git
-      #ref: master
-
 dev_dependencies:
   flutter_launcher_icons: 0.14.4
   flutter_test:

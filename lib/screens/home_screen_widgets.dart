@@ -7,7 +7,6 @@ import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/auto_update_manager.dart';
 import 'package:clashmi/app/modules/biz.dart';
-import 'package:clashmi/app/modules/board_session_persistent_manager.dart';
 import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
@@ -175,13 +174,10 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     bool connected = _state == FlutterVpnServiceState.connected;
     final currentProfile = ProfileManager.getCurrent();
     final currentProfileName = currentProfile?.getShowName() ?? "";
-    BoardSession? currentSession;
     final settings = SettingManager.getConfig();
     String tranffic = "";
     Tuple2<bool, String>? tranfficExpire;
     if (currentProfile != null && currentProfile.isRemote()) {
-      currentSession = BoardSessionPersistentManager.instance()
-          .getBySubscribeUrl(currentProfile.url);
       if (currentProfile.upload != 0 ||
           currentProfile.download != 0 ||
           currentProfile.total != 0) {
@@ -345,63 +341,48 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            if (currentProfile != null) ...[
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  currentProfileName,
-                  style: TextStyle(color: ThemeDefine.kColorBlue, fontSize: 12),
-                ),
-              ),
-            ],
-            if (tranffic.isNotEmpty) ...[
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  tranffic,
-                  style: TextStyle(color: ThemeDefine.kColorBlue, fontSize: 12),
-                ),
-              ),
-            ],
-            if (tranfficExpire != null) ...[
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: Text(
-                  tranfficExpire.item2,
-                  style: TextStyle(
-                    color: tranfficExpire.item1
-                        ? Colors.red
-                        : ThemeDefine.kColorBlue,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ],
+            currentProfile != null
+                ? Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      currentProfileName,
+                      style: TextStyle(color: ThemeDefine.kColorBlue),
+                    ),
+                  )
+                : SizedBox.shrink(),
+            tranffic.isNotEmpty
+                ? Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      tranffic,
+                      style: TextStyle(color: ThemeDefine.kColorBlue),
+                    ),
+                  )
+                : SizedBox.shrink(),
+            tranfficExpire != null
+                ? Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      tranfficExpire.item2,
+                      style: TextStyle(
+                        color: tranfficExpire.item1
+                            ? Colors.red
+                            : ThemeDefine.kColorBlue,
+                        fontSize: 12,
+                      ),
+                    ),
+                  )
+                : SizedBox.shrink(),
           ],
         ),
         trailing: SizedBox(
-          width: 100,
+          width: 70,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (currentSession != null) ...[
-                SizedBox(
-                  width: 40,
-                  height: 40,
-                  child: InkWell(
-                    onTap: () async {
-                      GroupHelper.showVpnProvider(
-                        context,
-                        currentSession!.provider,
-                      );
-                    },
-                    child: Icon(Icons.business, size: 30),
-                  ),
-                ),
-              ],
               SizedBox(
-                width: 40,
-                height: 40,
+                width: 45,
+                height: 45,
                 child: InkWell(
                   onTap: () async {
                     await Navigator.push(
@@ -417,6 +398,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
                   child: Icon(Icons.add, size: 30),
                 ),
               ),
+              SizedBox(width: 5),
               Icon(Icons.keyboard_arrow_right, size: 20),
             ],
           ),
@@ -576,10 +558,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
       child: Text(
         value,
         textAlign: TextAlign.start,
-        style: TextStyle(
-          color: ThemeDefine.kColorBlue,
-          fontFamily: Platform.isWindows ? 'Emoji' : null,
-        ),
+        style: TextStyle(color: ThemeDefine.kColorBlue),
       ),
     );
   }
@@ -939,7 +918,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         port: uri.port,
       );
       String host = Platform.isIOS ? await _getLocalAddress() : "127.0.0.1";
-      String secret = ClashSettingManager.getConfig().Secret!;
+      String secret = await ClashHttpApi.getSecret();
       final url =
           '${shortUrl.toString()}/?hostname=$host&port=${ClashSettingManager.getControlPort()}&secret=$secret&http=true';
 
