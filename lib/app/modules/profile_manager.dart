@@ -389,7 +389,6 @@ class ProfileManager {
   }
 
   static Future<void> load() async {
-    String dir = await PathUtils.profilesDir();
     String filePath = await PathUtils.profilesConfigFilePath();
     var file = File(filePath);
     bool exists = await file.exists();
@@ -408,6 +407,7 @@ class ProfileManager {
     }
 
     Map<String, String?> existProfiles = {};
+    String dir = await PathUtils.profilesDir();
     var files = FileUtils.recursionFile(
       dir,
       extensionFilter: {".yaml", ".yml"},
@@ -576,6 +576,7 @@ class ProfileManager {
     String decryptPassword = "",
     Duration? updateInterval,
     bool updateIntervalPreferByProfile = false,
+    bool popToTopIfNotExist = false,
   }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) {
@@ -587,18 +588,24 @@ class ProfileManager {
       userAgent = SettingManager.getConfig().userAgent();
     }
 
-    final result = await DownloadUtils.downloadWithPort(
-      uri,
-      savePath,
-      userAgent,
-      xhwid,
-      null,
-      timeout: const Duration(seconds: 30),
-    );
+    List<int?> ports = await VPNService.getPortsByPrefer(true);
+    late ReturnResult<HttpHeaders> result;
+    for (var port in ports) {
+      result = await DownloadUtils.downloadWithPort(
+        uri,
+        savePath,
+        userAgent,
+        xhwid,
+        port,
+        timeout: const Duration(seconds: 30),
+      );
+      if (result.error == null) {
+        break;
+      }
+    }
     if (result.error != null) {
       return ReturnResult(error: result.error);
     }
-
     Duration? updateIntervalByProfile;
     if (result.data != null) {
       final err = await decryptProfile(result.data, savePath, decryptPassword);
@@ -656,7 +663,11 @@ class ProfileManager {
 
     profile.updateSubscriptionTraffic(result.data);
     if (index < 0) {
-      _config.profiles.add(profile);
+      if (popToTopIfNotExist) {
+        _config.profiles.insert(0, profile);
+      } else {
+        _config.profiles.add(profile);
+      }
     } else {
       _config.profiles[index] = profile;
     }
@@ -710,15 +721,21 @@ class ProfileManager {
     }
     final savePath = path.join(await PathUtils.profilesDir(), id);
     final savePathTmp = "$savePath.tmp";
-    final result = await DownloadUtils.downloadWithPort(
-      uri,
-      savePathTmp,
-      userAgent,
-      profile.xhwid,
-      null,
-      timeout: const Duration(seconds: 30),
-    );
-
+    List<int?> ports = await VPNService.getPortsByPrefer(true);
+    late ReturnResult<HttpHeaders> result;
+    for (var port in ports) {
+      result = await DownloadUtils.downloadWithPort(
+        uri,
+        savePathTmp,
+        userAgent,
+        profile.xhwid,
+        port,
+        timeout: const Duration(seconds: 30),
+      );
+      if (result.error == null) {
+        break;
+      }
+    }
     profile.update = DateTime.now();
     if (result.error == null) {
       final profileUpdateInterval = result.data!.value(
@@ -818,7 +835,6 @@ class ProfileManager {
       if (updateInterval == null) {
         continue;
       }
-
       if (profile.update == null ||
           now.difference(profile.update!).inSeconds >=
               updateInterval.inSeconds) {

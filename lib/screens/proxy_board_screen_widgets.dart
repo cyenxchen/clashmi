@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:clashmi/app/clash/clash_config.dart';
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
@@ -104,10 +106,20 @@ class _ProxyScreenProxiesNodeWidget
                       },
                     ),
                     SizedBox(width: 5),
-                    Text(node.name),
+                    Text(
+                      node.name,
+                      style: TextStyle(
+                        fontFamily: Platform.isWindows ? 'Emoji' : null,
+                      ),
+                    ),
                   ],
                 )
-              : Text(node.name),
+              : Text(
+                  node.name,
+                  style: TextStyle(
+                    fontFamily: Platform.isWindows ? 'Emoji' : null,
+                  ),
+                ),
           subtitle: !_nodesTesting.contains(node.name)
               ? (node.delay == null
                     ? Text(node.type)
@@ -141,6 +153,9 @@ class _ProxyScreenProxiesNodeWidget
                     node.now,
                     textAlign: TextAlign.right,
                     overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: Platform.isWindows ? 'Emoji' : null,
+                    ),
                   ),
                 ),
                 Icon(Icons.keyboard_arrow_right, size: iconSize),
@@ -232,10 +247,20 @@ class _ProxyScreenProxiesNodeWidget
                       },
                     ),
                     SizedBox(width: 5),
-                    Text(node.name),
+                    Text(
+                      node.name,
+                      style: TextStyle(
+                        fontFamily: Platform.isWindows ? 'Emoji' : null,
+                      ),
+                    ),
                   ],
                 )
-              : Text("${i + 1} ${node.name}"),
+              : Text(
+                  "${i + 1} ${node.name}",
+                  style: TextStyle(
+                    fontFamily: Platform.isWindows ? 'Emoji' : null,
+                  ),
+                ),
           subtitle: subtitle.isEmpty
               ? Text(node.type)
               : Row(

@@ -42,6 +42,24 @@
         "update": "راه‌اندازی مجدد برای به‌روزرسانی",
         "cancel": "الان‌ نه"
     },
+    "loginScreen": {
+        "login": "ورود",
+        "register": "ایجاد حساب",
+        "forgotPassword": "فراموشی رمز عبور",
+        "provider": "ارائه دهنده خدمات",
+        "providerName": "نام @:{loginScreen.provider}",
+        "providerNameRequired": "لطفا نام @:{loginScreen.provider} را وارد کنید",
+        "account": "حساب",
+        "accountRequired": "لطفا حساب را وارد کنید",
+        "email": "ایمیل",
+        "emailRequired": "لطفا آدرس ایمیل را وارد کنید",
+        "password": "رمز عبور",
+        "passwordRequired": "لطفا رمز عبور را وارد کنید",
+        "validEmailRequired": "لطفا یک آدرس ایمیل معتبر وارد کنید",
+        "passwordMinLength": "طول رمز عبور باید حداقل $minLength کاراکتر باشد",
+        "unsupportedProvider": "@:{loginScreen.provider} پشتیبانی نمی شود",
+        "unsupportedProviderType": "نوع @:{loginScreen.provider} پشتیبانی نمی شود"
+    },
     "main": {
         "tray": {
             "menuOpen": "بازکردن",
@@ -177,6 +195,7 @@
         "hideVpn": "مخفی کردن آیکون VPN",
         "hideVpnTips": "فعال کردن IPv6 باعث از کار افتادن این عملکرد خواهد شد.",
         "website": "وبسایت",
+        "homePage": "صفحه اصلی",
         "rule": "قانون",
         "global": "عمومی",
         "direct": "مستقیم",
@@ -227,6 +246,8 @@
         "tvMode": "حالت تلویزیون",
         "autoUpdate": "به روز رسانی خودکار",
         "updateChannel": "کانال به‌روزرسانی خودکار",
+        "onlineCustomerService": "پشتیبانی آنلاین",
+        "subscriptionChannel": "کانال اشتراک",
         "hasNewVersion": "به‌روزرسانی نسخه $p ",
         "autoDownloadPkg": "دانلود خودکار بسته‌های به‌روزرسانی",
         "devOptions": "تنظیمات توسعه‌دهندگان",

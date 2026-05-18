@@ -42,6 +42,24 @@
         "update": "重啟更新",
         "cancel": "暫不更新"
     },
+    "loginScreen": {
+        "login": "登錄",
+        "register": "註冊賬號",
+        "forgotPassword": "忘記密碼",
+        "provider": "服務商",
+        "providerName": "@:{loginScreen.provider}名稱",
+        "providerNameRequired": "請輸入@:{loginScreen.provider}名稱",
+        "account": "賬號",
+        "accountRequired": "請輸入賬號",
+        "email": "郵箱",
+        "emailRequired": "請輸入郵箱地址",
+        "password": "密碼",
+        "passwordRequired": "請輸入密碼",
+        "validEmailRequired": "請輸入有效的郵箱地址",
+        "passwordMinLength": "密碼長度至少$minLength位",
+        "unsupportedProvider": "不支持的@:{loginScreen.provider}",
+        "unsupportedProviderType": "不支持的@:{loginScreen.provider}類型"
+    },
     "main": {
         "tray": {
             "menuOpen": "打開",
@@ -177,6 +195,7 @@
         "hideVpnTips": "開啟IPv6會導致此功能失效",
         "hideDockIcon": "隱藏Dock圖標",
         "website": "官網",
+        "homePage": "主頁",
         "rule": "規則",
         "global": "全局",
         "direct": "直連",
@@ -227,6 +246,8 @@
         "tvMode": "TV模式",
         "autoUpdate": "自動更新",
         "updateChannel": "自動更新通道",
+        "onlineCustomerService": "線上客服",
+        "subscriptionChannel": "訂閱頻道",
         "hasNewVersion": "更新版本 $p",
         "autoDownloadPkg": "自動下載更新包",
         "devOptions": "開發者選項",

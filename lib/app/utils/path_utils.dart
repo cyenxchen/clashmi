@@ -343,4 +343,22 @@ class PathUtils {
     String filePath = await profileDir();
     return path.join(filePath, storageFileName());
   }
+
+  static String providersConfigFileName() {
+    return "providers.json";
+  }
+
+  static Future<String> providersConfigFilePath() async {
+    String filePath = await profileDir();
+    return path.join(filePath, providersConfigFileName());
+  }
+
+  static String boardSessionFileName() {
+    return "board_sessions.json";
+  }
+
+  static Future<String> boardSessionFilePath() async {
+    String filePath = await profileDir();
+    return path.join(filePath, boardSessionFileName());
+  }
 }

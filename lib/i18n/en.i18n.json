@@ -42,6 +42,24 @@
         "tunNotEnabled": "TUN is not enabled",
         "routeTableSection": "4. Route Table"
     },
+    "loginScreen": {
+        "login": "Login",
+        "register": "Register Account",
+        "forgotPassword": "Forgot Password",
+        "provider": "Provider",
+        "providerName": "@:{loginScreen.provider} Name",
+        "providerNameRequired": "Please enter the @:{loginScreen.provider} name",
+        "account": "Account",
+        "accountRequired": "Please enter account",
+        "email": "Email",
+        "emailRequired": "Please enter email address",
+        "password": "Password",
+        "passwordRequired": "Please enter password",
+        "validEmailRequired": "Please enter valid email address",
+        "passwordMinLength": "Password length at least $minLength characters",
+        "unsupportedProvider": "Unsupported @:{loginScreen.provider}",
+        "unsupportedProviderType": "Unsupported @:{loginScreen.provider} type"
+    },
     "main": {
         "tray": {
             "menuOpen": "Open",
@@ -177,6 +195,7 @@
         "hideVpnTips": "Enabling IPv6 will cause this function to fail",
         "hideDockIcon": "Hide Dock Icon",
         "website": "Website",
+        "homePage": "Home Page",
         "rule": "Rule",
         "global": "Global",
         "direct": "Direct",
@@ -227,6 +246,8 @@
         "tvMode": "TV Mode",
         "autoUpdate": "Auto Update",
         "updateChannel": "Auto Update Channel",
+        "onlineCustomerService": "Online Customer Service",
+        "subscriptionChannel": "Subscription Channel",
         "hasNewVersion": "Update Version $p",
         "autoDownloadPkg": "Auto Download Update Packages",
         "devOptions": "Developer Options",

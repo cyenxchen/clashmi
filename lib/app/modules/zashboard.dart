@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
@@ -13,7 +12,7 @@ import 'package:path/path.dart';
 class Zashboard {
   static HttpServer? _server;
   static Future<String> getUrl() async {
-    String secret = await ClashHttpApi.getSecret();
+    String secret = ClashSettingManager.getConfig().Secret!;
     return 'http://127.0.0.1:${SettingManager.getConfig().boardLocalPort}?hostname=127.0.0.1&port=${ClashSettingManager.getControlPort()}&secret=$secret&http=true';
   }
 

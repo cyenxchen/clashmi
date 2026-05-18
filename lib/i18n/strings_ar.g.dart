@@ -43,6 +43,7 @@ class TranslationsAr with BaseTranslations<AppLocale, Translations> implements T
 	@override late final _TranslationsUserAgreementScreenAr UserAgreementScreen = _TranslationsUserAgreementScreenAr._(_root);
 	@override late final _TranslationsNetCheckScreenAr NetCheckScreen = _TranslationsNetCheckScreenAr._(_root);
 	@override late final _TranslationsVersionUpdateScreenAr VersionUpdateScreen = _TranslationsVersionUpdateScreenAr._(_root);
+	@override late final _TranslationsLoginScreenAr loginScreen = _TranslationsLoginScreenAr._(_root);
 	@override late final _TranslationsMainAr main = _TranslationsMainAr._(_root);
 	@override late final _TranslationsMetaAr meta = _TranslationsMetaAr._(_root);
 	@override late final _TranslationsPermissionAr permission = _TranslationsPermissionAr._(_root);
@@ -150,6 +151,31 @@ class _TranslationsVersionUpdateScreenAr implements TranslationsVersionUpdateScr
 	@override String versionReady({required Object p}) => 'الإصدار الجديد [${p}] جاهز';
 	@override String get update => 'أعد التشغيل للتحديث';
 	@override String get cancel => 'ليس الآن';
+}
+
+// Path: loginScreen
+class _TranslationsLoginScreenAr implements TranslationsLoginScreenEn {
+	_TranslationsLoginScreenAr._(this._root);
+
+	final TranslationsAr _root; // ignore: unused_field
+
+	// Translations
+	@override String get login => 'دخول';
+	@override String get register => 'إنشاء حساب';
+	@override String get forgotPassword => 'هل نسيت كلمة المرور';
+	@override String get provider => 'مزود الخدمة';
+	@override String get providerName => 'اسم ${_root.loginScreen.provider}';
+	@override String get providerNameRequired => 'يرجى إدخال اسم ${_root.loginScreen.provider}';
+	@override String get account => 'حساب';
+	@override String get accountRequired => 'يرجى إدخال الحساب';
+	@override String get email => 'البريد الإلكتروني';
+	@override String get emailRequired => 'يرجى إدخال عنوان بريدك الإلكتروني';
+	@override String get password => 'كلمة المرور';
+	@override String get passwordRequired => 'يرجى إدخال كلمة المرور';
+	@override String get validEmailRequired => 'يرجى إدخال عنوان بريد إلكتروني صحيح';
+	@override String passwordMinLength({required Object minLength}) => 'يجب أن تكون كلمة المرور ${minLength} أحرف على الأقل';
+	@override String get unsupportedProvider => '${_root.loginScreen.provider} غير مدعوم';
+	@override String get unsupportedProviderType => 'نوع ${_root.loginScreen.provider} غير مدعوم';
 }
 
 // Path: main
@@ -297,6 +323,7 @@ class _TranslationsMetaAr implements TranslationsMetaEn {
 	@override String get hideVpnTips => 'سيؤدي تمكين IPv6 إلى فشل هذه الوظيفة';
 	@override String get hideDockIcon => 'إخفاء أيقونة Dock';
 	@override String get website => 'موقع إلكتروني';
+	@override String get homePage => 'الصفحة الرئيسية';
 	@override String get rule => 'قاعدة';
 	@override String get global => 'عالمي';
 	@override String get direct => 'مباشر';
@@ -347,6 +374,8 @@ class _TranslationsMetaAr implements TranslationsMetaEn {
 	@override String get tvMode => 'وضع التلفزيون';
 	@override String get autoUpdate => 'التحديثات التلقائية';
 	@override String get updateChannel => 'تحديث القنوات تلقائيا';
+	@override String get onlineCustomerService => 'خدمة العملاء عبر الإنترنت';
+	@override String get subscriptionChannel => 'قناة الاشتراك';
 	@override String hasNewVersion({required Object p}) => 'تحديث الإصدار ${p}';
 	@override String get autoDownloadPkg => 'تنزيل حزم التحديث تلقائيًا';
 	@override String get devOptions => 'خيارات للمطور';
@@ -538,6 +567,22 @@ extension on TranslationsAr {
 			'VersionUpdateScreen.versionReady' => ({required Object p}) => 'الإصدار الجديد [${p}] جاهز',
 			'VersionUpdateScreen.update' => 'أعد التشغيل للتحديث',
 			'VersionUpdateScreen.cancel' => 'ليس الآن',
+			'loginScreen.login' => 'دخول',
+			'loginScreen.register' => 'إنشاء حساب',
+			'loginScreen.forgotPassword' => 'هل نسيت كلمة المرور',
+			'loginScreen.provider' => 'مزود الخدمة',
+			'loginScreen.providerName' => 'اسم ${_root.loginScreen.provider}',
+			'loginScreen.providerNameRequired' => 'يرجى إدخال اسم ${_root.loginScreen.provider}',
+			'loginScreen.account' => 'حساب',
+			'loginScreen.accountRequired' => 'يرجى إدخال الحساب',
+			'loginScreen.email' => 'البريد الإلكتروني',
+			'loginScreen.emailRequired' => 'يرجى إدخال عنوان بريدك الإلكتروني',
+			'loginScreen.password' => 'كلمة المرور',
+			'loginScreen.passwordRequired' => 'يرجى إدخال كلمة المرور',
+			'loginScreen.validEmailRequired' => 'يرجى إدخال عنوان بريد إلكتروني صحيح',
+			'loginScreen.passwordMinLength' => ({required Object minLength}) => 'يجب أن تكون كلمة المرور ${minLength} أحرف على الأقل',
+			'loginScreen.unsupportedProvider' => '${_root.loginScreen.provider} غير مدعوم',
+			'loginScreen.unsupportedProviderType' => 'نوع ${_root.loginScreen.provider} غير مدعوم',
 			'main.tray.menuOpen' => 'يفتح',
 			'main.tray.menuExit' => 'مخرج',
 			'meta.enable' => 'يُمكَِن',
@@ -668,6 +713,7 @@ extension on TranslationsAr {
 			'meta.hideVpnTips' => 'سيؤدي تمكين IPv6 إلى فشل هذه الوظيفة',
 			'meta.hideDockIcon' => 'إخفاء أيقونة Dock',
 			'meta.website' => 'موقع إلكتروني',
+			'meta.homePage' => 'الصفحة الرئيسية',
 			'meta.rule' => 'قاعدة',
 			'meta.global' => 'عالمي',
 			'meta.direct' => 'مباشر',
@@ -718,6 +764,8 @@ extension on TranslationsAr {
 			'meta.tvMode' => 'وضع التلفزيون',
 			'meta.autoUpdate' => 'التحديثات التلقائية',
 			'meta.updateChannel' => 'تحديث القنوات تلقائيا',
+			'meta.onlineCustomerService' => 'خدمة العملاء عبر الإنترنت',
+			'meta.subscriptionChannel' => 'قناة الاشتراك',
 			'meta.hasNewVersion' => ({required Object p}) => 'تحديث الإصدار ${p}',
 			'meta.autoDownloadPkg' => 'تنزيل حزم التحديث تلقائيًا',
 			'meta.devOptions' => 'خيارات للمطور',

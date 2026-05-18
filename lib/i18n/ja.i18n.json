@@ -42,6 +42,24 @@
         "update": "再起動して更新",
         "cancel": "今はしない"
     },
+    "loginScreen": {
+        "login": "ログイン",
+        "register": "アカウント登録",
+        "forgotPassword": "パスワードを忘れた",
+        "provider": "プロバイダー",
+        "providerName": "@:{loginScreen.provider}名",
+        "providerNameRequired": "@:{loginScreen.provider}名を入力してください",
+        "account": "アカウント",
+        "accountRequired": "アカウントを入力してください",
+        "email": "メール",
+        "emailRequired": "メールアドレスを入力してください",
+        "password": "パスワード",
+        "passwordRequired": "パスワードを入力してください",
+        "validEmailRequired": "有効なメールアドレスを入力してください",
+        "passwordMinLength": "パスワード長は最低$minLength文字以上である必要があります",
+        "unsupportedProvider": "サポートされていない@:{loginScreen.provider}",
+        "unsupportedProviderType": "サポートされていない@:{loginScreen.provider}タイプ"
+    },
     "main": {
         "tray": {
             "menuOpen": "開く",
@@ -177,6 +195,7 @@
         "hideVpnTips": "IPv6を有効にすると、この機能は失敗します",
         "hideDockIcon": "Dockアイコンを隠す",
         "website": "ウェブサイト",
+        "homePage": "ホームページ",
         "rule": "ルール",
         "global": "グローバル",
         "direct": "直通",
@@ -227,6 +246,8 @@
         "tvMode": "TVモード",
         "autoUpdate": "自動更新",
         "updateChannel": "自動更新チャンネル",
+        "onlineCustomerService": "オンラインカスタマーサポート",
+        "subscriptionChannel": "購読チャンネル",
         "hasNewVersion": "バージョン $p に更新",
         "autoDownloadPkg": "更新パッケージを自動ダウンロード",
         "devOptions": "開発者オプション",

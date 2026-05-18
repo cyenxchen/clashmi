@@ -3,7 +3,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
 import 'package:clashmi/app/modules/profile_patch_manager.dart';
@@ -203,7 +202,7 @@ class VPNService {
     config.id = await Did.getDid();
     config.version = AppUtils.getBuildinVersion();
     config.name = name;
-    config.secret = await ClashHttpApi.getSecret();
+    config.secret = ClashSettingManager.getConfig().Secret!;
     config.install_refer = installReferrer;
     config.prepare =
         (overwriteFinal &&

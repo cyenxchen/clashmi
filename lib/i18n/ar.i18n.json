@@ -42,6 +42,24 @@
         "update": "أعد التشغيل للتحديث",
         "cancel": "ليس الآن"
     },
+    "loginScreen": {
+        "login": "دخول",
+        "register": "إنشاء حساب",
+        "forgotPassword": "هل نسيت كلمة المرور",
+        "provider": "مزود الخدمة",
+        "providerName": "اسم @:{loginScreen.provider}",
+        "providerNameRequired": "يرجى إدخال اسم @:{loginScreen.provider}",
+        "account": "حساب",
+        "accountRequired": "يرجى إدخال الحساب",
+        "email": "البريد الإلكتروني",
+        "emailRequired": "يرجى إدخال عنوان بريدك الإلكتروني",
+        "password": "كلمة المرور",
+        "passwordRequired": "يرجى إدخال كلمة المرور",
+        "validEmailRequired": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+        "passwordMinLength": "يجب أن تكون كلمة المرور $minLength أحرف على الأقل",
+        "unsupportedProvider": "@:{loginScreen.provider} غير مدعوم",
+        "unsupportedProviderType": "نوع @:{loginScreen.provider} غير مدعوم"
+    },
     "main": {
         "tray": {
             "menuOpen": "يفتح",
@@ -177,6 +195,7 @@
         "hideVpnTips": "سيؤدي تمكين IPv6 إلى فشل هذه الوظيفة",
         "hideDockIcon": "إخفاء أيقونة Dock",
         "website": "موقع إلكتروني",
+        "homePage": "الصفحة الرئيسية",
         "rule": "قاعدة",
         "global": "عالمي",
         "direct": "مباشر",
@@ -227,6 +246,8 @@
         "tvMode": "وضع التلفزيون",
         "autoUpdate": "التحديثات التلقائية",
         "updateChannel": "تحديث القنوات تلقائيا",
+        "onlineCustomerService": "خدمة العملاء عبر الإنترنت",
+        "subscriptionChannel": "قناة الاشتراك",
         "hasNewVersion": "تحديث الإصدار $p",
         "autoDownloadPkg": "تنزيل حزم التحديث تلقائيًا",
         "devOptions": "خيارات للمطور",

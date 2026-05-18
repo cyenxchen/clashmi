@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/diversion_template_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
@@ -149,6 +151,9 @@ class _ProxyGroupsScreenState extends LasyRenderingState<ProxyGroupsScreen> {
                                     overflow: TextOverflow.ellipsis,
                                     style: TextStyle(
                                       fontSize: ThemeConfig.kFontSizeGroupItem,
+                                      fontFamily: Platform.isWindows
+                                          ? 'Emoji'
+                                          : null,
                                     ),
                                   ),
                                   Text(

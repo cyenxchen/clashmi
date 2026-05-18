@@ -42,6 +42,24 @@
         "update": "重启更新",
         "cancel": "暂不更新"
     },
+    "loginScreen": {
+        "login": "登录",
+        "register": "注册账号",
+        "forgotPassword": "忘记密码",
+        "provider": "服务商(机场)",
+        "providerName": "@:{loginScreen.provider}名称",
+        "providerNameRequired": "请输入@:{loginScreen.provider}名称",
+        "account": "账号",
+        "accountRequired": "请输入账号",
+        "email": "邮箱",
+        "emailRequired": "请输入邮箱地址",
+        "password": "密码",
+        "passwordRequired": "请输入密码",
+        "validEmailRequired": "请输入有效的邮箱地址",
+        "passwordMinLength": "密码长度至少$minLength位",
+        "unsupportedProvider": "不支持的@:{loginScreen.provider}",
+        "unsupportedProviderType": "不支持的@:{loginScreen.provider}类型"
+    },
     "main": {
         "tray": {
             "menuOpen": "打开",
@@ -177,6 +195,7 @@
         "hideVpnTips": "开启IPv6会导致此功能失效",
         "hideDockIcon": "隐藏Dock图标",
         "website": "官网",
+        "homePage": "主页",
         "rule": "规则",
         "global": "全局",
         "direct": "直连",
@@ -227,6 +246,8 @@
         "tvMode": "TV模式",
         "autoUpdate": "自动更新",
         "updateChannel": "自动更新通道",
+        "onlineCustomerService": "在线客服",
+        "subscriptionChannel": "订阅频道",
         "hasNewVersion": "更新版本 $p",
         "autoDownloadPkg": "自动下载更新包",
         "devOptions": "开发者选项",

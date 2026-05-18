@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ffi' as ffi;
 
+import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/download_utils.dart';
@@ -502,14 +503,21 @@ class ProfilePatchManager {
         : "${url.hashCode}.js";
     final savePath = path.join(await PathUtils.profilePatchsDir(), id);
     final userAgent = SettingManager.getConfig().userAgent();
-    final result = await DownloadUtils.downloadWithPort(
-      uri,
-      savePath,
-      userAgent,
-      false,
-      null,
-      timeout: const Duration(seconds: 30),
-    );
+    List<int?> ports = await VPNService.getPortsByPrefer(true);
+    late ReturnResult<HttpHeaders> result;
+    for (var port in ports) {
+      result = await DownloadUtils.downloadWithPort(
+        uri,
+        savePath,
+        userAgent,
+        false,
+        port,
+        timeout: const Duration(seconds: 30),
+      );
+      if (result.error == null) {
+        break;
+      }
+    }
     if (result.error != null) {
       return ReturnResult(error: result.error);
     }
@@ -595,14 +603,21 @@ class ProfilePatchManager {
     final userAgent = SettingManager.getConfig().userAgent();
     final savePath = path.join(await PathUtils.profilePatchsDir(), id);
     final savePathTmp = "$savePath.tmp";
-    final result = await DownloadUtils.downloadWithPort(
-      uri,
-      savePathTmp,
-      userAgent,
-      false,
-      null,
-      timeout: const Duration(seconds: 30),
-    );
+    List<int?> ports = await VPNService.getPortsByPrefer(true);
+    late ReturnResult<HttpHeaders> result;
+    for (var port in ports) {
+      result = await DownloadUtils.downloadWithPort(
+        uri,
+        savePathTmp,
+        userAgent,
+        false,
+        port,
+        timeout: const Duration(seconds: 30),
+      );
+      if (result.error == null) {
+        break;
+      }
+    }
     profile.update = DateTime.now();
     if (result.error == null) {
       if (profile.type == ProfilePatchFileType.yaml) {

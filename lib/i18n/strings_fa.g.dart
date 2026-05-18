@@ -43,6 +43,7 @@ class TranslationsFa with BaseTranslations<AppLocale, Translations> implements T
 	@override late final _TranslationsUserAgreementScreenFa UserAgreementScreen = _TranslationsUserAgreementScreenFa._(_root);
 	@override late final _TranslationsNetCheckScreenFa NetCheckScreen = _TranslationsNetCheckScreenFa._(_root);
 	@override late final _TranslationsVersionUpdateScreenFa VersionUpdateScreen = _TranslationsVersionUpdateScreenFa._(_root);
+	@override late final _TranslationsLoginScreenFa loginScreen = _TranslationsLoginScreenFa._(_root);
 	@override late final _TranslationsMainFa main = _TranslationsMainFa._(_root);
 	@override late final _TranslationsMetaFa meta = _TranslationsMetaFa._(_root);
 	@override late final _TranslationsPermissionFa permission = _TranslationsPermissionFa._(_root);
@@ -150,6 +151,31 @@ class _TranslationsVersionUpdateScreenFa implements TranslationsVersionUpdateScr
 	@override String versionReady({required Object p}) => 'نسخه جدید [${p}] آماده است';
 	@override String get update => 'راه‌اندازی مجدد برای به‌روزرسانی';
 	@override String get cancel => 'الان‌ نه';
+}
+
+// Path: loginScreen
+class _TranslationsLoginScreenFa implements TranslationsLoginScreenEn {
+	_TranslationsLoginScreenFa._(this._root);
+
+	final TranslationsFa _root; // ignore: unused_field
+
+	// Translations
+	@override String get login => 'ورود';
+	@override String get register => 'ایجاد حساب';
+	@override String get forgotPassword => 'فراموشی رمز عبور';
+	@override String get provider => 'ارائه دهنده خدمات';
+	@override String get providerName => 'نام ${_root.loginScreen.provider}';
+	@override String get providerNameRequired => 'لطفا نام ${_root.loginScreen.provider} را وارد کنید';
+	@override String get account => 'حساب';
+	@override String get accountRequired => 'لطفا حساب را وارد کنید';
+	@override String get email => 'ایمیل';
+	@override String get emailRequired => 'لطفا آدرس ایمیل را وارد کنید';
+	@override String get password => 'رمز عبور';
+	@override String get passwordRequired => 'لطفا رمز عبور را وارد کنید';
+	@override String get validEmailRequired => 'لطفا یک آدرس ایمیل معتبر وارد کنید';
+	@override String passwordMinLength({required Object minLength}) => 'طول رمز عبور باید حداقل ${minLength} کاراکتر باشد';
+	@override String get unsupportedProvider => '${_root.loginScreen.provider} پشتیبانی نمی شود';
+	@override String get unsupportedProviderType => 'نوع ${_root.loginScreen.provider} پشتیبانی نمی شود';
 }
 
 // Path: main
@@ -297,6 +323,7 @@ class _TranslationsMetaFa implements TranslationsMetaEn {
 	@override String get hideVpn => 'مخفی کردن آیکون VPN';
 	@override String get hideVpnTips => 'فعال کردن IPv6 باعث از کار افتادن این عملکرد خواهد شد.';
 	@override String get website => 'وبسایت';
+	@override String get homePage => 'صفحه اصلی';
 	@override String get rule => 'قانون';
 	@override String get global => 'عمومی';
 	@override String get direct => 'مستقیم';
@@ -347,6 +374,8 @@ class _TranslationsMetaFa implements TranslationsMetaEn {
 	@override String get tvMode => 'حالت تلویزیون';
 	@override String get autoUpdate => 'به روز رسانی خودکار';
 	@override String get updateChannel => 'کانال به‌روزرسانی خودکار';
+	@override String get onlineCustomerService => 'پشتیبانی آنلاین';
+	@override String get subscriptionChannel => 'کانال اشتراک';
 	@override String hasNewVersion({required Object p}) => 'به‌روزرسانی نسخه ${p} ';
 	@override String get autoDownloadPkg => 'دانلود خودکار بسته‌های به‌روزرسانی';
 	@override String get devOptions => 'تنظیمات توسعه‌دهندگان';
@@ -538,6 +567,22 @@ extension on TranslationsFa {
 			'VersionUpdateScreen.versionReady' => ({required Object p}) => 'نسخه جدید [${p}] آماده است',
 			'VersionUpdateScreen.update' => 'راه‌اندازی مجدد برای به‌روزرسانی',
 			'VersionUpdateScreen.cancel' => 'الان‌ نه',
+			'loginScreen.login' => 'ورود',
+			'loginScreen.register' => 'ایجاد حساب',
+			'loginScreen.forgotPassword' => 'فراموشی رمز عبور',
+			'loginScreen.provider' => 'ارائه دهنده خدمات',
+			'loginScreen.providerName' => 'نام ${_root.loginScreen.provider}',
+			'loginScreen.providerNameRequired' => 'لطفا نام ${_root.loginScreen.provider} را وارد کنید',
+			'loginScreen.account' => 'حساب',
+			'loginScreen.accountRequired' => 'لطفا حساب را وارد کنید',
+			'loginScreen.email' => 'ایمیل',
+			'loginScreen.emailRequired' => 'لطفا آدرس ایمیل را وارد کنید',
+			'loginScreen.password' => 'رمز عبور',
+			'loginScreen.passwordRequired' => 'لطفا رمز عبور را وارد کنید',
+			'loginScreen.validEmailRequired' => 'لطفا یک آدرس ایمیل معتبر وارد کنید',
+			'loginScreen.passwordMinLength' => ({required Object minLength}) => 'طول رمز عبور باید حداقل ${minLength} کاراکتر باشد',
+			'loginScreen.unsupportedProvider' => '${_root.loginScreen.provider} پشتیبانی نمی شود',
+			'loginScreen.unsupportedProviderType' => 'نوع ${_root.loginScreen.provider} پشتیبانی نمی شود',
 			'main.tray.menuOpen' => 'بازکردن',
 			'main.tray.menuExit' => 'بستن',
 			'meta.enable' => 'فعال‌سازی',
@@ -668,6 +713,7 @@ extension on TranslationsFa {
 			'meta.hideVpn' => 'مخفی کردن آیکون VPN',
 			'meta.hideVpnTips' => 'فعال کردن IPv6 باعث از کار افتادن این عملکرد خواهد شد.',
 			'meta.website' => 'وبسایت',
+			'meta.homePage' => 'صفحه اصلی',
 			'meta.rule' => 'قانون',
 			'meta.global' => 'عمومی',
 			'meta.direct' => 'مستقیم',
@@ -718,6 +764,8 @@ extension on TranslationsFa {
 			'meta.tvMode' => 'حالت تلویزیون',
 			'meta.autoUpdate' => 'به روز رسانی خودکار',
 			'meta.updateChannel' => 'کانال به‌روزرسانی خودکار',
+			'meta.onlineCustomerService' => 'پشتیبانی آنلاین',
+			'meta.subscriptionChannel' => 'کانال اشتراک',
 			'meta.hasNewVersion' => ({required Object p}) => 'به‌روزرسانی نسخه ${p} ',
 			'meta.autoDownloadPkg' => 'دانلود خودکار بسته‌های به‌روزرسانی',
 			'meta.devOptions' => 'تنظیمات توسعه‌دهندگان',

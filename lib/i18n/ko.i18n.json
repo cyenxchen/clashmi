@@ -42,6 +42,24 @@
         "update": "업데이트를 위해 재시작",
         "cancel": "나중에"
     },
+    "loginScreen": {
+        "login": "로그인",
+        "register": "계정 가입",
+        "forgotPassword": "비밀번호 찾기",
+        "provider": "서비스 제공자",
+        "providerName": "@:{loginScreen.provider} 이름",
+        "providerNameRequired": "@:{loginScreen.provider} 이름을 입력하세요",
+        "account": "계정",
+        "accountRequired": "계정을 입력하세요",
+        "email": "이메일",
+        "emailRequired": "이메일 주소를 입력하세요",
+        "password": "비밀번호",
+        "passwordRequired": "비밀번호를 입력하세요",
+        "validEmailRequired": "유효한 이메일 주소를 입력하세요",
+        "passwordMinLength": "비밀번호 길이는 최소 $minLength자 이상이어야 합니다",
+        "unsupportedProvider": "지원되지 않는 @:{loginScreen.provider}",
+        "unsupportedProviderType": "지원되지 않는 @:{loginScreen.provider} 유형"
+    },
     "main": {
         "tray": {
             "menuOpen": "열기",
@@ -177,6 +195,7 @@
         "hideVpnTips": "IPv6를 활성화하면 이 기능이 작동하지 않습니다",
         "hideDockIcon": "Dock 아이콘 숨기기",
         "website": "웹사이트",
+        "homePage": "홈페이지",
         "rule": "규칙",
         "global": "글로벌",
         "direct": "직접 연결",
@@ -227,6 +246,8 @@
         "tvMode": "TV 모드",
         "autoUpdate": "자동 업데이트",
         "updateChannel": "자동 업데이트 채널",
+        "onlineCustomerService": "온라인 고객센터",
+        "subscriptionChannel": "구독 채널",
         "hasNewVersion": "버전 $p로 업데이트",
         "autoDownloadPkg": "업데이트 패키지 자동 다운로드",
         "devOptions": "개발자 옵션",

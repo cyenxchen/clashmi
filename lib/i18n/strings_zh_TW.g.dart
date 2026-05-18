@@ -43,6 +43,7 @@ class TranslationsZhTw with BaseTranslations<AppLocale, Translations> implements
 	@override late final _TranslationsUserAgreementScreenZhTw UserAgreementScreen = _TranslationsUserAgreementScreenZhTw._(_root);
 	@override late final _TranslationsNetCheckScreenZhTw NetCheckScreen = _TranslationsNetCheckScreenZhTw._(_root);
 	@override late final _TranslationsVersionUpdateScreenZhTw VersionUpdateScreen = _TranslationsVersionUpdateScreenZhTw._(_root);
+	@override late final _TranslationsLoginScreenZhTw loginScreen = _TranslationsLoginScreenZhTw._(_root);
 	@override late final _TranslationsMainZhTw main = _TranslationsMainZhTw._(_root);
 	@override late final _TranslationsMetaZhTw meta = _TranslationsMetaZhTw._(_root);
 	@override late final _TranslationsPermissionZhTw permission = _TranslationsPermissionZhTw._(_root);
@@ -150,6 +151,31 @@ class _TranslationsVersionUpdateScreenZhTw implements TranslationsVersionUpdateS
 	@override String versionReady({required Object p}) => '新版本[${p}]已就緒';
 	@override String get update => '重啟更新';
 	@override String get cancel => '暫不更新';
+}
+
+// Path: loginScreen
+class _TranslationsLoginScreenZhTw implements TranslationsLoginScreenEn {
+	_TranslationsLoginScreenZhTw._(this._root);
+
+	final TranslationsZhTw _root; // ignore: unused_field
+
+	// Translations
+	@override String get login => '登錄';
+	@override String get register => '註冊賬號';
+	@override String get forgotPassword => '忘記密碼';
+	@override String get provider => '服務商';
+	@override String get providerName => '${_root.loginScreen.provider}名稱';
+	@override String get providerNameRequired => '請輸入${_root.loginScreen.provider}名稱';
+	@override String get account => '賬號';
+	@override String get accountRequired => '請輸入賬號';
+	@override String get email => '郵箱';
+	@override String get emailRequired => '請輸入郵箱地址';
+	@override String get password => '密碼';
+	@override String get passwordRequired => '請輸入密碼';
+	@override String get validEmailRequired => '請輸入有效的郵箱地址';
+	@override String passwordMinLength({required Object minLength}) => '密碼長度至少${minLength}位';
+	@override String get unsupportedProvider => '不支持的${_root.loginScreen.provider}';
+	@override String get unsupportedProviderType => '不支持的${_root.loginScreen.provider}類型';
 }
 
 // Path: main
@@ -297,6 +323,7 @@ class _TranslationsMetaZhTw implements TranslationsMetaEn {
 	@override String get hideVpnTips => '開啟IPv6會導致此功能失效';
 	@override String get hideDockIcon => '隱藏Dock圖標';
 	@override String get website => '官網';
+	@override String get homePage => '主頁';
 	@override String get rule => '規則';
 	@override String get global => '全局';
 	@override String get direct => '直連';
@@ -347,6 +374,8 @@ class _TranslationsMetaZhTw implements TranslationsMetaEn {
 	@override String get tvMode => 'TV模式';
 	@override String get autoUpdate => '自動更新';
 	@override String get updateChannel => '自動更新通道';
+	@override String get onlineCustomerService => '線上客服';
+	@override String get subscriptionChannel => '訂閱頻道';
 	@override String hasNewVersion({required Object p}) => '更新版本 ${p}';
 	@override String get autoDownloadPkg => '自動下載更新包';
 	@override String get devOptions => '開發者選項';
@@ -538,6 +567,22 @@ extension on TranslationsZhTw {
 			'VersionUpdateScreen.versionReady' => ({required Object p}) => '新版本[${p}]已就緒',
 			'VersionUpdateScreen.update' => '重啟更新',
 			'VersionUpdateScreen.cancel' => '暫不更新',
+			'loginScreen.login' => '登錄',
+			'loginScreen.register' => '註冊賬號',
+			'loginScreen.forgotPassword' => '忘記密碼',
+			'loginScreen.provider' => '服務商',
+			'loginScreen.providerName' => '${_root.loginScreen.provider}名稱',
+			'loginScreen.providerNameRequired' => '請輸入${_root.loginScreen.provider}名稱',
+			'loginScreen.account' => '賬號',
+			'loginScreen.accountRequired' => '請輸入賬號',
+			'loginScreen.email' => '郵箱',
+			'loginScreen.emailRequired' => '請輸入郵箱地址',
+			'loginScreen.password' => '密碼',
+			'loginScreen.passwordRequired' => '請輸入密碼',
+			'loginScreen.validEmailRequired' => '請輸入有效的郵箱地址',
+			'loginScreen.passwordMinLength' => ({required Object minLength}) => '密碼長度至少${minLength}位',
+			'loginScreen.unsupportedProvider' => '不支持的${_root.loginScreen.provider}',
+			'loginScreen.unsupportedProviderType' => '不支持的${_root.loginScreen.provider}類型',
 			'main.tray.menuOpen' => '打開',
 			'main.tray.menuExit' => '退出',
 			'meta.enable' => '啟用',
@@ -668,6 +713,7 @@ extension on TranslationsZhTw {
 			'meta.hideVpnTips' => '開啟IPv6會導致此功能失效',
 			'meta.hideDockIcon' => '隱藏Dock圖標',
 			'meta.website' => '官網',
+			'meta.homePage' => '主頁',
 			'meta.rule' => '規則',
 			'meta.global' => '全局',
 			'meta.direct' => '直連',
@@ -718,6 +764,8 @@ extension on TranslationsZhTw {
 			'meta.tvMode' => 'TV模式',
 			'meta.autoUpdate' => '自動更新',
 			'meta.updateChannel' => '自動更新通道',
+			'meta.onlineCustomerService' => '線上客服',
+			'meta.subscriptionChannel' => '訂閱頻道',
 			'meta.hasNewVersion' => ({required Object p}) => '更新版本 ${p}',
 			'meta.autoDownloadPkg' => '自動下載更新包',
 			'meta.devOptions' => '開發者選項',

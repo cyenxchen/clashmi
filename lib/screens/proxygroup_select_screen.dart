@@ -1,6 +1,7 @@
 // ignore_for_file: unused_catch_stack
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:after_layout/after_layout.dart';
 import 'package:clashmi/app/clash/clash_http_api.dart';
@@ -255,6 +256,9 @@ class _ProxyGroupScreenScreenState
                                     current.name,
                                     style: TextStyle(
                                       fontSize: ThemeConfig.kFontSizeGroupItem,
+                                      fontFamily: Platform.isWindows
+                                          ? 'Emoji'
+                                          : null,
                                     ),
                                   ),
                                   Row(

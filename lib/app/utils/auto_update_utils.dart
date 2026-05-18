@@ -11,12 +11,11 @@ import 'package:clashmi/app/utils/app_url_utils.dart';
 import 'package:clashmi/app/utils/http_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/url_launcher_utils.dart';
+import 'package:tuple/tuple.dart';
 
 class AutoupdateItem {
   String platform = "";
-
   List<String> channels = [];
-
   List<String> abis = [];
   String version = "";
   String url = "";
@@ -29,12 +28,10 @@ class AutoupdateItem {
       return;
     }
     platform = map["platform"] ?? "";
-
     var _channels = map["channels"] ?? [];
     for (var i in _channels) {
       channels.add(i as String);
     }
-
     var _abis = map["abis"] ?? [];
     for (var i in _abis) {
       abis.add(i as String);
@@ -219,8 +216,8 @@ abstract final class AutoupdateUtils {
       return ReturnResult(error: response.error);
     }
     try {
-      if (response.data!.isNotEmpty) {
-        var decodedResponse = jsonDecode(response.data!);
+      if (response.data!.item2.isNotEmpty) {
+        var decodedResponse = jsonDecode(response.data!.item2);
         items.addAll(parseAutoupdateItems(decodedResponse));
         Log.i(
           "AutoupdateUtils getAutoupdate parsed ${items.length} items from $url",
@@ -269,7 +266,7 @@ abstract final class AutoupdateUtils {
         return ReturnResult(error: response.error);
       }
       try {
-        final decodedResponse = jsonDecode(response.data ?? "");
+        final decodedResponse = jsonDecode(response.data?.item2 ?? "");
         if (decodedResponse is! List) {
           Log.i("AutoupdateUtils GitHub releases page $page is not a list");
           break;
@@ -292,12 +289,12 @@ abstract final class AutoupdateUtils {
     return ReturnResult(data: items);
   }
 
-  static Future<ReturnResult<String>> _httpGetFirstOk(
+  static Future<ReturnResult<Tuple2<int, String>>> _httpGetFirstOk(
     String url,
     List<int?> ports, {
     Map<String, String>? headers,
   }) async {
-    late ReturnResult<String> response;
+    late ReturnResult<Tuple2<int, String>> response;
     for (var port in ports) {
       response = await HttpUtils.httpGetRequest(
         url,
@@ -346,8 +343,8 @@ abstract final class AutoupdateUtils {
   static Future<ReturnResult<RemoteConfig>> getRemoteConfig() async {
     RemoteConfig rc = RemoteConfig();
     String url = RemoteConfigManager.getConfig().config;
-    late ReturnResult<String> response;
-    List<int?> ports = await VPNService.getPortsByPrefer(false);
+    late ReturnResult<Tuple2<int, String>> response;
+    List<int?> ports = await VPNService.getPortsByPrefer(true);
     for (var port in ports) {
       response = await HttpUtils.httpGetRequest(
         url,
@@ -366,8 +363,8 @@ abstract final class AutoupdateUtils {
       return ReturnResult(error: response.error);
     }
     try {
-      if (response.data!.isNotEmpty) {
-        var decodedResponse = jsonDecode(response.data!);
+      if (response.data!.item2.isNotEmpty) {
+        var decodedResponse = jsonDecode(response.data!.item2);
         rc.fromJson(decodedResponse);
       }
     } catch (err, _) {

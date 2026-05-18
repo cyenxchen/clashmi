@@ -38,6 +38,8 @@ class BackupAndSyncUtils {
       Tuple2(PathUtils.profilesFileName(), true),
       Tuple2(PathUtils.profilePatchsFileName(), true),
       Tuple2(PathUtils.diversionTemplateFileName(), true),
+      Tuple2(PathUtils.providersConfigFileName(), true),
+      Tuple2(PathUtils.boardSessionFileName(), true),
     ];
     if (profiles.isNotEmpty) {
       list.add(Tuple2(PathUtils.profilesName(), true));

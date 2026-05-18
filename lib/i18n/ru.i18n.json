@@ -42,6 +42,24 @@
         "update": "Перезапустить",
         "cancel": "Не сейчас"
     },
+    "loginScreen": {
+        "login": "Вход",
+        "register": "Зарегистрировать аккаунт",
+        "forgotPassword": "Забыли пароль",
+        "provider": "Провайдер",
+        "providerName": "Название @:{loginScreen.provider}",
+        "providerNameRequired": "Пожалуйста, введите название @:{loginScreen.provider}",
+        "account": "Аккаунт",
+        "accountRequired": "Пожалуйста, введите аккаунт",
+        "email": "Электронная почта",
+        "emailRequired": "Пожалуйста, введите адрес электронной почты",
+        "password": "Пароль",
+        "passwordRequired": "Пожалуйста, введите пароль",
+        "validEmailRequired": "Пожалуйста, введите действительный адрес электронной почты",
+        "passwordMinLength": "Длина пароля должна быть не менее $minLength символов",
+        "unsupportedProvider": "Неподдерживаемый @:{loginScreen.provider}",
+        "unsupportedProviderType": "Неподдерживаемый тип @:{loginScreen.provider}"
+    },
     "main": {
         "tray": {
             "menuOpen": "Открыть",
@@ -177,6 +195,7 @@
         "hideVpnTips": "Включение IPv6 приведет к сбою этой функции.",
         "hideDockIcon": "Скрыть значок дока",
         "website": "Веб-сайт",
+        "homePage": "Главная",
         "rule": "Правила",
         "global": "Глобально",
         "direct": "Напрямую",
@@ -227,6 +246,8 @@
         "tvMode": "Режим ТВ",
         "autoUpdate": "Автоматические обновления",
         "updateChannel": "Канал автоматического обновления",
+        "onlineCustomerService": "Онлайн-служба поддержки",
+        "subscriptionChannel": "Канал подписки",
         "hasNewVersion": "Обновить версию $p",
         "autoDownloadPkg": "Автоматически загружать пакеты обновлений",
         "devOptions": "Параметры разработчика",
