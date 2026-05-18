@@ -918,7 +918,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         port: uri.port,
       );
       String host = Platform.isIOS ? await _getLocalAddress() : "127.0.0.1";
-      String secret = await ClashHttpApi.getSecret();
+      String secret = ClashHttpApi.getSecret?.call() ?? "";
       final url =
           '${shortUrl.toString()}/?hostname=$host&port=${ClashSettingManager.getControlPort()}&secret=$secret&http=true';
 
