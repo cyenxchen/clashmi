@@ -215,6 +215,15 @@ class ClashProxiesNode {
   String icon = "";
   int? delay;
   bool hidden = false;
+  // Provider-only nodes are not addressable through /proxies/{name}.
+  String? providerName;
+  String testUrl = '';
+  String expectedStatus = '';
+  final Map<String, int?> delaysByUrl = {};
+  final Map<String, bool> aliveByUrl = {};
+
+  bool get isGroup => ClashProtocolType.GroupToList().contains(type);
+  int? delayForUrl(String url) => url.isEmpty ? delay : delaysByUrl[url];
 
   Map<String, dynamic> toJson() => {
     'all': all,
@@ -236,6 +245,26 @@ class ClashProxiesNode {
     icon = map['icon'] ?? "";
     all = List.from(map['all'] ?? []);
     hidden = map['hidden'] ?? false;
+    testUrl = map['testUrl'] ?? '';
+    expectedStatus = map['expectedStatus'] ?? '';
+    delaysByUrl.clear();
+    aliveByUrl.clear();
+    final extra = map['extra'];
+    if (extra is Map) {
+      for (final entry in extra.entries) {
+        final state = entry.value;
+        if (state is! Map) continue;
+        if (state['alive'] is bool) {
+          aliveByUrl[entry.key.toString()] = state['alive'];
+        }
+        final history = state['history'];
+        final value = history is List && history.isNotEmpty
+            ? history.last['delay']
+            : null;
+        delaysByUrl[entry.key.toString()] =
+            state['alive'] != false && value is int && value > 0 ? value : null;
+      }
+    }
     var history = map['history'];
     if (history is List) {
       if (history.isNotEmpty) {
@@ -258,6 +287,7 @@ class ClashProxies {
       return;
     }
 
+    proxies.clear();
     var p = map['proxies'];
     if (p is Map) {
       Set<String> toRemove = {};
@@ -292,7 +322,41 @@ class ClashProxies {
     }
   }
 
-  int? updateGroupDelay(ClashProxiesNode node) {
+  void mergeProviders(Map<String, dynamic> map) {
+    final providers = map['providers'];
+    if (providers is! Map) {
+      throw const FormatException('Invalid proxy provider response');
+    }
+    // Preserve existing top-level nodes; use the first provider for missing names.
+    final merged = {for (final node in proxies) node.name: node};
+    for (final entry in providers.entries) {
+      final provider = entry.value;
+      if (provider is! Map || provider['proxies'] is! List) {
+        throw const FormatException('Invalid proxy provider nodes');
+      }
+      for (final item in provider['proxies']) {
+        if (item is! Map<String, dynamic> || item['name'] is! String) {
+          throw const FormatException('Invalid proxy provider node');
+        }
+        final node = ClashProxiesNode()..fromJson(item);
+        if (node.type.toLowerCase() == 'dns') {
+          continue;
+        }
+        node.providerName = entry.key.toString();
+        merged.putIfAbsent(node.name, () => node);
+      }
+    }
+    proxies = merged.values.toList();
+    for (final node in proxies) {
+      node.delay = updateGroupDelay(node);
+    }
+  }
+
+  int? updateGroupDelay(ClashProxiesNode node, [Set<String>? visited]) {
+    visited ??= {};
+    if (!visited.add(node.name)) {
+      return null;
+    }
     if (node.type != ClashProtocolType.urltest.name &&
         node.type != ClashProtocolType.selector.name &&
         node.type != ClashProtocolType.fallback.name &&
@@ -313,11 +377,10 @@ class ClashProxies {
     if (nextNode == null) {
       return node.delay;
     }
-    final delay = updateGroupDelay(nextNode);
-    if (delay != null) {
-      return delay;
+    if (node.testUrl.isNotEmpty) {
+      return nextNode.delayForUrl(node.testUrl);
     }
-    return node.delay;
+    return updateGroupDelay(nextNode, visited);
   }
 }
 
@@ -364,6 +427,8 @@ class ClashHttpApi {
 
   static Future<ReturnResult<int>> getDelay(
     String node, {
+    String? providerName,
+    String expectedStatus = '',
     String url = "https://www.gstatic.com",
     Duration timeout = const Duration(seconds: 5),
   }) async {
@@ -372,11 +437,15 @@ class ClashHttpApi {
 
     final encodeNode = Uri.encodeComponent(node);
     final encodeUrl = Uri.encodeComponent(url);
+    final encodeExpected = Uri.encodeComponent(expectedStatus);
+    final path = providerName == null
+        ? '/proxies/$encodeNode/delay'
+        : '/providers/proxies/${Uri.encodeComponent(providerName)}/$encodeNode/healthcheck';
     var result = await HttpUtils.httpGetRequest(
-      "$host:${getControlPort?.call()}/proxies/$encodeNode/delay?url=$encodeUrl&timeout=${timeout.inMilliseconds}",
+      "$host:${getControlPort?.call()}$path?url=$encodeUrl&timeout=${timeout.inMilliseconds}&expected=$encodeExpected",
       null,
       headers,
-      const Duration(seconds: timeoutSeconds),
+      timeout + const Duration(seconds: timeoutSeconds),
       null,
       null,
     );
@@ -397,11 +466,17 @@ class ClashHttpApi {
   }
 
   static Future<ReturnResult<List<ClashProxiesNode>>> getProxies() async {
+    final port = getControlPort?.call();
+    if (port == null || port == 0) {
+      return ReturnResult(
+        error: ReturnResultError('Proxy controller unavailable'),
+      );
+    }
     String secret = getSecret?.call() ?? "";
     Map<String, String> headers = getHeaders(secret);
 
     var result = await HttpUtils.httpGetRequest(
-      "$host:${getControlPort?.call()}/proxies",
+      "$host:$port/proxies",
       null,
       headers,
       const Duration(seconds: timeoutSeconds),
@@ -414,7 +489,30 @@ class ClashHttpApi {
     try {
       var decodedResponse = jsonDecode(result.data!.item2);
       ClashProxies proxies = ClashProxies();
+      if (decodedResponse is! Map<String, dynamic> ||
+          decodedResponse['proxies'] is! Map) {
+        throw const FormatException('Invalid proxy response');
+      }
       proxies.fromJson(decodedResponse);
+      final providerResult = await HttpUtils.httpGetRequest(
+        "$host:$port/providers/proxies",
+        null,
+        headers,
+        const Duration(seconds: timeoutSeconds),
+        null,
+        null,
+      );
+      if (providerResult.error != null) {
+        return ReturnResult(data: proxies.proxies, error: providerResult.error);
+      }
+      try {
+        proxies.mergeProviders(jsonDecode(providerResult.data!.item2));
+      } catch (err) {
+        return ReturnResult(
+          data: proxies.proxies,
+          error: ReturnResultError(err.toString()),
+        );
+      }
       return ReturnResult(data: proxies.proxies);
     } catch (err) {
       return ReturnResult(error: ReturnResultError(err.toString()));

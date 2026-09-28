@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:after_layout/after_layout.dart';
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
+import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/proxy_board_screen_widgets.dart';
 import 'package:clashmi/screens/theme_config.dart';
@@ -23,9 +24,11 @@ class ProxyBoardScreen extends LasyRenderingStatefulWidget {
 class _ProxyBoardScreenState extends LasyRenderingState<ProxyBoardScreen>
     with WidgetsBindingObserver, AfterLayoutMixin {
   late ProxyScreenProxiesNodeWidgetController _controller;
+  late Future<ReturnResult<List<ClashProxiesNode>>> _proxiesFuture;
 
   @override
   void initState() {
+    _proxiesFuture = ClashHttpApi.getProxies();
     _controller = ProxyScreenProxiesNodeWidgetController(
       onTesting: () {
         if (!mounted) {
@@ -70,7 +73,7 @@ class _ProxyBoardScreenState extends LasyRenderingState<ProxyBoardScreen>
                     ),
                   ),
                   SizedBox(
-                    width: windowSize.width - 50 * 3,
+                    width: windowSize.width - 50 * 4,
                     child: Text(
                       tcontext.meta.proxy,
                       textAlign: TextAlign.center,
@@ -79,6 +82,20 @@ class _ProxyBoardScreenState extends LasyRenderingState<ProxyBoardScreen>
                         fontWeight: ThemeConfig.kFontWeightTitle,
                         fontSize: ThemeConfig.kFontSizeTitle,
                       ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 50,
+                    height: 30,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      tooltip: tcontext.meta.refresh,
+                      onPressed:
+                          _controller.delayTesting() == 0 &&
+                              !_controller.refreshing
+                          ? refresh
+                          : null,
+                      icon: const Icon(Icons.refresh, size: 26),
                     ),
                   ),
                   Tooltip(
@@ -141,10 +158,12 @@ class _ProxyBoardScreenState extends LasyRenderingState<ProxyBoardScreen>
                             width: 50,
                             height: 30,
                             child: InkWell(
+                              onTap: _controller.refreshing
+                                  ? null
+                                  : () {
+                                      onTapTestDelay();
+                                    },
                               child: Icon(Icons.bolt_outlined, size: 26),
-                              onTap: () {
-                                onTapTestDelay();
-                              },
                             ),
                           ),
                         ),
@@ -154,23 +173,50 @@ class _ProxyBoardScreenState extends LasyRenderingState<ProxyBoardScreen>
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
-                  child: FutureBuilder(
-                    future: getProxies(),
-                    builder:
-                        (
-                          BuildContext context,
-                          AsyncSnapshot<List<ClashProxiesNode>> snapshot,
-                        ) {
-                          List<ClashProxiesNode> data = snapshot.hasData
-                              ? snapshot.data!
-                              : [];
-                          return data.isEmpty
-                              ? SizedBox.shrink()
-                              : ProxyScreenProxiesNodeWidget(
-                                  nodes: data,
-                                  controller: _controller,
-                                );
-                        },
+                  child: FutureBuilder<ReturnResult<List<ClashProxiesNode>>>(
+                    future: _proxiesFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting &&
+                          !snapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final result = snapshot.data;
+                      final data = result?.data ?? <ClashProxiesNode>[];
+                      final error =
+                          result?.error?.message ?? snapshot.error?.toString();
+                      return Column(
+                        children: [
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting)
+                            const LinearProgressIndicator(),
+                          if (error != null && data.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Text(tcontext.meta.updateFailed(p: error)),
+                            ),
+                          Expanded(
+                            child: data.isEmpty
+                                ? Center(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(tcontext.meta.none),
+                                        TextButton(
+                                          onPressed: refresh,
+                                          child: Text(tcontext.meta.refresh),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : ProxyScreenProxiesNodeWidget(
+                                    nodes: data,
+                                    controller: _controller,
+                                    errorMessage: error,
+                                  ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -181,13 +227,14 @@ class _ProxyBoardScreenState extends LasyRenderingState<ProxyBoardScreen>
     );
   }
 
-  Future<List<ClashProxiesNode>> getProxies() async {
-    var result = await ClashHttpApi.getProxies();
-    if (result.error == null) {
-      return result.data!;
+  void refresh() {
+    final refreshNodes = _controller.refreshFun;
+    if (refreshNodes != null) {
+      refreshNodes();
+      return;
     }
-
-    return [];
+    _proxiesFuture = ClashHttpApi.getProxies();
+    setState(() {});
   }
 
   Future<void> onTapTestDelay() async {
