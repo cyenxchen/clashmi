@@ -22,6 +22,8 @@ import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/app/utils/url_launcher_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
+import 'package:clashmi/i18n/fork_network_location.dart';
+import 'package:clashmi/screens/fork_network_location_screen.dart';
 import 'package:clashmi/screens/backup_and_sync_icloud_screen.dart';
 import 'package:clashmi/screens/backup_and_sync_webdav_screen.dart';
 import 'package:clashmi/screens/backup_helper.dart';
@@ -583,6 +585,17 @@ class GroupHelper {
           ),
         ),
         if (Platform.isAndroid) ...[
+          GroupItemOptions(
+            pushOptions: GroupItemPushOptions(
+              name: ForkNetworkLocationText.of(context).title,
+              icon: Icons.location_on_outlined,
+              onPush: () async {
+                await Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => const ForkNetworkLocationScreen(),
+                ));
+              },
+            ),
+          ),
           GroupItemOptions(
             switchOptions: GroupItemSwitchOptions(
               name: tcontext.meta.tvMode,
