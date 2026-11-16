@@ -65,6 +65,8 @@ android {
                         storePassword = prop.getProperty("storePassword.release")
                         keyAlias = prop.getProperty("keyAlias.release")
                         keyPassword = prop.getProperty("keyPassword.release")
+                        enableV1Signing = true
+                        enableV2Signing = true
                     }
         }
     }
