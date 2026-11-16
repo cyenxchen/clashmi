@@ -196,17 +196,28 @@ jobs:
           set -euo pipefail
           apk="build/app/outputs/flutter-apk/app-release.apk"
           sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
-          apksigner="${sdk_root}/build-tools/36.0.0/apksigner"
-
-          if [[ ! -x "${apksigner}" ]]; then
-            echo "::error::apksigner not found at ${apksigner}"
+          shopt -s nullglob
+          candidates=("${sdk_root}"/build-tools/*/apksigner)
+          shopt -u nullglob
+          if (( ${#candidates[@]} == 0 )); then
+            echo "::error::apksigner not found under ${sdk_root}/build-tools"
             exit 1
           fi
+          apksigner="$(printf '%s\n' "${candidates[@]}" | sort -V | tail -n 1)"
+          echo "Using ${apksigner}"
 
-          verification="$("${apksigner}" verify --verbose --print-certs \
+          if ! verification="$("${apksigner}" verify --verbose --print-certs \
             --min-sdk-version 23 \
             --max-sdk-version 36 \
-            "${apk}")"
+            "${apk}" 2>&1)"; then
+            printf '%s\n' "${verification}"
+            if grep -Fq "Missing META-INF/MANIFEST.MF" <<< "${verification}"; then
+              echo "::error::Release APK is missing the v1/JAR signature required by legacy APK parsers"
+            else
+              echo "::error::apksigner rejected the release APK"
+            fi
+            exit 1
+          fi
           printf '%s\n' "${verification}"
 
           if ! grep -Fq "Verified using v1 scheme (JAR signing): true" <<< "${verification}"; then
