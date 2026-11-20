@@ -23,7 +23,6 @@ import 'package:clashmi_vpn_service/proxy_manager.dart';
 import 'package:clashmi_vpn_service/state.dart';
 import 'package:clashmi_vpn_service/vpn_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
@@ -38,6 +37,7 @@ class VPNService {
   static const localhost = "127.0.0.1";
   static bool _runAsAdmin = false;
   static final bool _systemExtension = true;
+  static int? _profileMixedPort;
   static List<String> _abis = [];
   static final List<
     void Function(FlutterVpnServiceState state, Map<String, String> params)
@@ -154,7 +154,7 @@ class VPNService {
   }
 
   static Future<bool> _prepareConfig(ProfileSetting profile) async {
-    final corePath = path.join(await PathUtils.profilesDir(), profile.id);
+    final corePath = await ProfileManager.getProfilePath(profile.id);
     final patch = ProfilePatchManager.getProfilePatch(profile.patch);
     final setting = ClashSettingManager.getConfig();
     final appSetting = SettingManager.getConfig();
@@ -162,8 +162,10 @@ class VPNService {
 
     bool overwriteFinal =
         patch.id.isEmpty || patch.id == kProfilePatchBuildinOverwrite;
+    final profileMixedPort = await getProfileMixedPort(corePath, patch.id);
+    final mixedPort = profileMixedPort ?? ClashSettingManager.getMixedPort();
 
-    await ClashSettingManager.saveCorePatchFinal(
+    final patchError = await ClashSettingManager.saveCorePatchFinal(
       profile.id,
       overwriteFinal,
       profile.overwriteRules
@@ -172,10 +174,13 @@ class VPNService {
                 : profile.rules)
           : null,
       profile.overwriteProxyGroups ? profile.proxyGroups : null,
+      preserveMixedPort: profileMixedPort != null,
     );
+    if (patchError != null) {
+      throw StateError(patchError.message);
+    }
 
-    var excludePorts = [controlPort];
-    excludePorts.add(ClashSettingManager.getMixedPort());
+    final excludePorts = [controlPort, if (mixedPort > 0) mixedPort];
 
     String name = AppUtils.getName();
     String vpnName = name;
@@ -269,13 +274,33 @@ class VPNService {
       await confFile.writeAsString(content, flush: true);
     } catch (err) {
       ErrorReporterUtils.tryReportNoSpace(err.toString());
+      rethrow;
     }
+    _profileMixedPort = profileMixedPort;
 
     if (Platform.isMacOS) {
       ProxyManager().setExcludeDevices({vpnName});
     }
 
     return reinstall;
+  }
+
+  static Future<int?> getProfileMixedPort(
+    String corePath,
+    String patchId,
+  ) async {
+    if (patchId != kProfilePatchBuildinNoOverwrite) {
+      return null;
+    }
+    try {
+      final doc = loadYaml(await File(corePath).readAsString());
+      final port = doc is YamlMap ? doc['mixed-port'] : null;
+      return port is int ? port : null;
+    } on YamlException {
+      return null;
+    } on FileSystemException {
+      return null;
+    }
   }
 
   static Future<String> _prepareRuntimeCoreProfile(String corePath) async {
@@ -421,6 +446,7 @@ class VPNService {
     if (!started) {
       return null;
     }
+    final enable = await getSystemProxyEnable();
     try {
       bool reinstall = await _prepareConfig(profile);
       if (reinstall) {
@@ -432,15 +458,14 @@ class VPNService {
     var setting = SettingManager.getConfig();
     if (Platform.isWindows) {
       final controlPort = ClashSettingManager.getControlPort();
-      final mixedPort = ClashSettingManager.getMixedPort();
-      var ports = [controlPort, mixedPort];
+      final mixedPort = getMixedPort();
+      final ports = [controlPort, if (mixedPort > 0) mixedPort];
 
       FlutterVpnService.firewallAddPorts(ports, PathUtils.serviceExeName());
     }
     if (Platform.isIOS || Platform.isMacOS) {
       await FlutterVpnService.setAlwaysOn(false);
     }
-    final enable = await getSystemProxyEnable();
     VpnServiceWaitResult result = await FlutterVpnService.restart(timeout);
     if (result.type == VpnServiceWaitType.timeout) {
       await stop();
@@ -467,7 +492,11 @@ class VPNService {
     }
 
     if (enable) {
-      await setSystemProxy(true);
+      if (getMixedPort() == 0) {
+        await FlutterVpnService.cleanSystemProxy();
+      } else {
+        await setSystemProxy(true);
+      }
     }
     return null;
   }
@@ -492,8 +521,8 @@ class VPNService {
     var setting = SettingManager.getConfig();
     if (Platform.isWindows) {
       final controlPort = ClashSettingManager.getControlPort();
-      final mixedPort = ClashSettingManager.getMixedPort();
-      var ports = [controlPort, mixedPort];
+      final mixedPort = getMixedPort();
+      final ports = [controlPort, if (mixedPort > 0) mixedPort];
 
       FlutterVpnService.firewallAddPorts(ports, PathUtils.serviceExeName());
     }
@@ -605,22 +634,22 @@ class VPNService {
     return false;
   }
 
+  static int getMixedPort() {
+    return _profileMixedPort ?? ClashSettingManager.getMixedPort();
+  }
+
   static Future<List<int?>> getPortsByPrefer(bool preferForward) async {
-    var started = await getStarted();
-    if (started) {
-      final mixedPort = ClashSettingManager.getMixedPort();
-      if (preferForward) {
-        return [mixedPort, null];
-      }
-      return [null, mixedPort];
+    final port = await getPort();
+    if (port == null) {
+      return [null];
     }
-    return [null];
+    return preferForward ? [port, null] : [null, port];
   }
 
   static Future<int?> getPort() async {
-    final mixedPort = ClashSettingManager.getMixedPort();
-    var started = await getStarted();
-    return started ? mixedPort : null;
+    final started = await getStarted();
+    final mixedPort = getMixedPort();
+    return started && mixedPort > 0 ? mixedPort : null;
   }
 
   static Future<ReturnResultError?> reload(Duration timeout) async {
@@ -677,7 +706,7 @@ class VPNService {
   static ProxyOption getSystemProxyOptionsLocalhost() {
     return ProxyOption(
       localhost,
-      ClashSettingManager.getMixedPort(),
+      getMixedPort(),
       SettingManager.getConfig().systemProxyBypassDomain,
     );
   }
@@ -702,14 +731,14 @@ class VPNService {
 
     return ProxyOption(
       host,
-      ClashSettingManager.getMixedPort(),
+      getMixedPort(),
       SettingManager.getConfig().systemProxyBypassDomain,
     );
   }
 
   static Future<ProxyOption> getSystemProxyOptions() async {
     final bypassDomain = SettingManager.getConfig().systemProxyBypassDomain;
-    final mixedPort = ClashSettingManager.getMixedPort();
+    final mixedPort = getMixedPort();
     if (Platform.isMacOS) {
       List<NetInterfacesInfo> interfaces = await NetworkUtils.getInterfaces(
         addressType: InternetAddressType.IPv4,

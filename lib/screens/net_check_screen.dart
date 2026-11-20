@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:clashmi/app/clash/clash_http_api.dart';
-import 'package:clashmi/app/modules/clash_setting_manager.dart';
+import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/utils/network_utils.dart';
 import 'package:clashmi/app/utils/system_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
@@ -97,7 +97,10 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
     setState(() {
       _directHttpResult = directResult;
     });
-    final proxyResult = await _checkHttpWithMixPort(domain, tcontext);
+    final mixedPort = VPNService.getMixedPort();
+    final proxyResult = mixedPort > 0
+        ? await _checkHttp(domain, tcontext, proxyPort: mixedPort)
+        : '';
     if (!mounted) {
       return;
     }
@@ -171,14 +174,6 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
     return _checkHttp(domain, tcontext, proxyPort: null);
   }
 
-  Future<String> _checkHttpWithMixPort(
-    String domain,
-    Translations tcontext,
-  ) async {
-    final mixPort = ClashSettingManager.getMixedPort();
-    return _checkHttp(domain, tcontext, proxyPort: mixPort);
-  }
-
   Future<String> _checkHttp(
     String domain,
     Translations tcontext, {
@@ -221,6 +216,7 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
   @override
   Widget build(BuildContext context) {
     final tcontext = Translations.of(context);
+    final mixedPort = VPNService.getMixedPort();
     Size windowSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: PreferredSize(preferredSize: Size.zero, child: AppBar()),
@@ -268,8 +264,10 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
                                     _dnsResult,
                                     '2. HTTP Via TUN:',
                                     _directHttpResult,
-                                    '3. HTTP Via Proxy:',
-                                    _proxyHttpResult,
+                                    if (mixedPort > 0) ...[
+                                      '3. HTTP Via Proxy:',
+                                      _proxyHttpResult,
+                                    ],
                                     if (!Platform.isIOS) ...[
                                       '4. Route Table:',
                                       _routeTableResult,
@@ -332,13 +330,15 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
                               tcontext.NetCheckScreen.directHttpSection,
                               _directHttpResult,
                             ),
-                            const SizedBox(height: 12),
-                            _buildSection(
-                              tcontext.NetCheckScreen.proxyHttpSection(
-                                p: ClashSettingManager.getMixedPort(),
+                            if (mixedPort > 0) ...[
+                              const SizedBox(height: 12),
+                              _buildSection(
+                                tcontext.NetCheckScreen.proxyHttpSection(
+                                  p: mixedPort,
+                                ),
+                                _proxyHttpResult,
                               ),
-                              _proxyHttpResult,
-                            ),
+                            ],
                             if (!Platform.isIOS) ...[
                               const SizedBox(height: 12),
                               _buildSection(

@@ -1306,7 +1306,15 @@ class GroupHelper {
           getOptions: getOptions,
           onDone: (context) async {
             final profile = ProfileManager.getCurrent();
-            final currentPatch = ProfilePatchManager.getCurrent();
+            final currentPatch = ProfilePatchManager.getProfilePatch(
+              profile?.patch ?? '',
+            );
+            final profileMixedPort = profile == null
+                ? null
+                : await VPNService.getProfileMixedPort(
+                    await ProfileManager.getProfilePath(profile.id),
+                    currentPatch.id,
+                  );
             final result = await ClashSettingManager.getPatchContent(
               currentPatch.id,
               currentPatch.id.isEmpty ||
@@ -1319,6 +1327,7 @@ class GroupHelper {
               profile != null && profile.overwriteProxyGroups
                   ? profile.proxyGroups
                   : null,
+              preserveMixedPort: profileMixedPort != null,
             );
             if (!context.mounted) {
               return false;

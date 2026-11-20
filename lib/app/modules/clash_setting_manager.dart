@@ -534,8 +534,9 @@ class ClashSettingManager {
     String profileId,
     bool overwrite,
     Map<String, String>? overwriteRule,
-    Map<String, ProfileSettingProxyGroup>? overwriteProxyGroups,
-  ) async {
+    Map<String, ProfileSettingProxyGroup>? overwriteProxyGroups, {
+    bool preserveMixedPort = false,
+  }) async {
     if (Platform.isIOS || Platform.isMacOS) {
       _setting.Tun?.Stack = ClashTunStack.gvisor.name;
     }
@@ -639,11 +640,16 @@ class ClashSettingManager {
       String content = encoder.convert(map);
       return ReturnResult(data: content);
     }
-    return ReturnResult(data: getPatchFinalContent());
+    return ReturnResult(
+      data: getPatchFinalContent(preserveMixedPort: preserveMixedPort),
+    );
   }
 
-  static String getPatchFinalContent() {
+  static String getPatchFinalContent({bool preserveMixedPort = false}) {
     final setting = defaultConfigNoOverwrite();
+    if (preserveMixedPort) {
+      setting.MixedPort = null;
+    }
     final map = setting.toJson();
     MapHelper.removeNullOrEmpty(map, true, true);
     const JsonEncoder encoder = JsonEncoder.withIndent('  ');
@@ -655,13 +661,15 @@ class ClashSettingManager {
     String profileId,
     bool overwrite,
     Map<String, String>? overwriteRule,
-    Map<String, ProfileSettingProxyGroup>? overwriteProxyGroups,
-  ) async {
+    Map<String, ProfileSettingProxyGroup>? overwriteProxyGroups, {
+    bool preserveMixedPort = false,
+  }) async {
     final result = await getPatchContent(
       profileId,
       overwrite,
       overwriteRule,
       overwriteProxyGroups,
+      preserveMixedPort: preserveMixedPort,
     );
     if (result.error != null) {
       return result.error;
