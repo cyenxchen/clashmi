@@ -16,20 +16,21 @@ class TranslationsZhCn with BaseTranslations<AppLocale, Translations> implements
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsZhCn({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.zhCn,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <zh-CN>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final TranslationsZhCn _root = this; // ignore: unused_field
 
@@ -37,23 +38,26 @@ class TranslationsZhCn with BaseTranslations<AppLocale, Translations> implements
 	TranslationsZhCn $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsZhCn(meta: meta ?? this.$meta);
 
 	// Translations
-	@override late final _TranslationsBackupAndSyncWebdavScreenZhCn BackupAndSyncWebdavScreen = _TranslationsBackupAndSyncWebdavScreenZhCn._(_root);
-	@override late final _TranslationsLaunchFailedScreenZhCn LaunchFailedScreen = _TranslationsLaunchFailedScreenZhCn._(_root);
-	@override late final _TranslationsPerAppAndroidScreenZhCn PerAppAndroidScreen = _TranslationsPerAppAndroidScreenZhCn._(_root);
-	@override late final _TranslationsUserAgreementScreenZhCn UserAgreementScreen = _TranslationsUserAgreementScreenZhCn._(_root);
-	@override late final _TranslationsNetCheckScreenZhCn NetCheckScreen = _TranslationsNetCheckScreenZhCn._(_root);
-	@override late final _TranslationsVersionUpdateScreenZhCn VersionUpdateScreen = _TranslationsVersionUpdateScreenZhCn._(_root);
-	@override late final _TranslationsLoginScreenZhCn loginScreen = _TranslationsLoginScreenZhCn._(_root);
-	@override late final _TranslationsMainZhCn main = _TranslationsMainZhCn._(_root);
-	@override late final _TranslationsMetaZhCn meta = _TranslationsMetaZhCn._(_root);
-	@override late final _TranslationsPermissionZhCn permission = _TranslationsPermissionZhCn._(_root);
-	@override late final _TranslationsTlsZhCn tls = _TranslationsTlsZhCn._(_root);
-	@override late final _TranslationsTunZhCn tun = _TranslationsTunZhCn._(_root);
-	@override late final _TranslationsDnsZhCn dns = _TranslationsDnsZhCn._(_root);
-	@override late final _TranslationsSnifferZhCn sniffer = _TranslationsSnifferZhCn._(_root);
-	@override late final _TranslationsProfilePatchModeZhCn profilePatchMode = _TranslationsProfilePatchModeZhCn._(_root);
+	@override late final Translations$BackupAndSyncWebdavScreen$zh_CN BackupAndSyncWebdavScreen = Translations$BackupAndSyncWebdavScreen$zh_CN.internal(_root);
+	@override late final Translations$LaunchFailedScreen$zh_CN LaunchFailedScreen = Translations$LaunchFailedScreen$zh_CN.internal(_root);
+	@override late final Translations$PerAppAndroidScreen$zh_CN PerAppAndroidScreen = Translations$PerAppAndroidScreen$zh_CN.internal(_root);
+	@override late final Translations$UserAgreementScreen$zh_CN UserAgreementScreen = Translations$UserAgreementScreen$zh_CN.internal(_root);
+	@override late final Translations$NetCheckScreen$zh_CN NetCheckScreen = Translations$NetCheckScreen$zh_CN.internal(_root);
+	@override late final Translations$VersionUpdateScreen$zh_CN VersionUpdateScreen = Translations$VersionUpdateScreen$zh_CN.internal(_root);
+	@override late final Translations$loginScreen$zh_CN loginScreen = Translations$loginScreen$zh_CN.internal(_root);
+	@override late final Translations$main$zh_CN main = Translations$main$zh_CN.internal(_root);
+	@override late final Translations$meta$zh_CN meta = Translations$meta$zh_CN.internal(_root);
+	@override late final Translations$permission$zh_CN permission = Translations$permission$zh_CN.internal(_root);
+	@override late final Translations$tls$zh_CN tls = Translations$tls$zh_CN.internal(_root);
+	@override late final Translations$tun$zh_CN tun = Translations$tun$zh_CN.internal(_root);
+	@override late final Translations$dns$zh_CN dns = Translations$dns$zh_CN.internal(_root);
+	@override late final Translations$sniffer$zh_CN sniffer = Translations$sniffer$zh_CN.internal(_root);
+	@override late final Translations$profilePatchMode$zh_CN profilePatchMode = Translations$profilePatchMode$zh_CN.internal(_root);
+	@override late final Translations$overwriteMode$zh_CN overwriteMode = Translations$overwriteMode$zh_CN.internal(_root);
 	@override String get protocolSniff => '协议探测';
 	@override String get protocolSniffOverrideDestination => '探测的域名覆盖连接目标地址';
+	@override String sendOrReceiveNotMatch({required Object p}) => '请使用[${p}]';
+	@override String targetConnectFailed({required Object p}) => '连接[${p}]失败,请确保设备在同一个局域网内';
 	@override String get edgeRuntimeNotInstalled => '当前设备尚未安装Edge WebView2运行时,无法展示页面,请下载安装Edge WebView2运行时(x64)后,重启App再试';
 	@override Map<String, String> get locales => {
 		'en': 'English',
@@ -69,8 +73,8 @@ class TranslationsZhCn with BaseTranslations<AppLocale, Translations> implements
 }
 
 // Path: BackupAndSyncWebdavScreen
-class _TranslationsBackupAndSyncWebdavScreenZhCn implements TranslationsBackupAndSyncWebdavScreenEn {
-	_TranslationsBackupAndSyncWebdavScreenZhCn._(this._root);
+class Translations$BackupAndSyncWebdavScreen$zh_CN implements Translations$BackupAndSyncWebdavScreen$en {
+	Translations$BackupAndSyncWebdavScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -82,8 +86,8 @@ class _TranslationsBackupAndSyncWebdavScreenZhCn implements TranslationsBackupAn
 }
 
 // Path: LaunchFailedScreen
-class _TranslationsLaunchFailedScreenZhCn implements TranslationsLaunchFailedScreenEn {
-	_TranslationsLaunchFailedScreenZhCn._(this._root);
+class Translations$LaunchFailedScreen$zh_CN implements Translations$LaunchFailedScreen$en {
+	Translations$LaunchFailedScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -96,8 +100,8 @@ class _TranslationsLaunchFailedScreenZhCn implements TranslationsLaunchFailedScr
 }
 
 // Path: PerAppAndroidScreen
-class _TranslationsPerAppAndroidScreenZhCn implements TranslationsPerAppAndroidScreenEn {
-	_TranslationsPerAppAndroidScreenZhCn._(this._root);
+class Translations$PerAppAndroidScreen$zh_CN implements Translations$PerAppAndroidScreen$en {
+	Translations$PerAppAndroidScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -108,8 +112,8 @@ class _TranslationsPerAppAndroidScreenZhCn implements TranslationsPerAppAndroidS
 }
 
 // Path: UserAgreementScreen
-class _TranslationsUserAgreementScreenZhCn implements TranslationsUserAgreementScreenEn {
-	_TranslationsUserAgreementScreenZhCn._(this._root);
+class Translations$UserAgreementScreen$zh_CN implements Translations$UserAgreementScreen$en {
+	Translations$UserAgreementScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -119,8 +123,8 @@ class _TranslationsUserAgreementScreenZhCn implements TranslationsUserAgreementS
 }
 
 // Path: NetCheckScreen
-class _TranslationsNetCheckScreenZhCn implements TranslationsNetCheckScreenEn {
-	_TranslationsNetCheckScreenZhCn._(this._root);
+class Translations$NetCheckScreen$zh_CN implements Translations$NetCheckScreen$en {
+	Translations$NetCheckScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -142,8 +146,8 @@ class _TranslationsNetCheckScreenZhCn implements TranslationsNetCheckScreenEn {
 }
 
 // Path: VersionUpdateScreen
-class _TranslationsVersionUpdateScreenZhCn implements TranslationsVersionUpdateScreenEn {
-	_TranslationsVersionUpdateScreenZhCn._(this._root);
+class Translations$VersionUpdateScreen$zh_CN implements Translations$VersionUpdateScreen$en {
+	Translations$VersionUpdateScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -154,8 +158,8 @@ class _TranslationsVersionUpdateScreenZhCn implements TranslationsVersionUpdateS
 }
 
 // Path: loginScreen
-class _TranslationsLoginScreenZhCn implements TranslationsLoginScreenEn {
-	_TranslationsLoginScreenZhCn._(this._root);
+class Translations$loginScreen$zh_CN implements Translations$loginScreen$en {
+	Translations$loginScreen$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -164,8 +168,8 @@ class _TranslationsLoginScreenZhCn implements TranslationsLoginScreenEn {
 	@override String get register => '注册账号';
 	@override String get forgotPassword => '忘记密码';
 	@override String get provider => '服务商(机场)';
-	@override String get providerName => '${_root.loginScreen.provider}名称';
-	@override String get providerNameRequired => '请输入${_root.loginScreen.provider}名称';
+	@override String get providerName => '${_root.loginScreen.provider}编码/别名/URL';
+	@override String get providerNameRequired => '请输入${_root.loginScreen.provider}编码/别名/URL';
 	@override String get account => '账号';
 	@override String get accountRequired => '请输入账号';
 	@override String get email => '邮箱';
@@ -176,21 +180,24 @@ class _TranslationsLoginScreenZhCn implements TranslationsLoginScreenEn {
 	@override String passwordMinLength({required Object minLength}) => '密码长度至少${minLength}位';
 	@override String get unsupportedProvider => '不支持的${_root.loginScreen.provider}';
 	@override String get unsupportedProviderType => '不支持的${_root.loginScreen.provider}类型';
+	@override String get unActivedProvider => '登录功能未激活';
+	@override String providerLoginSupportRequired({required Object p}) => '编码/别名请找${_root.loginScreen.provider}索要\n${_root.loginScreen.provider}接入请参考:${p}';
+	@override String get providerDisclaimer => '免责声明:${_root.loginScreen.provider}为三方服务,与本App无关';
 }
 
 // Path: main
-class _TranslationsMainZhCn implements TranslationsMainEn {
-	_TranslationsMainZhCn._(this._root);
+class Translations$main$zh_CN implements Translations$main$en {
+	Translations$main$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
-	@override late final _TranslationsMainTrayZhCn tray = _TranslationsMainTrayZhCn._(_root);
+	@override late final Translations$main$tray$zh_CN tray = Translations$main$tray$zh_CN.internal(_root);
 }
 
 // Path: meta
-class _TranslationsMetaZhCn implements TranslationsMetaEn {
-	_TranslationsMetaZhCn._(this._root);
+class Translations$meta$zh_CN implements Translations$meta$en {
+	Translations$meta$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -228,6 +235,7 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get hours => '时';
 	@override String get minutes => '分';
 	@override String get seconds => '秒';
+	@override String get milliseconds => '毫秒';
 	@override String get protocol => '协议';
 	@override String get search => '搜索';
 	@override String get custom => '自定义';
@@ -260,8 +268,10 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get user => '用户';
 	@override String get account => '账号';
 	@override String get password => '密码';
-	@override String get decryptPassword => '解密密码';
+	@override String get decryptPasswordAES => 'AES解密密码';
+	@override String get decryptPasswordAGE => 'AGE解密密码';
 	@override String get required => '必填';
+	@override String get go => '继续';
 	@override String get sudoPassword => 'sudo 密码(TUN模式需要)';
 	@override String get other => '其他';
 	@override String get dns => 'DNS';
@@ -274,7 +284,9 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get shareUrl => '分享链接';
 	@override String get coreSettingTips => '注意:修改配置后,需要重新连接才会生效';
 	@override String get overwrite => '覆写';
+	@override String get overwriteMethod => '覆写方式';
 	@override String get overwriteCustom => '自定义覆写';
+	@override String get overwriteAppend => '追加覆写';
 	@override String get overwriteTips => '原始配置<-自定义覆写<-App覆写';
 	@override String get noOverwrite => '不覆写';
 	@override String get overwriteSettings => '覆写设置';
@@ -307,7 +319,7 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get userAgent => 'UserAgent';
 	@override String get launchAtStartup => '开机启动';
 	@override String get launchAtStartupRunAsAdmin => '请以管理员身份重新启动Clash Mi';
-	@override String get tunModeRunAsAdmin => 'TUN模式需要系统管理员权限,请以管理员身份重新启动应用';
+	@override String get needRunAsAdmin => '本功能需要系统管理员权限,请以管理员身份重新启动应用';
 	@override String get portableMode => '便携模式';
 	@override String get portableModeDisableTips => '如需退出便携模式,请退出[clashmi]后,手动删除[clashmi.exe]同目录下的[portable]文件夹即可';
 	@override String get systemProxy => '系统代理';
@@ -322,6 +334,7 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get hideVpn => '隐藏VPN图标';
 	@override String get hideVpnTips => '开启IPv6会导致此功能失效';
 	@override String get hideDockIcon => '隐藏Dock图标';
+	@override String get showTrayTraffic => '托盘上显示流量信息';
 	@override String get website => '官网';
 	@override String get homePage => '主页';
 	@override String get rule => '规则';
@@ -360,6 +373,7 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get boardOnline => '使用在线面板';
 	@override String get boardOnlineUrl => '在线面板URL';
 	@override String get boardLocalPort => '本地面板端口';
+	@override String get alwayOnVPN => '始终开启连接';
 	@override String get disableFontScaler => '禁用字体缩放';
 	@override String get autoOrientation => '跟随屏幕旋转';
 	@override String get restartTakesEffect => '重启生效';
@@ -370,7 +384,14 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get requestNeedsUserApproval => '1. 请在[系统设置]-[隐私与安全性]里[允许] Clash Mi安装系统扩展\n2. :[系统设置]-[通用]-[登录项与扩展-网络扩展]启用[clashmiServiceSE]\n完成后重新连接';
 	@override String get FullDiskAccessPermissionRequired => '请在[系统设置]-[隐私与安全性]-[完全磁盘访问权限]里开启clashmiServiceSE权限后,重新连接';
 	@override String get proxy => '代理';
+	@override String get homeScreen => '主屏';
 	@override String get theme => '主题';
+	@override String get widgetsAlpha => 'Widgets 透明度';
+	@override String get widgetsEmpty => '无可用Widget';
+	@override String get backgroundImage => '背景图';
+	@override String get path => '路径';
+	@override String get local => '本地';
+	@override String get remote => '远程';
 	@override String get tvMode => 'TV模式';
 	@override String get autoUpdate => '自动更新';
 	@override String get updateChannel => '自动更新通道';
@@ -415,17 +436,22 @@ class _TranslationsMetaZhCn implements TranslationsMetaEn {
 	@override String get addProfile => '添加配置';
 	@override String get myProfiles => '我的配置';
 	@override String get profileEdit => '编辑配置';
+	@override String get profileNeedActive => '请先将本配置设置为当前配置,并开启连接/重新连接';
+	@override String get profileDownloadBackupChannel => '启用备用下载通道';
+	@override String get profileDownloadBackupChannelTips => 'Clash Mi提供的代理下载通道(不存储任何信息)';
 	@override String get profileEditReloadAfterProfileUpdate => '配置更新后重新加载';
+	@override String get profileRulesAppendApplePush => '附加 Apple 推送通知规则';
+	@override String get profileRulesAppendProxyTips => '规则将自动设置为原始配置里[proxy-groups]中的第一个类型为[url-test]或[select]的代理';
 	@override String get profileImport => '导入配置文件';
 	@override String get profileAddUrlOrContent => '添加配置链接';
-	@override String get profileUrlOrContent => 'Clash配置链接';
-	@override String get profileUrlOrContentHit => 'Clash配置链接[必填]';
+	@override String profileUrlOrContent({required Object p}) => '${p}配置链接';
+	@override String profileUrlOrContentHit({required Object p}) => '[必填], 注意:如果你的链接不是[${_root.meta.profileUrlOrContent(p: p)}](比如V2Ray或Sing-box),请先使用[Clash在线转换工具]将其转换为[${_root.meta.profileUrlOrContent(p: p)}]';
 	@override String get profileUrlOrContentCannotEmpty => '配置链接不能为空';
 }
 
 // Path: permission
-class _TranslationsPermissionZhCn implements TranslationsPermissionEn {
-	_TranslationsPermissionZhCn._(this._root);
+class Translations$permission$zh_CN implements Translations$permission$en {
+	Translations$permission$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -438,21 +464,22 @@ class _TranslationsPermissionZhCn implements TranslationsPermissionEn {
 }
 
 // Path: tls
-class _TranslationsTlsZhCn implements TranslationsTlsEn {
-	_TranslationsTlsZhCn._(this._root);
+class Translations$tls$zh_CN implements Translations$tls$en {
+	Translations$tls$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
 	// Translations
 	@override String get insecure => '跳过证书验证';
+	@override String get ignoreBadCertificate => '忽略证书错误';
 	@override String get certificate => '证书';
 	@override String get privateKey => '私钥';
 	@override String get customTrustCert => '自定义证书';
 }
 
 // Path: tun
-class _TranslationsTunZhCn implements TranslationsTunEn {
-	_TranslationsTunZhCn._(this._root);
+class Translations$tun$zh_CN implements Translations$tun$en {
+	Translations$tun$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -470,8 +497,8 @@ class _TranslationsTunZhCn implements TranslationsTunEn {
 }
 
 // Path: dns
-class _TranslationsDnsZhCn implements TranslationsDnsEn {
-	_TranslationsDnsZhCn._(this._root);
+class Translations$dns$zh_CN implements Translations$dns$en {
+	Translations$dns$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -496,8 +523,8 @@ class _TranslationsDnsZhCn implements TranslationsDnsEn {
 }
 
 // Path: sniffer
-class _TranslationsSnifferZhCn implements TranslationsSnifferEn {
-	_TranslationsSnifferZhCn._(this._root);
+class Translations$sniffer$zh_CN implements Translations$sniffer$en {
+	Translations$sniffer$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -506,8 +533,8 @@ class _TranslationsSnifferZhCn implements TranslationsSnifferEn {
 }
 
 // Path: profilePatchMode
-class _TranslationsProfilePatchModeZhCn implements TranslationsProfilePatchModeEn {
-	_TranslationsProfilePatchModeZhCn._(this._root);
+class Translations$profilePatchMode$zh_CN implements Translations$profilePatchMode$en {
+	Translations$profilePatchMode$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -517,9 +544,21 @@ class _TranslationsProfilePatchModeZhCn implements TranslationsProfilePatchModeE
 	@override String get noOverwrite => '内置-不覆写';
 }
 
+// Path: overwriteMode
+class Translations$overwriteMode$zh_CN implements Translations$overwriteMode$en {
+	Translations$overwriteMode$zh_CN.internal(this._root);
+
+	final TranslationsZhCn _root; // ignore: unused_field
+
+	// Translations
+	@override String get overwrite => '覆写';
+	@override String get noOverwrite => '不覆写';
+	@override String get overwriteAppendToHead => '覆写-附加到头部';
+}
+
 // Path: main.tray
-class _TranslationsMainTrayZhCn implements TranslationsMainTrayEn {
-	_TranslationsMainTrayZhCn._(this._root);
+class Translations$main$tray$zh_CN implements Translations$main$tray$en {
+	Translations$main$tray$zh_CN.internal(this._root);
 
 	final TranslationsZhCn _root; // ignore: unused_field
 
@@ -571,8 +610,8 @@ extension on TranslationsZhCn {
 			'loginScreen.register' => '注册账号',
 			'loginScreen.forgotPassword' => '忘记密码',
 			'loginScreen.provider' => '服务商(机场)',
-			'loginScreen.providerName' => '${_root.loginScreen.provider}名称',
-			'loginScreen.providerNameRequired' => '请输入${_root.loginScreen.provider}名称',
+			'loginScreen.providerName' => '${_root.loginScreen.provider}编码/别名/URL',
+			'loginScreen.providerNameRequired' => '请输入${_root.loginScreen.provider}编码/别名/URL',
 			'loginScreen.account' => '账号',
 			'loginScreen.accountRequired' => '请输入账号',
 			'loginScreen.email' => '邮箱',
@@ -583,6 +622,9 @@ extension on TranslationsZhCn {
 			'loginScreen.passwordMinLength' => ({required Object minLength}) => '密码长度至少${minLength}位',
 			'loginScreen.unsupportedProvider' => '不支持的${_root.loginScreen.provider}',
 			'loginScreen.unsupportedProviderType' => '不支持的${_root.loginScreen.provider}类型',
+			'loginScreen.unActivedProvider' => '登录功能未激活',
+			'loginScreen.providerLoginSupportRequired' => ({required Object p}) => '编码/别名请找${_root.loginScreen.provider}索要\n${_root.loginScreen.provider}接入请参考:${p}',
+			'loginScreen.providerDisclaimer' => '免责声明:${_root.loginScreen.provider}为三方服务,与本App无关',
 			'main.tray.menuOpen' => '打开',
 			'main.tray.menuExit' => '退出',
 			'meta.enable' => '启用',
@@ -618,6 +660,7 @@ extension on TranslationsZhCn {
 			'meta.hours' => '时',
 			'meta.minutes' => '分',
 			'meta.seconds' => '秒',
+			'meta.milliseconds' => '毫秒',
 			'meta.protocol' => '协议',
 			'meta.search' => '搜索',
 			'meta.custom' => '自定义',
@@ -650,8 +693,10 @@ extension on TranslationsZhCn {
 			'meta.user' => '用户',
 			'meta.account' => '账号',
 			'meta.password' => '密码',
-			'meta.decryptPassword' => '解密密码',
+			'meta.decryptPasswordAES' => 'AES解密密码',
+			'meta.decryptPasswordAGE' => 'AGE解密密码',
 			'meta.required' => '必填',
+			'meta.go' => '继续',
 			'meta.sudoPassword' => 'sudo 密码(TUN模式需要)',
 			'meta.other' => '其他',
 			'meta.dns' => 'DNS',
@@ -664,7 +709,9 @@ extension on TranslationsZhCn {
 			'meta.shareUrl' => '分享链接',
 			'meta.coreSettingTips' => '注意:修改配置后,需要重新连接才会生效',
 			'meta.overwrite' => '覆写',
+			'meta.overwriteMethod' => '覆写方式',
 			'meta.overwriteCustom' => '自定义覆写',
+			'meta.overwriteAppend' => '追加覆写',
 			'meta.overwriteTips' => '原始配置<-自定义覆写<-App覆写',
 			'meta.noOverwrite' => '不覆写',
 			'meta.overwriteSettings' => '覆写设置',
@@ -697,7 +744,7 @@ extension on TranslationsZhCn {
 			'meta.userAgent' => 'UserAgent',
 			'meta.launchAtStartup' => '开机启动',
 			'meta.launchAtStartupRunAsAdmin' => '请以管理员身份重新启动Clash Mi',
-			'meta.tunModeRunAsAdmin' => 'TUN模式需要系统管理员权限,请以管理员身份重新启动应用',
+			'meta.needRunAsAdmin' => '本功能需要系统管理员权限,请以管理员身份重新启动应用',
 			'meta.portableMode' => '便携模式',
 			'meta.portableModeDisableTips' => '如需退出便携模式,请退出[clashmi]后,手动删除[clashmi.exe]同目录下的[portable]文件夹即可',
 			'meta.systemProxy' => '系统代理',
@@ -712,6 +759,7 @@ extension on TranslationsZhCn {
 			'meta.hideVpn' => '隐藏VPN图标',
 			'meta.hideVpnTips' => '开启IPv6会导致此功能失效',
 			'meta.hideDockIcon' => '隐藏Dock图标',
+			'meta.showTrayTraffic' => '托盘上显示流量信息',
 			'meta.website' => '官网',
 			'meta.homePage' => '主页',
 			'meta.rule' => '规则',
@@ -750,6 +798,7 @@ extension on TranslationsZhCn {
 			'meta.boardOnline' => '使用在线面板',
 			'meta.boardOnlineUrl' => '在线面板URL',
 			'meta.boardLocalPort' => '本地面板端口',
+			'meta.alwayOnVPN' => '始终开启连接',
 			'meta.disableFontScaler' => '禁用字体缩放',
 			'meta.autoOrientation' => '跟随屏幕旋转',
 			'meta.restartTakesEffect' => '重启生效',
@@ -760,7 +809,14 @@ extension on TranslationsZhCn {
 			'meta.requestNeedsUserApproval' => '1. 请在[系统设置]-[隐私与安全性]里[允许] Clash Mi安装系统扩展\n2. :[系统设置]-[通用]-[登录项与扩展-网络扩展]启用[clashmiServiceSE]\n完成后重新连接',
 			'meta.FullDiskAccessPermissionRequired' => '请在[系统设置]-[隐私与安全性]-[完全磁盘访问权限]里开启clashmiServiceSE权限后,重新连接',
 			'meta.proxy' => '代理',
+			'meta.homeScreen' => '主屏',
 			'meta.theme' => '主题',
+			'meta.widgetsAlpha' => 'Widgets 透明度',
+			'meta.widgetsEmpty' => '无可用Widget',
+			'meta.backgroundImage' => '背景图',
+			'meta.path' => '路径',
+			'meta.local' => '本地',
+			'meta.remote' => '远程',
 			'meta.tvMode' => 'TV模式',
 			'meta.autoUpdate' => '自动更新',
 			'meta.updateChannel' => '自动更新通道',
@@ -805,11 +861,16 @@ extension on TranslationsZhCn {
 			'meta.addProfile' => '添加配置',
 			'meta.myProfiles' => '我的配置',
 			'meta.profileEdit' => '编辑配置',
+			'meta.profileNeedActive' => '请先将本配置设置为当前配置,并开启连接/重新连接',
+			'meta.profileDownloadBackupChannel' => '启用备用下载通道',
+			'meta.profileDownloadBackupChannelTips' => 'Clash Mi提供的代理下载通道(不存储任何信息)',
 			'meta.profileEditReloadAfterProfileUpdate' => '配置更新后重新加载',
+			'meta.profileRulesAppendApplePush' => '附加 Apple 推送通知规则',
+			'meta.profileRulesAppendProxyTips' => '规则将自动设置为原始配置里[proxy-groups]中的第一个类型为[url-test]或[select]的代理',
 			'meta.profileImport' => '导入配置文件',
 			'meta.profileAddUrlOrContent' => '添加配置链接',
-			'meta.profileUrlOrContent' => 'Clash配置链接',
-			'meta.profileUrlOrContentHit' => 'Clash配置链接[必填]',
+			'meta.profileUrlOrContent' => ({required Object p}) => '${p}配置链接',
+			'meta.profileUrlOrContentHit' => ({required Object p}) => '[必填], 注意:如果你的链接不是[${_root.meta.profileUrlOrContent(p: p)}](比如V2Ray或Sing-box),请先使用[Clash在线转换工具]将其转换为[${_root.meta.profileUrlOrContent(p: p)}]',
 			'meta.profileUrlOrContentCannotEmpty' => '配置链接不能为空',
 			'permission.camera' => '摄像头',
 			'permission.screen' => '屏幕录制',
@@ -817,6 +878,7 @@ extension on TranslationsZhCn {
 			'permission.request' => ({required Object p}) => '开启[${p}]权限',
 			'permission.requestNeed' => ({required Object p}) => '请开启[${p}]权限',
 			'tls.insecure' => '跳过证书验证',
+			'tls.ignoreBadCertificate' => '忽略证书错误',
 			'tls.certificate' => '证书',
 			'tls.privateKey' => '私钥',
 			'tls.customTrustCert' => '自定义证书',
@@ -851,8 +913,13 @@ extension on TranslationsZhCn {
 			'profilePatchMode.currentSelected' => '当前选择',
 			'profilePatchMode.overwrite' => '内置-覆写',
 			'profilePatchMode.noOverwrite' => '内置-不覆写',
+			'overwriteMode.overwrite' => '覆写',
+			'overwriteMode.noOverwrite' => '不覆写',
+			'overwriteMode.overwriteAppendToHead' => '覆写-附加到头部',
 			'protocolSniff' => '协议探测',
 			'protocolSniffOverrideDestination' => '探测的域名覆盖连接目标地址',
+			'sendOrReceiveNotMatch' => ({required Object p}) => '请使用[${p}]',
+			'targetConnectFailed' => ({required Object p}) => '连接[${p}]失败,请确保设备在同一个局域网内',
 			'edgeRuntimeNotInstalled' => '当前设备尚未安装Edge WebView2运行时,无法展示页面,请下载安装Edge WebView2运行时(x64)后,重启App再试',
 			'locales.en' => 'English',
 			'locales.zh-CN' => '简体中文',

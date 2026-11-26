@@ -1,5 +1,6 @@
 import 'package:characters/characters.dart';
 import 'package:flutter_emoji/flutter_emoji.dart';
+import 'package:tuple/tuple.dart';
 
 abstract final class EmojiUtils {
   static final EmojiParser _parser = EmojiParser();
@@ -24,13 +25,14 @@ abstract final class EmojiUtils {
     return buffer.toString();
   }
 
-  static String unemojify(String text) {
-    if (text.isEmpty) return text;
-
+  static Tuple2<String, bool> unemojify(String text) {
+    if (text.isEmpty) return Tuple2(text, false);
+    bool hasEmoji = false;
     final characters = Characters(text);
     final buffer = StringBuffer();
     for (final character in characters) {
       if (_parser.hasEmoji(character)) {
+        hasEmoji = true;
         var result = character;
         result = result.replaceAll(
           character,
@@ -42,7 +44,7 @@ abstract final class EmojiUtils {
         buffer.write(character);
       }
     }
-    return buffer.toString();
+    return Tuple2(buffer.toString(), hasEmoji);
   }
 
   static String emojify(String text, {String Function(String)? fnFormat}) {

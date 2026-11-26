@@ -25,6 +25,18 @@ import 'package:tuple/tuple.dart';
 
 const int kRemarkMaxLength = 32;
 
+enum OverwriteMode {
+  overwrite(name: "overwrite"),
+  overwriteAppendToHead(name: "overwriteAppendToHead"),
+  noOverwrite(name: "noOverwrite");
+
+  const OverwriteMode({required this.name});
+  final String name;
+
+  static List<String> names() =>
+      OverwriteMode.values.map((e) => e.name).toList();
+}
+
 class ProfileSettingProxyGroup {
   List<String> proxies = [];
   Map<String, dynamic> toJson() => {'proxies': proxies};
@@ -50,9 +62,12 @@ class ProfileSetting {
     this.updateIntervalByProfile,
     this.updateIntervalPreferByProfile = false,
     this.update,
+    this.updateFailed,
     this.url = "",
     this.xhwid = false,
-    this.decryptPassword = "",
+    this.decryptPasswordAES = "",
+    this.delayTestUrl,
+    this.delayTestTimeout,
     this.userAgent = "",
     this.patch = "",
   });
@@ -63,20 +78,23 @@ class ProfileSetting {
   Duration? updateIntervalByProfile;
   bool updateIntervalPreferByProfile = false;
   DateTime? update;
+  DateTime? updateFailed;
   String url;
   String userAgent;
   bool xhwid = false;
-  String decryptPassword = "";
+  String decryptPasswordAES = "";
+  String? delayTestUrl;
+  int? delayTestTimeout;
   num upload = 0;
   num download = 0;
   num total = 0;
   String expire = "";
 
-  bool overwriteProxyGroups = false;
-  bool overwriteRules = false;
+  OverwriteMode proxyGroupsOverwriteMethod = OverwriteMode.overwrite;
+  OverwriteMode rulesOverwriteMethod = OverwriteMode.overwrite;
   Map<String, ProfileSettingProxyGroup> proxyGroups = {};
   Map<String, String> rules = {};
-  Map<String, String> rulesForProxyGroups = {};
+  bool appendApplePushRules = Platform.isIOS || Platform.isMacOS;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -89,16 +107,18 @@ class ProfileSetting {
     'url': url,
     'user_agent': userAgent,
     'xhwid': xhwid,
-    'decrypt_password': decryptPassword,
+    'decrypt_password_aes': decryptPasswordAES,
+    'delay_test_url': delayTestUrl,
+    'delay_test_timeout': delayTestTimeout,
     'upload': upload,
     'download': download,
     'total': total,
     'expire': expire,
-    'overwrite_rules': overwriteRules,
-    'overwrite_proxy_groups': overwriteProxyGroups,
+    'proxy_groups_overwrite_method': proxyGroupsOverwriteMethod.name,
+    'rules_overwrite_method': rulesOverwriteMethod.name,
     'proxy_groups': proxyGroups,
     'rules': rules,
-    'rules_for_proxy_groups': rulesForProxyGroups,
+    'append_apple_push_rules': appendApplePushRules,
   };
   void fromJson(Map<String, dynamic>? map) {
     if (map == null) {
@@ -132,14 +152,28 @@ class ProfileSetting {
     url = map['url'] ?? '';
     userAgent = map['user_agent'] ?? '';
     xhwid = map['xhwid'] ?? false;
-    decryptPassword = map['decrypt_password'] ?? '';
+    decryptPasswordAES =
+        map['decrypt_password_aes'] ?? map['decrypt_password'] ?? '';
+    delayTestUrl = map['delay_test_url'];
+    delayTestTimeout = map['delay_test_timeout'];
     upload = map['upload'] ?? 0;
     download = map['download'] ?? 0;
     total = map['total'] ?? 0;
     expire = map['expire'] ?? "";
-    decryptPassword = map['decrypt_password'] ?? "";
-    overwriteProxyGroups = map['overwrite_proxy_groups'] ?? false;
-    overwriteRules = map['overwrite_rules'] ?? false;
+    final overwriteProxyGroups = map['overwrite_proxy_groups'] ?? false;
+    final overwriteRules = map['overwrite_rules'] ?? false;
+    proxyGroupsOverwriteMethod = OverwriteMode.values.firstWhere(
+      (e) => e.name == map['proxy_groups_overwrite_method'],
+      orElse: () => overwriteProxyGroups == false
+          ? OverwriteMode.noOverwrite
+          : OverwriteMode.overwrite,
+    );
+    rulesOverwriteMethod = OverwriteMode.values.firstWhere(
+      (e) => e.name == map['rules_overwrite_method'],
+      orElse: () => overwriteRules == false
+          ? OverwriteMode.noOverwrite
+          : OverwriteMode.overwrite,
+    );
     final pgs = map["proxy_groups"];
     if (pgs is Map) {
       pgs.forEach((key, value) {
@@ -148,15 +182,17 @@ class ProfileSetting {
         proxyGroups[key] = pg;
       });
     }
-    rules = ConvertUtils.convertMap(map["rules"]) ?? {};
+    rules =
+        ConvertUtils.convertMap(
+          map["rules"] ?? map["rules_for_proxy_groups"],
+        ) ??
+        {};
     rules.removeWhere((key, value) {
       return key.isEmpty || value.isEmpty;
     });
-    rulesForProxyGroups =
-        ConvertUtils.convertMap(map["rules_for_proxy_groups"]) ?? {};
-    rulesForProxyGroups.removeWhere((key, value) {
-      return key.isEmpty || value.isEmpty;
-    });
+
+    appendApplePushRules =
+        map['append_apple_push_rules'] ?? Platform.isIOS || Platform.isMacOS;
   }
 
   String getType() {
@@ -248,25 +284,26 @@ class ProfileSetting {
     ps.updateIntervalByProfile = updateIntervalByProfile;
     ps.updateIntervalPreferByProfile = updateIntervalPreferByProfile;
     ps.update = update;
+    ps.updateFailed = updateFailed;
     ps.url = url;
     ps.userAgent = userAgent;
     ps.xhwid = xhwid;
-    ps.decryptPassword = decryptPassword;
+    ps.decryptPasswordAES = decryptPasswordAES;
+    ps.delayTestUrl = delayTestUrl;
+    ps.delayTestTimeout = delayTestTimeout;
     ps.upload = upload;
     ps.download = download;
     ps.total = total;
     ps.expire = expire;
-    ps.overwriteProxyGroups = overwriteProxyGroups;
-    ps.overwriteRules = overwriteRules;
+    ps.proxyGroupsOverwriteMethod = proxyGroupsOverwriteMethod;
+    ps.rulesOverwriteMethod = rulesOverwriteMethod;
     proxyGroups.forEach((key, value) {
       ps.proxyGroups[key] = value.clone();
     });
     rules.forEach((key, value) {
       ps.rules[key] = value;
     });
-    rulesForProxyGroups.forEach((key, value) {
-      ps.rulesForProxyGroups[key] = value;
-    });
+    ps.appendApplePushRules = appendApplePushRules;
     return ps;
   }
 }
@@ -302,7 +339,6 @@ class ProfileConfig {
 
 class ProfileManager {
   static const String yamlExtension = "yaml";
-  static const String urlComment = "#url:";
   static final ProfileConfig _config = ProfileConfig();
 
   static final List<void Function(String)> onEventCurrentChanged = [];
@@ -311,9 +347,10 @@ class ProfileManager {
   static final List<void Function(String, bool)> onEventUpdate = [];
   static final Set<String> updating = {};
   static Timer? _timerChecker;
-  static bool _saving = false;
+  static final FileSaver _fileSaver = FileSaver();
 
   static Future<void> init() async {
+    _fileSaver.setSavePath(await PathUtils.profilesConfigFilePath());
     await load();
     VPNService.onEventStateChanged.add((
       FlutterVpnServiceState state,
@@ -373,19 +410,7 @@ class ProfileManager {
   }
 
   static Future<void> save() async {
-    if (_saving) {
-      return;
-    }
-    _saving = true;
-    String filePath = await PathUtils.profilesConfigFilePath();
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    String content = encoder.convert(_config);
-    try {
-      await File(filePath).writeAsString(content, flush: true);
-    } catch (err, stacktrace) {
-      Log.w("ProfileManager.save exception  $filePath ${err.toString()}");
-    }
-    _saving = false;
+    await _fileSaver.saveAsJson(_config);
   }
 
   static Future<void> load() async {
@@ -405,34 +430,6 @@ class ProfileManager {
     } else {
       await save();
     }
-
-    Map<String, String?> existProfiles = {};
-    String dir = await PathUtils.profilesDir();
-    var files = FileUtils.recursionFile(
-      dir,
-      extensionFilter: {".yaml", ".yml"},
-    );
-    for (var file in files) {
-      String? line = await FileUtils.readLastLineStartWith(file, urlComment);
-      existProfiles[path.basename(file)] = line
-          ?.substring(urlComment.length)
-          .trim();
-    }
-    for (int i = 0; i < _config.profiles.length; ++i) {
-      if (!existProfiles.containsKey(_config.profiles[i].id) &&
-          !_config.profiles[i].isRemote()) {
-        _config.profiles.removeAt(i);
-        --i;
-      }
-    }
-    existProfiles.forEach((key, existValue) {
-      int index = _config.profiles.indexWhere((value) {
-        return value.id == key;
-      });
-      if (index < 0) {
-        _config.profiles.add(ProfileSetting(id: key, url: existValue ?? ""));
-      }
-    });
 
     if (_config._currentId.isNotEmpty) {
       int index = _config.profiles.indexWhere((value) {
@@ -559,6 +556,9 @@ class ProfileManager {
     if (content.startsWith("<!DOCTYPE html>") || content.startsWith("<html")) {
       return ReturnResultError("Invalid format: html");
     }
+    if (content.startsWith("-----BEGIN AGE ENCRYPTED FILE-----")) {
+      return ReturnResultError("AGE encrypted profiles are not supported");
+    }
     if (!content.contains("proxies") && !content.contains("proxy-providers")) {
       return ReturnResultError(
         "Invalid Clash Yaml file: proxies and proxy-providers not found",
@@ -573,10 +573,9 @@ class ProfileManager {
     String patch = "",
     String userAgent = "",
     bool xhwid = false,
-    String decryptPassword = "",
+    String decryptPasswordAES = "",
     Duration? updateInterval,
     bool updateIntervalPreferByProfile = false,
-    bool popToTopIfNotExist = false,
   }) async {
     final uri = Uri.tryParse(url);
     if (uri == null) {
@@ -603,29 +602,55 @@ class ProfileManager {
         break;
       }
     }
+    if (result.data != null) {
+      final err = _handleHwidError(result.data!);
+      if (err != null) {
+        return ReturnResult(error: err);
+      }
+    }
     if (result.error != null) {
       return ReturnResult(error: result.error);
     }
     Duration? updateIntervalByProfile;
     if (result.data != null) {
-      final err = await decryptProfile(result.data, savePath, decryptPassword);
+      final err = await decryptProfile(
+        result.data,
+        savePath,
+        decryptPasswordAES,
+      );
       if (err != null) {
         await FileUtils.deletePath(savePath);
         return ReturnResult(error: err);
       }
       //final announce = result.data!.value("announce");
       //final supportUrl = result.data!.value("support-url");
-      //final xhwidLimit = result.data!.value("x-hwid-limit");
+
       final profileUpdateInterval = result.data!.value(
         "profile-update-interval",
       );
       if (profileUpdateInterval != null) {
-        var pui = int.tryParse(profileUpdateInterval);
-        if (pui != null) {
-          if (pui < 1) {
-            pui = 1;
+        var hours = int.tryParse(profileUpdateInterval);
+        if (hours != null) {
+          if (hours < 1) {
+            hours = 1;
           }
-          updateIntervalByProfile = Duration(hours: pui);
+          updateIntervalByProfile = Duration(hours: hours);
+        }
+      }
+      if (remark.isEmpty) {
+        final profileTitle = result.data!.value("profile-title");
+        if (profileTitle != null && profileTitle.isNotEmpty) {
+          if (profileTitle.startsWith("base64:")) {
+            final base64Str = profileTitle.substring("base64:".length);
+            try {
+              String de = base64.normalize(base64Str);
+              remark = utf8.decode(base64.decode(de));
+            } catch (e) {
+              Log.w("Failed to decode base64 profile-title: $e");
+            }
+          } else {
+            remark = profileTitle;
+          }
         }
       }
     }
@@ -635,14 +660,11 @@ class ProfileManager {
       return ReturnResult(error: err);
     }
 
-    await FileUtils.append(savePath, "\n$urlComment$url\n");
     if (remark.isEmpty) {
-      final result = await HttpUtils.httpGetTitle(url, userAgent);
-      if (result.data == null || result.data!.length > 32) {
-        remark = uri.host;
-      } else {
-        remark = result.data!;
-      }
+      final title = (await HttpUtils.httpGetTitle(url, userAgent)).data;
+      remark = title == null || title.isEmpty || title.length > 32
+          ? uri.host
+          : title;
     }
     int index = _config.profiles.indexWhere((value) {
       return value.id == id;
@@ -657,17 +679,13 @@ class ProfileManager {
       url: url,
       userAgent: userAgent,
       xhwid: xhwid,
-      decryptPassword: decryptPassword,
+      decryptPasswordAES: decryptPasswordAES,
       patch: patch,
     );
 
     profile.updateSubscriptionTraffic(result.data);
     if (index < 0) {
-      if (popToTopIfNotExist) {
-        _config.profiles.insert(0, profile);
-      } else {
-        _config.profiles.add(profile);
-      }
+      _config.profiles.add(profile);
     } else {
       _config.profiles[index] = profile;
     }
@@ -736,34 +754,53 @@ class ProfileManager {
         break;
       }
     }
+    final error =
+        (result.data == null ? null : _handleHwidError(result.data!)) ??
+        result.error;
+    if (error != null) {
+      updating.remove(id);
+      Future.delayed(const Duration(milliseconds: 10), () async {
+        for (var event in onEventUpdate) {
+          event(id, true);
+        }
+      });
+      profile.updateFailed = DateTime.now();
+      return error;
+    }
     profile.update = DateTime.now();
+    profile.updateFailed = null;
     if (result.error == null) {
       final profileUpdateInterval = result.data!.value(
         "profile-update-interval",
       );
       if (profileUpdateInterval != null) {
-        var pui = int.tryParse(profileUpdateInterval);
-        if (pui != null) {
-          if (pui < 1) {
-            pui = 1;
+        var hours = int.tryParse(profileUpdateInterval);
+        if (hours != null) {
+          if (hours < 1) {
+            hours = 1;
           }
-          profile.updateIntervalByProfile = Duration(hours: pui);
+          profile.updateIntervalByProfile = Duration(hours: hours);
         }
       }
       final err1 = await decryptProfile(
         result.data,
         savePathTmp,
-        profile.decryptPassword,
+        profile.decryptPasswordAES,
       );
       if (err1 != null) {
+        updating.remove(id);
         await FileUtils.deletePath(savePath);
+        Future.delayed(const Duration(milliseconds: 10), () async {
+          for (var event in onEventUpdate) {
+            event(id, true);
+          }
+        });
         return err1;
       }
       final err = await validFileContentFormat(savePathTmp);
       if (err != null) {
         updating.remove(id);
         await FileUtils.deletePath(savePathTmp);
-
         Future.delayed(const Duration(milliseconds: 10), () async {
           for (var event in onEventUpdate) {
             event(id, true);
@@ -787,7 +824,6 @@ class ProfileManager {
       if (renameError.isNotEmpty) {
         updating.remove(id);
         await FileUtils.deletePath(savePathTmp);
-
         Future.delayed(const Duration(milliseconds: 10), () async {
           for (var event in onEventUpdate) {
             event(id, true);
@@ -798,15 +834,6 @@ class ProfileManager {
         );
       }
 
-      await FileUtils.append(savePath, "\n$urlComment${profile.url}\n");
-      if (profile.remark.isEmpty) {
-        final result = await HttpUtils.httpGetTitle(profile.url, userAgent);
-        if (result.data == null || result.data!.length > 32) {
-          profile.remark = uri.host;
-        } else {
-          profile.remark = result.data!;
-        }
-      }
       profile.updateSubscriptionTraffic(result.data);
     }
     await save();
@@ -817,6 +844,27 @@ class ProfileManager {
       }
     });
     return result.error;
+  }
+
+  static ReturnResultError? _handleHwidError(HttpHeaders headers) {
+    final xHwidActive = headers.value("x-hwid-active");
+    final xHwidNotSupported = headers.value("x-hwid-not-supported");
+    final xHwidLimit = headers.value("x-hwid-limit");
+    final xHwidMaxDevicesReached = headers.value("x-hwid-max-devices-reached");
+    if (xHwidActive == "true" && xHwidNotSupported == "true") {
+      return ReturnResultError(
+        "The server has enabled HWID device restrictions; please enable your \"X-HWID\" and try again.",
+      );
+    }
+    if (xHwidLimit == "true") {
+      return ReturnResultError("You have reached the X-HWID limit.");
+    }
+    if (xHwidMaxDevicesReached == "true") {
+      return ReturnResultError(
+        "You have reached the maximum number of devices for X-HWID.",
+      );
+    }
+    return null;
   }
 
   static Future<void> updateByTicker() async {
@@ -838,7 +886,11 @@ class ProfileManager {
       if (profile.update == null ||
           now.difference(profile.update!).inSeconds >=
               updateInterval.inSeconds) {
-        update(profile.id);
+        if (profile.updateFailed == null ||
+            now.difference(profile.updateFailed!).inSeconds >=
+                updateInterval.inSeconds) {
+          update(profile.id);
+        }
       }
     }
   }
@@ -892,9 +944,6 @@ class ProfileManager {
   }
 
   static void reorder(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= _config.profiles.length ||
         newIndex >= _config.profiles.length) {
       return;
@@ -915,7 +964,7 @@ class ProfileManager {
   static Future<ReturnResultError?> decryptProfile(
     HttpHeaders? headers,
     String filePath,
-    String password,
+    String passwordAES,
   ) async {
     if (headers == null) {
       return null;
@@ -926,7 +975,7 @@ class ProfileManager {
         subscriptionEncryption.first.trim() != "true") {
       return null;
     }
-    if (password.isEmpty) {
+    if (passwordAES.isEmpty) {
       return ReturnResultError("profile is encrypted but no password provided");
     }
     final file = File(filePath);
@@ -934,10 +983,7 @@ class ProfileManager {
       return null;
     }
     final content = await file.readAsString();
-    final decodedContent = ProfileDecryptUtils.decryptProfileContent(
-      password,
-      content,
-    );
+    final decodedContent = ProfileDecryptUtils.aesDecrypt(passwordAES, content);
     if (decodedContent == null) {
       return ReturnResultError("decrypt profile failed");
     }

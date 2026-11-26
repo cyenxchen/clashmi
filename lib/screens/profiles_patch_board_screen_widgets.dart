@@ -230,7 +230,7 @@ class _ProfilesPatchBoardScreenWidget
         child: Scrollbar(
           child: ReorderableListView(
             children: widgets,
-            onReorder: (int oldIndex, int newIndex) {
+            onReorderItem: (int oldIndex, int newIndex) {
               ProfilePatchManager.reorder(oldIndex, newIndex);
 
               setState(() {});
@@ -261,7 +261,7 @@ class _ProfilesPatchBoardScreenWidget
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: FileViewScreen.routSettings(),
+              settings: FileViewScreen.routeSettings(),
               builder: (context) => FileViewScreen(
                 title: setting.getShowName(context),
                 content: content,
@@ -316,7 +316,7 @@ class _ProfilesPatchBoardScreenWidget
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: ProfilesPatchSettingsEditScreen.routSettings(),
+              settings: ProfilesPatchSettingsEditScreen.routeSettings(),
               builder: (context) =>
                   ProfilesPatchSettingsEditScreen(profileid: setting.id),
             ),

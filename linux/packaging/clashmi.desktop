@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Clash Mi
+GenericName=Clash Mi
+Comment=Clash Mi client
+Exec=clashmi %u
+TryExec=clashmi
+Terminal=false
+Categories=Network;
+StartupNotify=true
+Icon=com.nebula.clashmi
+MimeType=x-scheme-handler/clash;x-scheme-handler/clashmi;

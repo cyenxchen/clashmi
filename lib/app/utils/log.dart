@@ -40,7 +40,7 @@ class FileLogOutput extends LogOutput {
   }
 
   @override
-  void output(OutputEvent event) async {
+  void output(OutputEvent event) {
     if (_file == null || _raf == null) {
       return;
     }
@@ -53,6 +53,10 @@ class FileLogOutput extends LogOutput {
     }
 
     _write();
+  }
+
+  Future<void> flush() async {
+    await _write();
   }
 
   Future<void> _write() async {
@@ -111,6 +115,7 @@ class Printer extends LogPrinter {
         "${event.time.timeZoneOffset.inHours > 0 ? "+" : "-"}$zone  ${event.time.toLocal().toString()}";
     List<String> ret = [
       time,
+      pid.toString(),
       _prefixMap[event.level] ?? 'UNKNOWN',
       event.message,
     ];
@@ -129,9 +134,10 @@ class Printer extends LogPrinter {
 
 class Log {
   static final FileLogOutput _fileLogOutput = FileLogOutput();
+  static final DevelopmentFilter _filter = DevelopmentFilter();
   static final Logger _logger = Logger(
     printer: Printer(),
-    filter: DevelopmentFilter(),
+    filter: _filter,
     output: _fileLogOutput,
     level: bool.fromEnvironment("dart.vm.product")
         ? Level.warning
@@ -145,6 +151,20 @@ class Log {
 
   static Future<void> uninit() async {
     await _fileLogOutput.destroy();
+  }
+
+  static void setLevel(String logLevel) {
+    if (logLevel == "trace") {
+      _filter.level = Level.trace;
+    } else if (logLevel == "debug") {
+      _filter.level = Level.debug;
+    } else if (logLevel == "info") {
+      _filter.level = Level.info;
+    } else if (logLevel == "warning") {
+      _filter.level = Level.warning;
+    } else if (logLevel == "error") {
+      _filter.level = Level.error;
+    }
   }
 
   static void d(dynamic message) {
@@ -161,5 +181,9 @@ class Log {
 
   static void e(dynamic message) {
     _logger.e(message);
+  }
+
+  static Future<void> flush() async {
+    await _fileLogOutput.flush();
   }
 }

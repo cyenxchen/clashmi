@@ -9,10 +9,12 @@ import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/diversion_template_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
+import 'package:clashmi/app/modules/profile_patch_manager.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/did.dart';
+import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
@@ -21,6 +23,7 @@ import 'package:flutter/services.dart';
 
 import 'package:clashmi_vpn_service/proxy_manager.dart';
 import 'package:path/path.dart' as path;
+import 'package:yaml/yaml.dart';
 
 class ClashSettingManager {
   static final List<void Function()> onEventModeChanged = [];
@@ -32,6 +35,7 @@ class ClashSettingManager {
   static const iNet6Address = "fdfe:dcbe:9876::1/126";
   static const dnsHijack = "0.0.0.0:53";
   static RawConfig _setting = defaultConfig();
+  static final FileSaver _fileSaver = FileSaver();
 
   static Future<void> init() async {
     ClashHttpApi.getControlPort = () {
@@ -40,6 +44,7 @@ class ClashSettingManager {
     ClashHttpApi.getSecret = () {
       return _setting.Secret ?? "";
     };
+    _fileSaver.setSavePath(await PathUtils.serviceCoreSettingFilePath());
     await load();
     await initGeo();
   }
@@ -297,11 +302,12 @@ class ClashSettingManager {
       Inet4Address: [iNet4Address],
       Inet6Address: [iNet6Address],
       DNSHijack: [dnsHijack],
+      DisableICMPForwarding: true,
     );
   }
 
   static RawDNS defaultDNS() {
-    const nameServer = [
+    const List<String> nameServer = [
       "223.5.5.5",
       "119.29.29.29",
       "8.8.8.8",
@@ -318,7 +324,28 @@ class ClashSettingManager {
       "quic://dns.adguard.com:784",
       "system",
     ];
-    const defaultNameserver = [
+    const List<String> defaultNameserver = [
+      "223.5.5.5",
+      "119.29.29.29",
+      "8.8.8.8",
+      "8.8.4.4",
+      "1.0.0.1",
+      "1.1.1.1",
+      "system",
+    ];
+    const List<String> proxyServerNameserver = [
+      "223.5.5.5",
+      "119.29.29.29",
+      "8.8.8.8",
+      "8.8.4.4",
+      "1.0.0.1",
+      "1.1.1.1",
+      "tls://8.8.4.4",
+      "tls://1.1.1.1",
+      "tls://223.5.5.5:853",
+      "https://dns.alidns.com/dns-query#h3=true",
+    ];
+    const List<String> directNameServer = [
       "223.5.5.5",
       "119.29.29.29",
       "8.8.8.8",
@@ -334,13 +361,7 @@ class ClashSettingManager {
         "https://1.12.12.12/dns-query",
         "https://120.53.53.53/dns-query"*/
     ];
-    const List<String> proxyServerNameserver = [
-      /*"tls://8.8.4.4",
-        "tls://1.1.1.1",
-        "tls://223.5.5.5:853",
-        "https://dns.alidns.com/dns-query#h3=true",*/
-    ];
-    const fakeIPFilter = [
+    const List<String> fakeIPFilter = [
       "*.lan",
       "*.local",
       "time.*.com",
@@ -406,11 +427,11 @@ class ClashSettingManager {
       FakeIPRange: "${iNet4Address.split('/')[0]}/16",
       FakeIPFilter: fakeIPFilter,
       FakeIPFilterMode: ClashFakeIPFilterMode.blacklist.name,
-      DefaultNameserver: defaultNameserver,
       CacheAlgorithm: ClashDnsCacheAlgorithm.arc.name,
+      DefaultNameserver: defaultNameserver,
       NameServerPolicy: {},
       ProxyServerNameserver: proxyServerNameserver,
-      DirectNameServer: [],
+      DirectNameServer: directNameServer,
       DirectNameServerFollowPolicy: false,
     );
   }
@@ -518,27 +539,46 @@ class ClashSettingManager {
   static Future<void> uninit() async {}
 
   static Future<void> save() async {
-    String filePath = await PathUtils.serviceCoreSettingFilePath();
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
     final map = _setting.toJson();
     MapHelper.removeNullOrEmpty(map, false, false);
-    String content = encoder.convert(map);
-    try {
-      await File(filePath).writeAsString(content, flush: true);
-    } catch (err, stacktrace) {
-      Log.w("ClashSettingManager.save exception  $filePath ${err.toString()}");
-    }
+    await _fileSaver.saveAsJson(map);
   }
 
   static Future<ReturnResult<String>> getPatchContent(
-    String profileId,
-    bool overwrite,
-    Map<String, String>? overwriteRule,
-    Map<String, ProfileSettingProxyGroup>? overwriteProxyGroups, {
+    ProfileSetting? profile,
+    ProfilePatchSetting patch, {
+    String corePath = '',
+    String corePatchPath = '',
     bool preserveMixedPort = false,
   }) async {
+    final overwrite = patch.appliesBuiltInOverwrite;
+    final rulesOverwriteMethod = profile?.rulesOverwriteMethod;
+    final overwriteRule = profile?.rules;
+    final proxyGroupsOverwriteMethod = profile?.proxyGroupsOverwriteMethod;
+    final overwriteProxyGroups = profile?.proxyGroups;
+    final appendApplePush = profile?.appendApplePushRules == true;
+    Map<dynamic, dynamic> base = const {};
+    Map<dynamic, dynamic> custom = const {};
+    if (appendApplePush ||
+        (rulesOverwriteMethod == OverwriteMode.overwriteAppendToHead &&
+            overwriteRule?.isNotEmpty == true) ||
+        (proxyGroupsOverwriteMethod == OverwriteMode.overwriteAppendToHead &&
+            overwriteProxyGroups?.isNotEmpty == true)) {
+      try {
+        base = await _readCoreMapping(corePath);
+        custom = await _readCoreMapping(corePatchPath);
+      } catch (error) {
+        return ReturnResult(error: ReturnResultError(error.toString()));
+      }
+    }
+    final prependedRules = <String>[];
+    final prependedGroups = <Map<String, dynamic>>[];
+    Map<String, dynamic>? prependedRuleProviders;
     if (Platform.isIOS || Platform.isMacOS) {
-      _setting.Tun?.Stack = ClashTunStack.gvisor.name;
+      if ((_setting.Tun?.Stack != ClashTunStack.gvisor.name) &&
+          (_setting.Tun?.Stack != ClashTunStack.mips.name)) {
+        _setting.Tun?.Stack = ClashTunStack.gvisor.name;
+      }
     }
     _setting.DNS?.IPv6 = _setting.IPv6;
     if (_setting.IPv6 == true) {
@@ -558,19 +598,26 @@ class ClashSettingManager {
 
     _setting.OverWriteRuleProviders = false;
     _setting.OverWriteRules = false;
+    _setting.OverWriteProxyGroups = false;
     _setting.OverWriteSubRules = false;
     _setting.Rules = null;
     _setting.RuleProviders = null;
     _setting.ProxyGroups = null;
-    _setting.Extension?.ProfileStoreSelectedPrefix = profileId;
+    _setting.Extension?.Rules = null;
+    _setting.Extension?.RuleProviders = null;
+    _setting.Extension?.ProxyGroups = null;
+    _setting.Extension?.ProfileStoreSelectedPrefix = profile?.id ?? '';
+    _setting.Extension?.AppendProxyGroups = null;
+    _setting.Extension?.AppendRules = null;
     if (Platform.isIOS) {
       _setting.FindProcessMode = ClashFindProcessMode.off.name;
     }
 
-    if (overwriteRule != null && overwriteRule.isNotEmpty) {
-      _setting.OverWriteRuleProviders = true;
-      _setting.OverWriteRules = true;
-      _setting.OverWriteSubRules = true;
+    if (rulesOverwriteMethod != OverwriteMode.noOverwrite &&
+        overwriteRule != null &&
+        overwriteRule.isNotEmpty) {
+      List<String> newRules = [];
+      Map<String, dynamic> newRuleProviders = {};
 
       List<RuleProvider> newAllProviders = [];
       final allProviders = DiversionTemplateManager.getRuleProviders();
@@ -580,7 +627,7 @@ class ClashSettingManager {
         final target = overwriteRule[template.name];
         if (target != null && target.isNotEmpty) {
           targets.add(target);
-          _setting.Rules ??= [];
+
           final providers = allProviders.where((ele) {
             return template.getProviders().contains(ele.name);
           });
@@ -594,81 +641,146 @@ class ClashSettingManager {
               ruleWithTarget = "$rule,$target";
             }
 
-            if (!_setting.Rules!.contains(ruleWithTarget)) {
-              _setting.Rules!.add(ruleWithTarget);
+            if (!newRules.contains(ruleWithTarget)) {
+              newRules.add(ruleWithTarget);
             }
           }
         }
       }
       if (newAllProviders.isNotEmpty) {
-        _setting.RuleProviders ??= {};
         for (var provider in newAllProviders) {
-          _setting.RuleProviders![provider.name] = provider.toJsonNoName();
+          newRuleProviders[provider.name] = provider.toJsonNoName();
         }
       }
-      if (overwriteProxyGroups != null && overwriteProxyGroups.isNotEmpty) {
-        _setting.OverWriteProxyGroups = true;
-        final pgTemplates = DiversionTemplateManager.getProxyGroupTemplates();
-        _setting.ProxyGroups ??= [];
-        for (var template in pgTemplates) {
-          final pg = overwriteProxyGroups[template.name];
-          if (pg == null) {
-            return ReturnResult(
-              error: ReturnResultError(
-                "${t.meta.proxyGroups} [${template.name}]: not exist",
-              ),
-            );
-          }
-          if (pg.proxies.isEmpty) {
-            return ReturnResult(
-              error: ReturnResultError(
-                "${t.meta.proxyGroups} [${template.name}]->[${t.meta.proxyNodeList}] is empty",
-              ),
-            );
-          }
-          var newTemplate = template.clone();
-          newTemplate.proxies = pg.proxies;
-          _setting.ProxyGroups!.add(newTemplate.toJson());
-        }
+
+      if (rulesOverwriteMethod == OverwriteMode.overwrite) {
+        _setting.OverWriteRuleProviders = true;
+        _setting.OverWriteRules = true;
+        _setting.OverWriteSubRules = true;
+        _setting.Rules = newRules;
+        _setting.RuleProviders = newRuleProviders;
+      } else {
+        prependedRules.addAll(newRules);
+        prependedRuleProviders = newRuleProviders;
       }
     }
-    if (overwrite) {
-      final map = _setting.toJson();
-      MapHelper.removeNullOrEmpty(map, true, true);
+    if (proxyGroupsOverwriteMethod != OverwriteMode.noOverwrite &&
+        overwriteProxyGroups != null &&
+        overwriteProxyGroups.isNotEmpty) {
+      _setting.OverWriteProxyGroups = true;
+      final pgTemplates = DiversionTemplateManager.getProxyGroupTemplates();
+      final newProxyGroups = <Map<String, dynamic>>[];
+      for (var template in pgTemplates) {
+        final pg = overwriteProxyGroups[template.name];
+        if (pg == null) {
+          return ReturnResult(
+            error: ReturnResultError(
+              "${t.meta.proxyGroups} [${template.name}]: not exist",
+            ),
+          );
+        }
+        if (pg.proxies.isEmpty) {
+          return ReturnResult(
+            error: ReturnResultError(
+              "${t.meta.proxyGroups} [${template.name}]->[${t.meta.proxyNodeList}] is empty",
+            ),
+          );
+        }
+        var newTemplate = template.clone();
+        newTemplate.proxies = pg.proxies;
+        newProxyGroups.add(newTemplate.toJson());
+      }
 
-      const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-      String content = encoder.convert(map);
-      return ReturnResult(data: content);
+      if (proxyGroupsOverwriteMethod == OverwriteMode.overwrite) {
+        _setting.ProxyGroups = newProxyGroups;
+      } else {
+        prependedGroups.addAll(newProxyGroups);
+      }
     }
-    return ReturnResult(
-      data: getPatchFinalContent(preserveMixedPort: preserveMixedPort),
-    );
-  }
-
-  static String getPatchFinalContent({bool preserveMixedPort = false}) {
-    final setting = defaultConfigNoOverwrite();
-    if (preserveMixedPort) {
+    final setting = overwrite ? _setting : defaultConfigNoOverwrite();
+    if (preserveMixedPort && !overwrite) {
       setting.MixedPort = null;
     }
     final map = setting.toJson();
     MapHelper.removeNullOrEmpty(map, true, true);
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    String content = encoder.convert(map);
-    return content;
+    if (appendApplePush ||
+        prependedRules.isNotEmpty ||
+        prependedGroups.isNotEmpty) {
+      final groups =
+          map['proxy-groups'] ?? custom['proxy-groups'] ?? base['proxy-groups'];
+      if (appendApplePush && base['proxy-groups'] is List) {
+        final effectiveNames = <Object?>{
+          ...prependedGroups.map((group) => group['name']),
+          if (groups is List)
+            ...groups.whereType<Map>().map((group) => group['name']),
+        };
+        for (final group in (base['proxy-groups'] as List).whereType<Map>()) {
+          final name = group['name'];
+          if (name is String &&
+              name.isNotEmpty &&
+              effectiveNames.contains(name) &&
+              (group['type'] == 'url-test' || group['type'] == 'select')) {
+            prependedRules.addAll(
+              ProfilePatchManager.appendRulesApplePush(name),
+            );
+            break;
+          }
+        }
+      }
+      if (prependedRules.isNotEmpty) {
+        final rules = map['rules'] ?? custom['rules'] ?? base['rules'];
+        map['rules'] = [...prependedRules, if (rules is List) ...rules];
+        if (prependedRuleProviders != null &&
+            prependedRuleProviders.isNotEmpty) {
+          map['rule-providers'] = prependedRuleProviders;
+        }
+      }
+      if (prependedGroups.isNotEmpty) {
+        final names = <Object?>{};
+        map['proxy-groups'] = [
+          for (final group in prependedGroups)
+            if (names.add(group['name'])) group,
+          if (groups is List)
+            ...groups.where(
+              (group) => group is! Map || names.add(group['name']),
+            ),
+        ];
+      }
+    }
+    const encoder = JsonEncoder.withIndent('  ');
+    return ReturnResult(data: encoder.convert(map));
+  }
+
+  static Future<Map<dynamic, dynamic>> _readCoreMapping(String path) async {
+    if (path.isEmpty) {
+      return const {};
+    }
+    final file = File(path);
+    if (!await file.exists()) {
+      return const {};
+    }
+    final config = loadYaml(await file.readAsString());
+    if (config == null) {
+      return const {};
+    }
+    if (config is! YamlMap) {
+      throw const FormatException('VPN configuration must be a YAML mapping');
+    }
+    return config;
   }
 
   static Future<ReturnResultError?> saveCorePatchFinal(
-    String profileId,
-    bool overwrite,
-    Map<String, String>? overwriteRule,
-    Map<String, ProfileSettingProxyGroup>? overwriteProxyGroups, {
+    ProfileSetting profile,
+    ProfilePatchSetting patch, {
+    required String corePath,
+    required String corePatchPath,
     bool preserveMixedPort = false,
   }) async {
     final result = await getPatchContent(
-      profileId,
-      overwrite,
-      overwriteRule,
-      overwriteProxyGroups,
+      profile,
+      patch,
+      corePath: corePath,
+      corePatchPath: corePatchPath,
       preserveMixedPort: preserveMixedPort,
     );
     if (result.error != null) {
@@ -678,7 +790,7 @@ class ClashSettingManager {
     try {
       await File(filePath).writeAsString(result.data!, flush: true);
       Log.i(
-        "ClashSettingManager.saveCorePatchFinal profile=$profileId overwrite=$overwrite globalUA=${SettingManager.getConfig().userAgent()}",
+        "ClashSettingManager.saveCorePatchFinal profile=${profile.id} overwrite=${patch.appliesBuiltInOverwrite} globalUA=${SettingManager.getConfig().userAgent()}",
       );
     } catch (err, stacktrace) {
       return ReturnResultError(err.toString());
@@ -743,7 +855,6 @@ class ClashSettingManager {
     if (_setting.Secret == null || _setting.Secret!.isEmpty) {
       _setting.Secret = await getSecretFromDid();
     }
-    _setting.UnifiedDelay = true;
     _setting.ExternalUI = "";
     _setting.ExternalUIName = "";
     _setting.ExternalUIURL = "";

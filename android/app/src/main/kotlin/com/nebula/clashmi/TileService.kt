@@ -25,10 +25,10 @@ class TileService : TileService() {
     companion object {
         private const val TAG = "ClashMiTileService"
         private const val SERVICE_FILE_NAME = "service.json"
-        private const val SERVICE_CLASS_NAME =
+        internal const val SERVICE_CLASS_NAME =
                 "com.cyenx.clashmi.clashmi_vpn_service.ClashMiVpnService"
-        private const val ACTION_START = "com.cyenx.clashmi.clashmi_vpn_service.START"
-        private const val ACTION_STOP = "com.cyenx.clashmi.clashmi_vpn_service.STOP"
+        internal const val ACTION_START = "com.cyenx.clashmi.clashmi_vpn_service.START"
+        internal const val ACTION_STOP = "com.cyenx.clashmi.clashmi_vpn_service.STOP"
         private const val ACTION_STATE_CHANGED =
                 "com.cyenx.clashmi.clashmi_vpn_service.STATE_CHANGED"
         private const val EXTRA_STATE = "state"

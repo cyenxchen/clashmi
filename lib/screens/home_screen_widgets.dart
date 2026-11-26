@@ -54,7 +54,8 @@ class ProxyHttpOverrides extends HttpOverrides {
 }
 
 class HomeScreenWidgetPart1 extends StatefulWidget {
-  const HomeScreenWidgetPart1({super.key});
+  final bool Function() hasDecoration;
+  const HomeScreenWidgetPart1({super.key, required this.hasDecoration});
 
   @override
   State<HomeScreenWidgetPart1> createState() => _HomeScreenWidgetPart1();
@@ -99,6 +100,9 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
       await _onInitAllFinish();
     });
     ClashSettingManager.onEventModeChanged.add(() async {
+      if (!mounted) {
+        return;
+      }
       setState(() {});
     });
   }
@@ -171,10 +175,18 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
   @override
   Widget build(BuildContext context) {
     final tcontext = Translations.of(context);
+    final theme = Theme.of(context);
+
     bool connected = _state == FlutterVpnServiceState.connected;
     final currentProfile = ProfileManager.getCurrent();
     final currentProfileName = currentProfile?.getShowName() ?? "";
     final settings = SettingManager.getConfig();
+    Color? color;
+    int alpha = settings.uiScreen.getWidgetAlpha();
+    if (widget.hasDecoration()) {
+      color = theme.colorScheme.surface;
+    }
+
     String tranffic = "";
     Tuple2<bool, String>? tranfficExpire;
     if (currentProfile != null && currentProfile.isRemote()) {
@@ -230,8 +242,31 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
                       fit: BoxFit.fill,
                       child: Switch.adaptive(
                         value: _state == FlutterVpnServiceState.connected,
-                        activeThumbColor: Colors.white,
-                        activeTrackColor: ThemeDefine.kColorGreenBright,
+                        activeThumbColor: color != null ? null : Colors.white,
+                        activeTrackColor: color != null
+                            ? null
+                            : ThemeDefine.kColorGreenBright,
+                        thumbColor: color != null
+                            ? WidgetStateProperty.resolveWith<Color>((
+                                Set<WidgetState> states,
+                              ) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return Colors.white.withValues(alpha: 0.8);
+                                }
+                                return Colors.white;
+                              })
+                            : null,
+                        trackColor: color != null
+                            ? WidgetStateProperty.resolveWith<Color>((
+                                Set<WidgetState> states,
+                              ) {
+                                if (states.contains(WidgetState.selected)) {
+                                  return ThemeDefine.kColorGreenBright
+                                      .withValues(alpha: 0.8);
+                                }
+                                return Colors.grey[200]!.withValues(alpha: 0.8);
+                              })
+                            : null,
                         focusNode: _focusNodeConnect,
                         onChanged: (bool value) async {
                           if (value) {
@@ -302,6 +337,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         padding: const EdgeInsets.fromLTRB(0, 15, 0, 15),
         height: 70,
         child: SegmentedElevatedButton(
+          background: theme.colorScheme.surface.withAlpha(alpha),
           segments: [
             SegemntedElevatedButtonItem(
               value: ClashConfigsMode.rule.index,
@@ -388,7 +424,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
                     await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        settings: ProfilesBoardScreen.routSettings(),
+                        settings: ProfilesBoardScreen.routeSettings(),
                         builder: (context) =>
                             ProfilesBoardScreen(navigateToAdd: true),
                       ),
@@ -408,7 +444,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: ProfilesBoardScreen.routSettings(),
+              settings: ProfilesBoardScreen.routeSettings(),
               builder: (context) => ProfilesBoardScreen(),
             ),
           );
@@ -431,7 +467,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
             await Navigator.push(
               context,
               MaterialPageRoute(
-                settings: ProxyBoardScreen.routSettings(),
+                settings: ProxyBoardScreen.routeSettings(),
                 builder: (context) => ProxyBoardScreen(),
               ),
             );
@@ -521,7 +557,10 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
         ),
       );
     }
+
     return Card(
+      color: color?.withAlpha(alpha),
+      shadowColor: color?.withAlpha(alpha),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: ListView.separated(
@@ -605,7 +644,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
       await Navigator.push(
         context,
         MaterialPageRoute(
-          settings: ProfilesBoardScreen.routSettings(),
+          settings: ProfilesBoardScreen.routeSettings(),
           builder: (context) => ProfilesBoardScreen(),
         ),
       );
@@ -672,13 +711,12 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
       } else if (err.message.contains(
         "configure tun interface: Access is denied",
       )) {
-        err.message += "\n${t.meta.tunModeRunAsAdmin}";
+        err.message += "\n${t.meta.needRunAsAdmin}";
       }
 
       DialogUtils.showAlertDialog(context, err.message, withVersion: true);
       return false;
     }
-
     return true;
   }
 
@@ -762,6 +800,9 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
 
   Future<void> _onStatePaused() async {
     _stopStateCheckTimer();
+    if (Platform.isMacOS && SettingManager.getConfig().showTrayTraffic) {
+      return;
+    }
     _disconnectToCore(resetUI: false);
   }
 
@@ -808,6 +849,36 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     }
   }
 
+  Future<void> _updateConnections() async {
+    String connections = await FlutterVpnService.clashiApiConnections(false);
+    String tranffic = await FlutterVpnService.clashiApiTraffic();
+
+    String trafficTotalNew = "";
+    String trafficSpeedNew = "";
+    try {
+      var obj = jsonDecode(connections);
+      ClashConnections body = ClashConnections();
+      body.fromJson(obj, false);
+      //_memory.value =
+      //    ClashHttpApi.convertTrafficToStringDouble(body.memory);
+      trafficTotalNew =
+          "↑ ${ClashHttpApi.convertTrafficToStringDouble(body.uploadTotal)}  ↓ ${ClashHttpApi.convertTrafficToStringDouble(body.downloadTotal)} ";
+    } catch (err) {}
+    try {
+      var obj = jsonDecode(tranffic);
+      ClashTraffic traffic = ClashTraffic();
+      traffic.fromJson(obj);
+      trafficSpeedNew =
+          "↑ ${ClashHttpApi.convertTrafficToStringDouble(traffic.upload)}/s  ↓ ${ClashHttpApi.convertTrafficToStringDouble(traffic.download)}/s";
+    } catch (err) {}
+    Biz.trafficChanged(trafficTotalNew, trafficSpeedNew);
+    if (AppLifecycleStateNofity.isPaused()) {
+      return;
+    }
+    _trafficTotal.value = trafficTotalNew;
+    _trafficSpeed.value = trafficSpeedNew;
+  }
+
   Future<void> _connectToCore() async {
     bool started = await VPNService.getStarted();
     if (!started) {
@@ -816,33 +887,13 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     if (AppLifecycleStateNofity.isPaused()) {
       return;
     }
+    await _updateConnections();
     const Duration duration = Duration(seconds: 1);
     _timerConnectToCore ??= Timer.periodic(duration, (timer) async {
       if (AppLifecycleStateNofity.isPaused()) {
         return;
       }
-      String connections = await FlutterVpnService.clashiApiConnections(false);
-      String tranffic = await FlutterVpnService.clashiApiTraffic();
-      if (AppLifecycleStateNofity.isPaused()) {
-        return;
-      }
-      try {
-        var obj = jsonDecode(connections);
-        ClashConnections body = ClashConnections();
-        body.fromJson(obj, false);
-        //_memory.value =
-        //    ClashHttpApi.convertTrafficToStringDouble(body.memory);
-        _trafficTotal.value =
-            "↑ ${ClashHttpApi.convertTrafficToStringDouble(body.uploadTotal)}  ↓ ${ClashHttpApi.convertTrafficToStringDouble(body.downloadTotal)} ";
-      } catch (err) {}
-      try {
-        var obj = jsonDecode(tranffic);
-        ClashTraffic traffic = ClashTraffic();
-        traffic.fromJson(obj);
-        _trafficSpeed.value =
-            "↑ ${ClashHttpApi.convertTrafficToStringDouble(traffic.upload)}/s  ↓ ${ClashHttpApi.convertTrafficToStringDouble(traffic.download)}/s";
-      } catch (err) {}
-
+      await _updateConnections();
       if (_proxyNow.value.isEmpty) {
         Future.delayed(Duration(seconds: 1), () async {
           _updateProxyNow();
@@ -857,6 +908,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     if (resetUI) {
       _trafficTotal.value = _kNoTrafficTotal;
       _trafficSpeed.value = _kNoSpeed;
+      Biz.trafficChanged("", "");
       // _memory.value = _kNoMemory;
       _proxyNow.value = "";
     }
@@ -969,17 +1021,11 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     try {
       final path = await PathUtils.serviceCoreRuntimeProfileFilePath();
       content = await File(path).readAsString();
-    } catch (err) {
+    } catch (err, stacktrace) {
       if (!mounted) {
         return;
       }
-      DialogUtils.showAlertDialog(
-        context,
-        err.toString(),
-        showCopy: true,
-        showFAQ: true,
-        withVersion: true,
-      );
+      DialogUtils.showExceptionDialog(context, err, stacktrace);
       return;
     }
     if (!mounted) {
@@ -988,7 +1034,7 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: FileViewScreen.routSettings(),
+        settings: FileViewScreen.routeSettings(),
         builder: (context) => FileViewScreen(
           title: tcontext.meta.runtimeProfile,
           content: content,
@@ -1001,20 +1047,44 @@ class _HomeScreenWidgetPart1 extends State<HomeScreenWidgetPart1> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: NetCheckScreen.routSettings(),
+        settings: NetCheckScreen.routeSettings(),
         builder: (context) => const NetCheckScreen(),
       ),
     );
   }
 }
 
-class HomeScreenWidgetPart2 extends StatelessWidget {
-  const HomeScreenWidgetPart2({super.key});
+class HomeScreenWidgetPart2 extends StatefulWidget {
+  final bool Function() hasDecoration;
+  final Function()? onUpdate;
+  const HomeScreenWidgetPart2({
+    super.key,
+    this.onUpdate,
+    required this.hasDecoration,
+  });
+
+  @override
+  State<HomeScreenWidgetPart2> createState() => _HomeScreenWidgetPart2();
+}
+
+class _HomeScreenWidgetPart2 extends State<HomeScreenWidgetPart2> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     AutoUpdateCheckVersion versionCheck = AutoUpdateManager.getVersionCheck();
     final tcontext = Translations.of(context);
+    final theme = Theme.of(context);
+
+    final settings = SettingManager.getConfig();
+    Color? color;
+    int alpha = settings.uiScreen.getWidgetAlpha();
+    if (widget.hasDecoration()) {
+      color = theme.colorScheme.surface;
+    }
     var widgets = [
       ListTile(
         title: Text(tcontext.meta.settingApp),
@@ -1023,6 +1093,7 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
         minVerticalPadding: 22,
         onTap: () async {
           await GroupHelper.showAppSettings(context);
+          widget.onUpdate?.call();
         },
       ),
       ListTile(
@@ -1054,7 +1125,7 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
           }
           final item = await FileUtils.readAsStringReverse(
             filePath,
-            20 * 1024,
+            50 * 1024,
             false,
           );
           if (item != null) {
@@ -1069,7 +1140,7 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              settings: RichtextViewScreen.routSettings(),
+              settings: RichtextViewScreen.routeSettings(),
               builder: (context) => RichtextViewScreen(
                 title: tcontext.meta.coreLog,
                 file: "",
@@ -1123,7 +1194,7 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: AboutScreen.routSettings(),
+              settings: AboutScreen.routeSettings(),
               builder: (context) => AboutScreen(),
             ),
           );
@@ -1132,6 +1203,8 @@ class HomeScreenWidgetPart2 extends StatelessWidget {
     ]);
 
     return Card(
+      color: color?.withAlpha(alpha),
+      shadowColor: color?.withAlpha(alpha),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
         child: ListView.separated(

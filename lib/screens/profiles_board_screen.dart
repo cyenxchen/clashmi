@@ -19,7 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class ProfilesBoardScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "/");
   }
 
@@ -206,7 +206,7 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: AddProfileByUrlScreen.routSettings(),
+              settings: AddProfileByUrlScreen.routeSettings(),
               builder: (context) => AddProfileByUrlScreen(),
             ),
           );
@@ -220,17 +220,11 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
           ClipboardData? data;
           try {
             data = await Clipboard.getData("text/plain");
-          } catch (err) {
+          } catch (err, stacktrace) {
             if (!mounted) {
               return;
             }
-            DialogUtils.showAlertDialog(
-              context,
-              err.toString(),
-              showCopy: true,
-              showFAQ: true,
-              withVersion: true,
-            );
+            DialogUtils.showExceptionDialog(context, err, stacktrace);
             return;
           }
           if (!mounted) {
@@ -242,7 +236,7 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: AddProfileByUrlScreen.routSettings(),
+              settings: AddProfileByUrlScreen.routeSettings(),
               builder: (context) => AddProfileByUrlScreen(url: data!.text!),
             ),
           );
@@ -256,7 +250,7 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              settings: AddProfileByScanQrcodeScanScreen.routSettings(),
+              settings: AddProfileByScanQrcodeScanScreen.routeSettings(),
               builder: (context) => const AddProfileByScanQrcodeScanScreen(),
             ),
           ).then((value) {
@@ -267,7 +261,7 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  settings: AddProfileByUrlScreen.routSettings(),
+                  settings: AddProfileByUrlScreen.routeSettings(),
                   builder: (context) =>
                       AddProfileByUrlScreen(url: value.qrcode!),
                 ),
@@ -284,7 +278,7 @@ class _ProfilesBoardScreenState extends LasyRenderingState<ProfilesBoardScreen>
           Navigator.push(
             context,
             MaterialPageRoute(
-              settings: AddProfileByImportFromFileScreen.routSettings(),
+              settings: AddProfileByImportFromFileScreen.routeSettings(),
               builder: (context) => const AddProfileByImportFromFileScreen(),
             ),
           );

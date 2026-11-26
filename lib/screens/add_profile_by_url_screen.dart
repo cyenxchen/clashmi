@@ -18,7 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:tuple/tuple.dart';
 
 class AddProfileByUrlScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "AddProfileByUrlScreen");
   }
 
@@ -48,7 +48,7 @@ class _AddProfileByUrlScreenState
   bool _updateIntervalPreferByProfile = true;
   String _userAgent = "";
   bool _xhwid = false;
-  String _decryptPassword = "";
+  String _decryptPasswordAES = "";
   String _patch = "";
   bool _loading = false;
   @override
@@ -91,7 +91,7 @@ class _AddProfileByUrlScreenState
       patch: _patch,
       userAgent: _userAgent,
       xhwid: _xhwid,
-      decryptPassword: _decryptPassword,
+      decryptPasswordAES: _decryptPasswordAES,
       updateInterval: _updateInterval,
       updateIntervalPreferByProfile: _updateIntervalPreferByProfile,
     );
@@ -207,9 +207,12 @@ class _AddProfileByUrlScreenState
                                 maxLines: 5,
                                 controller: _textControllerLink,
                                 decoration: InputDecoration(
-                                  labelText: tcontext.meta.profileUrlOrContent,
-                                  hintText:
-                                      tcontext.meta.profileUrlOrContentHit,
+                                  labelText: tcontext.meta.profileUrlOrContent(
+                                    p: "Clash",
+                                  ),
+                                  hintText: tcontext.meta
+                                      .profileUrlOrContentHit(p: "Clash"),
+                                  hintStyle: const TextStyle(fontSize: 12),
                                 ),
                                 onChanged: (text) {},
                                 onEditingComplete: () async {
@@ -343,12 +346,11 @@ class _AddProfileByUrlScreenState
       ),
       GroupItemOptions(
         textFormFieldOptions: GroupItemTextFieldOptions(
-          name: tcontext.meta.decryptPassword,
-          text: _decryptPassword,
+          name: tcontext.meta.decryptPasswordAES,
+          text: _decryptPasswordAES,
           textWidthPercent: 0.6,
           onChanged: (String value) {
-            _decryptPassword = value;
-            setState(() {});
+            _decryptPasswordAES = value;
           },
         ),
       ),

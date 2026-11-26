@@ -19,7 +19,7 @@ import 'package:clashmi/screens/theme_define.dart';
 import 'package:clashmi/screens/widgets/framework.dart';
 
 class PerAppAndroidScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "PerAppAndroidScreen");
   }
 
@@ -37,11 +37,11 @@ class _PerAppAndroidScreenState
   final List<PackageInfoEx> _applicationInfoList = [];
   final _searchController = TextEditingController();
   List<PackageInfoEx> _searchedData = [];
+  final Map<String, Future<Image?>> _packageIconFutures = {};
   bool _needPermission = false;
 
   @override
   void initState() {
-    _loading = true;
     getInstalledPackages();
     super.initState();
   }
@@ -76,6 +76,7 @@ class _PerAppAndroidScreenState
   }
 
   Future<void> getInstalledPackages() async {
+    _packageIconFutures.clear();
     _applicationInfoList.clear();
     _searchedData.clear();
     final settings = SettingManager.getConfig();
@@ -152,13 +153,16 @@ class _PerAppAndroidScreenState
     setState(() {});
   }
 
-  Future<Image?> getInstalledPackageIcon(String packageName) async {
+  Future<Image?> getInstalledPackageIcon(String packageName) {
     if (SettingManager.getConfig().ui.perAppHideAppIcon) {
-      return null;
+      return Future.value(null);
     }
-    return PackageManagerAndroid.getInstalledPackageIcon(
-      _applicationInfoList,
+    return _packageIconFutures.putIfAbsent(
       packageName,
+      () => PackageManagerAndroid.getInstalledPackageIcon(
+        _applicationInfoList,
+        packageName,
+      ),
     );
   }
 
@@ -458,7 +462,6 @@ class _PerAppAndroidScreenState
           switchValue: SettingManager.getConfig().ui.perAppHideSystemApp,
           onSwitch: (bool value) async {
             SettingManager.getConfig().ui.perAppHideSystemApp = value;
-            _loading = true;
             getInstalledPackages();
             setState(() {});
           },
@@ -470,6 +473,7 @@ class _PerAppAndroidScreenState
           switchValue: SettingManager.getConfig().ui.perAppHideAppIcon,
           onSwitch: (bool value) async {
             SettingManager.getConfig().ui.perAppHideAppIcon = value;
+            _packageIconFutures.clear();
             setState(() {});
           },
         ),
@@ -518,17 +522,11 @@ class _PerAppAndroidScreenState
                 perapp.PackageIds!.add(app);
               }
               setState(() {});
-            } catch (err) {
+            } catch (err, stacktrace) {
               if (!mounted) {
                 return;
               }
-              DialogUtils.showAlertDialog(
-                context,
-                err.toString(),
-                showCopy: true,
-                showFAQ: true,
-                withVersion: true,
-              );
+              DialogUtils.showExceptionDialog(context, err, stacktrace);
             }
           },
         ),
@@ -555,17 +553,11 @@ class _PerAppAndroidScreenState
               if (!mounted) {
                 return;
               }
-            } catch (err) {
+            } catch (err, stacktrace) {
               if (!mounted) {
                 return;
               }
-              DialogUtils.showAlertDialog(
-                context,
-                err.toString(),
-                showCopy: true,
-                showFAQ: true,
-                withVersion: true,
-              );
+              DialogUtils.showExceptionDialog(context, err, stacktrace);
             }
           },
         ),

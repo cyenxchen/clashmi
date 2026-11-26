@@ -16,20 +16,21 @@ class TranslationsJa with BaseTranslations<AppLocale, Translations> implements T
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsJa({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.ja,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <ja>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final TranslationsJa _root = this; // ignore: unused_field
 
@@ -37,23 +38,26 @@ class TranslationsJa with BaseTranslations<AppLocale, Translations> implements T
 	TranslationsJa $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsJa(meta: meta ?? this.$meta);
 
 	// Translations
-	@override late final _TranslationsBackupAndSyncWebdavScreenJa BackupAndSyncWebdavScreen = _TranslationsBackupAndSyncWebdavScreenJa._(_root);
-	@override late final _TranslationsLaunchFailedScreenJa LaunchFailedScreen = _TranslationsLaunchFailedScreenJa._(_root);
-	@override late final _TranslationsPerAppAndroidScreenJa PerAppAndroidScreen = _TranslationsPerAppAndroidScreenJa._(_root);
-	@override late final _TranslationsUserAgreementScreenJa UserAgreementScreen = _TranslationsUserAgreementScreenJa._(_root);
-	@override late final _TranslationsNetCheckScreenJa NetCheckScreen = _TranslationsNetCheckScreenJa._(_root);
-	@override late final _TranslationsVersionUpdateScreenJa VersionUpdateScreen = _TranslationsVersionUpdateScreenJa._(_root);
-	@override late final _TranslationsLoginScreenJa loginScreen = _TranslationsLoginScreenJa._(_root);
-	@override late final _TranslationsMainJa main = _TranslationsMainJa._(_root);
-	@override late final _TranslationsMetaJa meta = _TranslationsMetaJa._(_root);
-	@override late final _TranslationsPermissionJa permission = _TranslationsPermissionJa._(_root);
-	@override late final _TranslationsTlsJa tls = _TranslationsTlsJa._(_root);
-	@override late final _TranslationsTunJa tun = _TranslationsTunJa._(_root);
-	@override late final _TranslationsDnsJa dns = _TranslationsDnsJa._(_root);
-	@override late final _TranslationsSnifferJa sniffer = _TranslationsSnifferJa._(_root);
-	@override late final _TranslationsProfilePatchModeJa profilePatchMode = _TranslationsProfilePatchModeJa._(_root);
+	@override late final _Translations$BackupAndSyncWebdavScreen$ja BackupAndSyncWebdavScreen = _Translations$BackupAndSyncWebdavScreen$ja._(_root);
+	@override late final _Translations$LaunchFailedScreen$ja LaunchFailedScreen = _Translations$LaunchFailedScreen$ja._(_root);
+	@override late final _Translations$PerAppAndroidScreen$ja PerAppAndroidScreen = _Translations$PerAppAndroidScreen$ja._(_root);
+	@override late final _Translations$UserAgreementScreen$ja UserAgreementScreen = _Translations$UserAgreementScreen$ja._(_root);
+	@override late final _Translations$NetCheckScreen$ja NetCheckScreen = _Translations$NetCheckScreen$ja._(_root);
+	@override late final _Translations$VersionUpdateScreen$ja VersionUpdateScreen = _Translations$VersionUpdateScreen$ja._(_root);
+	@override late final _Translations$loginScreen$ja loginScreen = _Translations$loginScreen$ja._(_root);
+	@override late final _Translations$main$ja main = _Translations$main$ja._(_root);
+	@override late final _Translations$meta$ja meta = _Translations$meta$ja._(_root);
+	@override late final _Translations$permission$ja permission = _Translations$permission$ja._(_root);
+	@override late final _Translations$tls$ja tls = _Translations$tls$ja._(_root);
+	@override late final _Translations$tun$ja tun = _Translations$tun$ja._(_root);
+	@override late final _Translations$dns$ja dns = _Translations$dns$ja._(_root);
+	@override late final _Translations$sniffer$ja sniffer = _Translations$sniffer$ja._(_root);
+	@override late final _Translations$profilePatchMode$ja profilePatchMode = _Translations$profilePatchMode$ja._(_root);
+	@override late final _Translations$overwriteMode$ja overwriteMode = _Translations$overwriteMode$ja._(_root);
 	@override String get protocolSniff => 'プロトコル検知';
 	@override String get protocolSniffOverrideDestination => '検知されたドメイン名で接続先アドレスを上書きする';
+	@override String sendOrReceiveNotMatch({required Object p}) => '[${p}] を使用してください';
+	@override String targetConnectFailed({required Object p}) => '[${p}] への接続に失敗しました。デバイスが同じ LAN 内にあることを確認してください';
 	@override String get edgeRuntimeNotInstalled => '現在のデバイスには Edge WebView2 ランタイムがインストールされていないため、ページを表示できません。Edge WebView2 ランタイム (x64) をダウンロードしてインストールし、アプリを再起動してからもう一度お試しください。';
 	@override Map<String, String> get locales => {
 		'en': 'English',
@@ -69,8 +73,8 @@ class TranslationsJa with BaseTranslations<AppLocale, Translations> implements T
 }
 
 // Path: BackupAndSyncWebdavScreen
-class _TranslationsBackupAndSyncWebdavScreenJa implements TranslationsBackupAndSyncWebdavScreenEn {
-	_TranslationsBackupAndSyncWebdavScreenJa._(this._root);
+class _Translations$BackupAndSyncWebdavScreen$ja implements Translations$BackupAndSyncWebdavScreen$en {
+	_Translations$BackupAndSyncWebdavScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -82,8 +86,8 @@ class _TranslationsBackupAndSyncWebdavScreenJa implements TranslationsBackupAndS
 }
 
 // Path: LaunchFailedScreen
-class _TranslationsLaunchFailedScreenJa implements TranslationsLaunchFailedScreenEn {
-	_TranslationsLaunchFailedScreenJa._(this._root);
+class _Translations$LaunchFailedScreen$ja implements Translations$LaunchFailedScreen$en {
+	_Translations$LaunchFailedScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -96,8 +100,8 @@ class _TranslationsLaunchFailedScreenJa implements TranslationsLaunchFailedScree
 }
 
 // Path: PerAppAndroidScreen
-class _TranslationsPerAppAndroidScreenJa implements TranslationsPerAppAndroidScreenEn {
-	_TranslationsPerAppAndroidScreenJa._(this._root);
+class _Translations$PerAppAndroidScreen$ja implements Translations$PerAppAndroidScreen$en {
+	_Translations$PerAppAndroidScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -108,8 +112,8 @@ class _TranslationsPerAppAndroidScreenJa implements TranslationsPerAppAndroidScr
 }
 
 // Path: UserAgreementScreen
-class _TranslationsUserAgreementScreenJa implements TranslationsUserAgreementScreenEn {
-	_TranslationsUserAgreementScreenJa._(this._root);
+class _Translations$UserAgreementScreen$ja implements Translations$UserAgreementScreen$en {
+	_Translations$UserAgreementScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -119,8 +123,8 @@ class _TranslationsUserAgreementScreenJa implements TranslationsUserAgreementScr
 }
 
 // Path: NetCheckScreen
-class _TranslationsNetCheckScreenJa implements TranslationsNetCheckScreenEn {
-	_TranslationsNetCheckScreenJa._(this._root);
+class _Translations$NetCheckScreen$ja implements Translations$NetCheckScreen$en {
+	_Translations$NetCheckScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -142,8 +146,8 @@ class _TranslationsNetCheckScreenJa implements TranslationsNetCheckScreenEn {
 }
 
 // Path: VersionUpdateScreen
-class _TranslationsVersionUpdateScreenJa implements TranslationsVersionUpdateScreenEn {
-	_TranslationsVersionUpdateScreenJa._(this._root);
+class _Translations$VersionUpdateScreen$ja implements Translations$VersionUpdateScreen$en {
+	_Translations$VersionUpdateScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -154,8 +158,8 @@ class _TranslationsVersionUpdateScreenJa implements TranslationsVersionUpdateScr
 }
 
 // Path: loginScreen
-class _TranslationsLoginScreenJa implements TranslationsLoginScreenEn {
-	_TranslationsLoginScreenJa._(this._root);
+class _Translations$loginScreen$ja implements Translations$loginScreen$en {
+	_Translations$loginScreen$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -164,8 +168,8 @@ class _TranslationsLoginScreenJa implements TranslationsLoginScreenEn {
 	@override String get register => 'アカウント登録';
 	@override String get forgotPassword => 'パスワードを忘れた';
 	@override String get provider => 'プロバイダー';
-	@override String get providerName => '${_root.loginScreen.provider}名';
-	@override String get providerNameRequired => '${_root.loginScreen.provider}名を入力してください';
+	@override String get providerName => '${_root.loginScreen.provider}コード/別名/URL';
+	@override String get providerNameRequired => '${_root.loginScreen.provider}コード/別名/URLを入力してください';
 	@override String get account => 'アカウント';
 	@override String get accountRequired => 'アカウントを入力してください';
 	@override String get email => 'メール';
@@ -176,21 +180,24 @@ class _TranslationsLoginScreenJa implements TranslationsLoginScreenEn {
 	@override String passwordMinLength({required Object minLength}) => 'パスワード長は最低${minLength}文字以上である必要があります';
 	@override String get unsupportedProvider => 'サポートされていない${_root.loginScreen.provider}';
 	@override String get unsupportedProviderType => 'サポートされていない${_root.loginScreen.provider}タイプ';
+	@override String get unActivedProvider => 'ログイン機能は有効化されていません';
+	@override String providerLoginSupportRequired({required Object p}) => 'プロバイダーのコード/別名は${_root.loginScreen.provider}にお問い合わせください。\n${_root.loginScreen.provider}連携は次をご参照ください: ${p}';
+	@override String get providerDisclaimer => '免責事項:${_root.loginScreen.provider}はサードパーティサービスであり、本アプリとは無関係です';
 }
 
 // Path: main
-class _TranslationsMainJa implements TranslationsMainEn {
-	_TranslationsMainJa._(this._root);
+class _Translations$main$ja implements Translations$main$en {
+	_Translations$main$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
-	@override late final _TranslationsMainTrayJa tray = _TranslationsMainTrayJa._(_root);
+	@override late final _Translations$main$tray$ja tray = _Translations$main$tray$ja._(_root);
 }
 
 // Path: meta
-class _TranslationsMetaJa implements TranslationsMetaEn {
-	_TranslationsMetaJa._(this._root);
+class _Translations$meta$ja implements Translations$meta$en {
+	_Translations$meta$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -228,6 +235,7 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get hours => '時間';
 	@override String get minutes => '分';
 	@override String get seconds => '秒';
+	@override String get milliseconds => 'ミリ秒';
 	@override String get protocol => 'プロトコル';
 	@override String get search => '検索';
 	@override String get custom => 'カスタム';
@@ -260,8 +268,10 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get user => 'ユーザー';
 	@override String get account => 'アカウント';
 	@override String get password => 'パスワード';
-	@override String get decryptPassword => '複号化パスワード';
+	@override String get decryptPasswordAES => 'AES 複号化パスワード';
+	@override String get decryptPasswordAGE => 'AGE 複号化パスワード';
 	@override String get required => '必須';
+	@override String get go => '続行';
 	@override String get sudoPassword => 'sudo パスワード (TUNモードで必要)';
 	@override String get other => 'その他';
 	@override String get dns => 'DNS';
@@ -274,7 +284,9 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get shareUrl => 'リンクを共有';
 	@override String get coreSettingTips => '注意：設定を変更した後、有効にするには再接続する必要があります';
 	@override String get overwrite => '上書き';
+	@override String get overwriteMethod => '上書き方式';
 	@override String get overwriteCustom => 'カスタム上書き';
+	@override String get overwriteAppend => '追加上書き';
 	@override String get overwriteTips => 'オリジナルプロファイル <- カスタム上書き <- アプリ上書き';
 	@override String get noOverwrite => '上書きしない';
 	@override String get overwriteSettings => '上書き設定';
@@ -307,7 +319,7 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get userAgent => 'UserAgent';
 	@override String get launchAtStartup => 'スタートアップ時に起動';
 	@override String get launchAtStartupRunAsAdmin => 'Clash Miを管理者として再起動してください';
-	@override String get tunModeRunAsAdmin => 'TUNモードにはシステム管理者権限が必要です。アプリを管理者として再起動してください';
+	@override String get needRunAsAdmin => 'この機能にはシステム管理者権限が必要です。アプリを管理者として再起動してください';
 	@override String get portableMode => 'ポータブルモード';
 	@override String get portableModeDisableTips => 'ポータブルモードを終了する必要がある場合は、[clashmi]を終了し、[clashmi.exe]と同じディレクトリにある[portable]フォルダを手動で削除してください';
 	@override String get systemProxy => 'システムプロキシ';
@@ -322,6 +334,7 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get hideVpn => 'VPNアイコンを隠す';
 	@override String get hideVpnTips => 'IPv6を有効にすると、この機能は失敗します';
 	@override String get hideDockIcon => 'Dockアイコンを隠す';
+	@override String get showTrayTraffic => 'トレイに通信量情報を表示';
 	@override String get website => 'ウェブサイト';
 	@override String get homePage => 'ホームページ';
 	@override String get rule => 'ルール';
@@ -360,6 +373,7 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get boardOnline => 'オンラインボードを使用';
 	@override String get boardOnlineUrl => 'オンラインボードURL';
 	@override String get boardLocalPort => 'ローカルボードポート';
+	@override String get alwayOnVPN => '常時接続';
 	@override String get disableFontScaler => 'フォントスケーリングを無効にする（再起動後に有効）';
 	@override String get autoOrientation => '画面に合わせて回転';
 	@override String get restartTakesEffect => '再起動後に有効';
@@ -370,7 +384,14 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get requestNeedsUserApproval => '1. [システム設定]-[プライバシーとセキュリティ]でClash Miによるシステム拡張機能のインストールを[許可]してください\n2. [システム設定]-[一般]-[ログイン項目と拡張機能]-[ネットワーク拡張機能]で[clashmiServiceSE]を有効にしてください\n完了後に再接続してください';
 	@override String get FullDiskAccessPermissionRequired => '[システム設定]-[プライバシーとセキュリティ]-[フルディスクアクセス]でclashmiServiceSEの権限を有効にし、再接続してください。';
 	@override String get proxy => 'プロキシ';
+	@override String get homeScreen => 'ホーム画面';
 	@override String get theme => 'テーマ';
+	@override String get widgetsAlpha => 'ウィジェットの透明度';
+	@override String get widgetsEmpty => '利用可能なウィジェットはありません';
+	@override String get backgroundImage => '背景画像';
+	@override String get path => 'パス';
+	@override String get local => 'ローカル';
+	@override String get remote => 'リモート';
 	@override String get tvMode => 'TVモード';
 	@override String get autoUpdate => '自動更新';
 	@override String get updateChannel => '自動更新チャンネル';
@@ -415,17 +436,22 @@ class _TranslationsMetaJa implements TranslationsMetaEn {
 	@override String get addProfile => 'プロファイルを追加';
 	@override String get myProfiles => 'マイプロファイル';
 	@override String get profileEdit => 'プロファイルを編集';
+	@override String get profileNeedActive => '先にこのプロファイルを現在のプロファイルに設定し、接続/再接続してください';
+	@override String get profileDownloadBackupChannel => 'バックアップダウンロードチャネルを有効化';
+	@override String get profileDownloadBackupChannelTips => 'Clash Mi が提供するプロキシダウンロードチャネル（情報は一切保存されません）';
 	@override String get profileEditReloadAfterProfileUpdate => 'プロファイル更新後にリロード';
+	@override String get profileRulesAppendApplePush => 'Appleプッシュ通知ルールを追加';
+	@override String get profileRulesAppendProxyTips => 'ルールは元の設定の [proxy-groups] 内で、タイプが [url-test] または [select] の最初のプロキシに自動設定されます';
 	@override String get profileImport => 'プロファイルファイルをインポート';
 	@override String get profileAddUrlOrContent => 'プロファイルリンクを追加';
-	@override String get profileUrlOrContent => 'Clash設定リンク';
-	@override String get profileUrlOrContentHit => 'Clash設定リンク [必須]';
+	@override String profileUrlOrContent({required Object p}) => '${p}設定リンク';
+	@override String profileUrlOrContentHit({required Object p}) => '[必須]。注意: リンクが ${_root.meta.profileUrlOrContent(p: p)} ではない場合（V2Ray または Sing-box など）は、先に Clash オンライン変換ツールを使用して ${_root.meta.profileUrlOrContent(p: p)} に変換してください';
 	@override String get profileUrlOrContentCannotEmpty => 'プロファイルリンクを空にすることはできません';
 }
 
 // Path: permission
-class _TranslationsPermissionJa implements TranslationsPermissionEn {
-	_TranslationsPermissionJa._(this._root);
+class _Translations$permission$ja implements Translations$permission$en {
+	_Translations$permission$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -438,21 +464,22 @@ class _TranslationsPermissionJa implements TranslationsPermissionEn {
 }
 
 // Path: tls
-class _TranslationsTlsJa implements TranslationsTlsEn {
-	_TranslationsTlsJa._(this._root);
+class _Translations$tls$ja implements Translations$tls$en {
+	_Translations$tls$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
 	// Translations
 	@override String get insecure => '証明書の検証をスキップ';
+	@override String get ignoreBadCertificate => '証明書エラーを無視する';
 	@override String get certificate => '証明書';
 	@override String get privateKey => '秘密鍵';
 	@override String get customTrustCert => 'カスタム証明書';
 }
 
 // Path: tun
-class _TranslationsTunJa implements TranslationsTunEn {
-	_TranslationsTunJa._(this._root);
+class _Translations$tun$ja implements Translations$tun$en {
+	_Translations$tun$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -470,8 +497,8 @@ class _TranslationsTunJa implements TranslationsTunEn {
 }
 
 // Path: dns
-class _TranslationsDnsJa implements TranslationsDnsEn {
-	_TranslationsDnsJa._(this._root);
+class _Translations$dns$ja implements Translations$dns$en {
+	_Translations$dns$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -496,8 +523,8 @@ class _TranslationsDnsJa implements TranslationsDnsEn {
 }
 
 // Path: sniffer
-class _TranslationsSnifferJa implements TranslationsSnifferEn {
-	_TranslationsSnifferJa._(this._root);
+class _Translations$sniffer$ja implements Translations$sniffer$en {
+	_Translations$sniffer$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -506,8 +533,8 @@ class _TranslationsSnifferJa implements TranslationsSnifferEn {
 }
 
 // Path: profilePatchMode
-class _TranslationsProfilePatchModeJa implements TranslationsProfilePatchModeEn {
-	_TranslationsProfilePatchModeJa._(this._root);
+class _Translations$profilePatchMode$ja implements Translations$profilePatchMode$en {
+	_Translations$profilePatchMode$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -517,9 +544,21 @@ class _TranslationsProfilePatchModeJa implements TranslationsProfilePatchModeEn 
 	@override String get noOverwrite => '内蔵 - 上書きなし';
 }
 
+// Path: overwriteMode
+class _Translations$overwriteMode$ja implements Translations$overwriteMode$en {
+	_Translations$overwriteMode$ja._(this._root);
+
+	final TranslationsJa _root; // ignore: unused_field
+
+	// Translations
+	@override String get overwrite => '上書き';
+	@override String get noOverwrite => '上書きしない';
+	@override String get overwriteAppendToHead => '上書き - 先頭に挿入';
+}
+
 // Path: main.tray
-class _TranslationsMainTrayJa implements TranslationsMainTrayEn {
-	_TranslationsMainTrayJa._(this._root);
+class _Translations$main$tray$ja implements Translations$main$tray$en {
+	_Translations$main$tray$ja._(this._root);
 
 	final TranslationsJa _root; // ignore: unused_field
 
@@ -571,8 +610,8 @@ extension on TranslationsJa {
 			'loginScreen.register' => 'アカウント登録',
 			'loginScreen.forgotPassword' => 'パスワードを忘れた',
 			'loginScreen.provider' => 'プロバイダー',
-			'loginScreen.providerName' => '${_root.loginScreen.provider}名',
-			'loginScreen.providerNameRequired' => '${_root.loginScreen.provider}名を入力してください',
+			'loginScreen.providerName' => '${_root.loginScreen.provider}コード/別名/URL',
+			'loginScreen.providerNameRequired' => '${_root.loginScreen.provider}コード/別名/URLを入力してください',
 			'loginScreen.account' => 'アカウント',
 			'loginScreen.accountRequired' => 'アカウントを入力してください',
 			'loginScreen.email' => 'メール',
@@ -583,6 +622,9 @@ extension on TranslationsJa {
 			'loginScreen.passwordMinLength' => ({required Object minLength}) => 'パスワード長は最低${minLength}文字以上である必要があります',
 			'loginScreen.unsupportedProvider' => 'サポートされていない${_root.loginScreen.provider}',
 			'loginScreen.unsupportedProviderType' => 'サポートされていない${_root.loginScreen.provider}タイプ',
+			'loginScreen.unActivedProvider' => 'ログイン機能は有効化されていません',
+			'loginScreen.providerLoginSupportRequired' => ({required Object p}) => 'プロバイダーのコード/別名は${_root.loginScreen.provider}にお問い合わせください。\n${_root.loginScreen.provider}連携は次をご参照ください: ${p}',
+			'loginScreen.providerDisclaimer' => '免責事項:${_root.loginScreen.provider}はサードパーティサービスであり、本アプリとは無関係です',
 			'main.tray.menuOpen' => '開く',
 			'main.tray.menuExit' => '終了',
 			'meta.enable' => '有効',
@@ -618,6 +660,7 @@ extension on TranslationsJa {
 			'meta.hours' => '時間',
 			'meta.minutes' => '分',
 			'meta.seconds' => '秒',
+			'meta.milliseconds' => 'ミリ秒',
 			'meta.protocol' => 'プロトコル',
 			'meta.search' => '検索',
 			'meta.custom' => 'カスタム',
@@ -650,8 +693,10 @@ extension on TranslationsJa {
 			'meta.user' => 'ユーザー',
 			'meta.account' => 'アカウント',
 			'meta.password' => 'パスワード',
-			'meta.decryptPassword' => '複号化パスワード',
+			'meta.decryptPasswordAES' => 'AES 複号化パスワード',
+			'meta.decryptPasswordAGE' => 'AGE 複号化パスワード',
 			'meta.required' => '必須',
+			'meta.go' => '続行',
 			'meta.sudoPassword' => 'sudo パスワード (TUNモードで必要)',
 			'meta.other' => 'その他',
 			'meta.dns' => 'DNS',
@@ -664,7 +709,9 @@ extension on TranslationsJa {
 			'meta.shareUrl' => 'リンクを共有',
 			'meta.coreSettingTips' => '注意：設定を変更した後、有効にするには再接続する必要があります',
 			'meta.overwrite' => '上書き',
+			'meta.overwriteMethod' => '上書き方式',
 			'meta.overwriteCustom' => 'カスタム上書き',
+			'meta.overwriteAppend' => '追加上書き',
 			'meta.overwriteTips' => 'オリジナルプロファイル <- カスタム上書き <- アプリ上書き',
 			'meta.noOverwrite' => '上書きしない',
 			'meta.overwriteSettings' => '上書き設定',
@@ -697,7 +744,7 @@ extension on TranslationsJa {
 			'meta.userAgent' => 'UserAgent',
 			'meta.launchAtStartup' => 'スタートアップ時に起動',
 			'meta.launchAtStartupRunAsAdmin' => 'Clash Miを管理者として再起動してください',
-			'meta.tunModeRunAsAdmin' => 'TUNモードにはシステム管理者権限が必要です。アプリを管理者として再起動してください',
+			'meta.needRunAsAdmin' => 'この機能にはシステム管理者権限が必要です。アプリを管理者として再起動してください',
 			'meta.portableMode' => 'ポータブルモード',
 			'meta.portableModeDisableTips' => 'ポータブルモードを終了する必要がある場合は、[clashmi]を終了し、[clashmi.exe]と同じディレクトリにある[portable]フォルダを手動で削除してください',
 			'meta.systemProxy' => 'システムプロキシ',
@@ -712,6 +759,7 @@ extension on TranslationsJa {
 			'meta.hideVpn' => 'VPNアイコンを隠す',
 			'meta.hideVpnTips' => 'IPv6を有効にすると、この機能は失敗します',
 			'meta.hideDockIcon' => 'Dockアイコンを隠す',
+			'meta.showTrayTraffic' => 'トレイに通信量情報を表示',
 			'meta.website' => 'ウェブサイト',
 			'meta.homePage' => 'ホームページ',
 			'meta.rule' => 'ルール',
@@ -750,6 +798,7 @@ extension on TranslationsJa {
 			'meta.boardOnline' => 'オンラインボードを使用',
 			'meta.boardOnlineUrl' => 'オンラインボードURL',
 			'meta.boardLocalPort' => 'ローカルボードポート',
+			'meta.alwayOnVPN' => '常時接続',
 			'meta.disableFontScaler' => 'フォントスケーリングを無効にする（再起動後に有効）',
 			'meta.autoOrientation' => '画面に合わせて回転',
 			'meta.restartTakesEffect' => '再起動後に有効',
@@ -760,7 +809,14 @@ extension on TranslationsJa {
 			'meta.requestNeedsUserApproval' => '1. [システム設定]-[プライバシーとセキュリティ]でClash Miによるシステム拡張機能のインストールを[許可]してください\n2. [システム設定]-[一般]-[ログイン項目と拡張機能]-[ネットワーク拡張機能]で[clashmiServiceSE]を有効にしてください\n完了後に再接続してください',
 			'meta.FullDiskAccessPermissionRequired' => '[システム設定]-[プライバシーとセキュリティ]-[フルディスクアクセス]でclashmiServiceSEの権限を有効にし、再接続してください。',
 			'meta.proxy' => 'プロキシ',
+			'meta.homeScreen' => 'ホーム画面',
 			'meta.theme' => 'テーマ',
+			'meta.widgetsAlpha' => 'ウィジェットの透明度',
+			'meta.widgetsEmpty' => '利用可能なウィジェットはありません',
+			'meta.backgroundImage' => '背景画像',
+			'meta.path' => 'パス',
+			'meta.local' => 'ローカル',
+			'meta.remote' => 'リモート',
 			'meta.tvMode' => 'TVモード',
 			'meta.autoUpdate' => '自動更新',
 			'meta.updateChannel' => '自動更新チャンネル',
@@ -805,11 +861,16 @@ extension on TranslationsJa {
 			'meta.addProfile' => 'プロファイルを追加',
 			'meta.myProfiles' => 'マイプロファイル',
 			'meta.profileEdit' => 'プロファイルを編集',
+			'meta.profileNeedActive' => '先にこのプロファイルを現在のプロファイルに設定し、接続/再接続してください',
+			'meta.profileDownloadBackupChannel' => 'バックアップダウンロードチャネルを有効化',
+			'meta.profileDownloadBackupChannelTips' => 'Clash Mi が提供するプロキシダウンロードチャネル（情報は一切保存されません）',
 			'meta.profileEditReloadAfterProfileUpdate' => 'プロファイル更新後にリロード',
+			'meta.profileRulesAppendApplePush' => 'Appleプッシュ通知ルールを追加',
+			'meta.profileRulesAppendProxyTips' => 'ルールは元の設定の [proxy-groups] 内で、タイプが [url-test] または [select] の最初のプロキシに自動設定されます',
 			'meta.profileImport' => 'プロファイルファイルをインポート',
 			'meta.profileAddUrlOrContent' => 'プロファイルリンクを追加',
-			'meta.profileUrlOrContent' => 'Clash設定リンク',
-			'meta.profileUrlOrContentHit' => 'Clash設定リンク [必須]',
+			'meta.profileUrlOrContent' => ({required Object p}) => '${p}設定リンク',
+			'meta.profileUrlOrContentHit' => ({required Object p}) => '[必須]。注意: リンクが ${_root.meta.profileUrlOrContent(p: p)} ではない場合（V2Ray または Sing-box など）は、先に Clash オンライン変換ツールを使用して ${_root.meta.profileUrlOrContent(p: p)} に変換してください',
 			'meta.profileUrlOrContentCannotEmpty' => 'プロファイルリンクを空にすることはできません',
 			'permission.camera' => 'カメラ',
 			'permission.screen' => '画面録画',
@@ -817,6 +878,7 @@ extension on TranslationsJa {
 			'permission.request' => ({required Object p}) => '[${p}] 権限をオンにする',
 			'permission.requestNeed' => ({required Object p}) => '[${p}] 権限をオンにしてください',
 			'tls.insecure' => '証明書の検証をスキップ',
+			'tls.ignoreBadCertificate' => '証明書エラーを無視する',
 			'tls.certificate' => '証明書',
 			'tls.privateKey' => '秘密鍵',
 			'tls.customTrustCert' => 'カスタム証明書',
@@ -851,8 +913,13 @@ extension on TranslationsJa {
 			'profilePatchMode.currentSelected' => '現在選択中',
 			'profilePatchMode.overwrite' => '内蔵 - 上書き',
 			'profilePatchMode.noOverwrite' => '内蔵 - 上書きなし',
+			'overwriteMode.overwrite' => '上書き',
+			'overwriteMode.noOverwrite' => '上書きしない',
+			'overwriteMode.overwriteAppendToHead' => '上書き - 先頭に挿入',
 			'protocolSniff' => 'プロトコル検知',
 			'protocolSniffOverrideDestination' => '検知されたドメイン名で接続先アドレスを上書きする',
+			'sendOrReceiveNotMatch' => ({required Object p}) => '[${p}] を使用してください',
+			'targetConnectFailed' => ({required Object p}) => '[${p}] への接続に失敗しました。デバイスが同じ LAN 内にあることを確認してください',
 			'edgeRuntimeNotInstalled' => '現在のデバイスには Edge WebView2 ランタイムがインストールされていないため、ページを表示できません。Edge WebView2 ランタイム (x64) をダウンロードしてインストールし、アプリを再起動してからもう一度お試しください。',
 			'locales.en' => 'English',
 			'locales.zh-CN' => '简体中文',

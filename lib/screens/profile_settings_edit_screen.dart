@@ -18,10 +18,11 @@ import 'package:clashmi/screens/widgets/framework.dart';
 import 'package:clashmi/screens/widgets/sheet.dart';
 import 'package:clashmi/screens/widgets/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tuple/tuple.dart';
 
 class ProfilesSettingsEditScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "ProfilesSettingsEditScreen");
   }
 
@@ -266,12 +267,11 @@ class _ProfilesSettingsEditScreenState
       ),
       GroupItemOptions(
         textFormFieldOptions: GroupItemTextFieldOptions(
-          name: tcontext.meta.decryptPassword,
-          text: _profile.decryptPassword,
+          name: tcontext.meta.decryptPasswordAES,
+          text: _profile.decryptPasswordAES,
           textWidthPercent: 0.6,
           onChanged: (String value) {
-            _profile.decryptPassword = value;
-            setState(() {});
+            _profile.decryptPasswordAES = value;
           },
         ),
       ),
@@ -326,6 +326,33 @@ class _ProfilesSettingsEditScreenState
           ),
         ),
       ],
+
+      GroupItemOptions(
+        textFormFieldOptions: GroupItemTextFieldOptions(
+          name: tcontext.meta.delayTestUrl,
+          text:
+              _profile.delayTestUrl ?? SettingManager.getConfig().delayTestUrl,
+          textWidthPercent: 0.5,
+          onChanged: (String value) {
+            _profile.delayTestUrl = value;
+          },
+        ),
+      ),
+      GroupItemOptions(
+        textFormFieldOptions: GroupItemTextFieldOptions(
+          name: tcontext.meta.delayTestTimeout,
+          text:
+              _profile.delayTestTimeout?.toString() ??
+              SettingManager.getConfig().delayTestTimeout.toString(),
+          textWidthPercent: 0.3,
+          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+          onChanged: (String value) {
+            _profile.delayTestTimeout =
+                int.tryParse(value) ??
+                SettingManager.getConfig().delayTestTimeout;
+          },
+        ),
+      ),
     ];
 
     List<GroupItemOptions> options1 = [
@@ -347,6 +374,17 @@ class _ProfilesSettingsEditScreenState
           },
         ),
       ),
+      GroupItemOptions(
+        switchOptions: GroupItemSwitchOptions(
+          name: tcontext.meta.profileRulesAppendApplePush,
+          tips: tcontext.meta.profileRulesAppendProxyTips,
+          switchValue: _profile.appendApplePushRules,
+          onSwitch: (bool value) async {
+            _profile.appendApplePushRules = value;
+            setState(() {});
+          },
+        ),
+      ),
     ];
 
     groupOptions.add(GroupItem(options: options));
@@ -356,19 +394,11 @@ class _ProfilesSettingsEditScreenState
   }
 
   Future<void> showClashSettingsProxyGroups() async {
-    final current = ProfileManager.getCurrent();
     final connected = await VPNService.getStarted();
     if (!mounted) {
       return;
     }
-    if (!connected || current == null || current.id != _profile.id) {
-      DialogUtils.showAlertDialog(
-        context,
-        "Please activate this profile and start the connection before trying again.",
-      );
-      return;
-    }
-    if (_nodes.isEmpty) {
+    if (connected && _nodes.isEmpty) {
       _nodes = await getProxies();
     }
     var newNodes = _nodes.toList();
@@ -381,7 +411,7 @@ class _ProfilesSettingsEditScreenState
     Navigator.push(
       context,
       MaterialPageRoute(
-        settings: ProxyGroupsScreen.routSettings(),
+        settings: ProxyGroupsScreen.routeSettings(),
         builder: (context) =>
             ProxyGroupsScreen(profile: _profile, nodes: newNodes),
       ),
@@ -394,46 +424,46 @@ class _ProfilesSettingsEditScreenState
       BuildContext context,
       SetStateCallback? setstate,
     ) async {
+      List<Tuple2<String?, String>> overwrite = [
+        Tuple2(OverwriteMode.overwrite.name, tcontext.overwriteMode.overwrite),
+        Tuple2(
+          OverwriteMode.overwriteAppendToHead.name,
+          tcontext.overwriteMode.overwriteAppendToHead,
+        ),
+        Tuple2(
+          OverwriteMode.noOverwrite.name,
+          tcontext.overwriteMode.noOverwrite,
+        ),
+      ];
+
       List<GroupItemOptions> options = [
         GroupItemOptions(
-          switchOptions: GroupItemSwitchOptions(
-            name: "${tcontext.meta.overwrite} [${tcontext.meta.rule}]",
-            switchValue: _profile.overwriteRules,
-            onSwitch: (bool value) async {
-              _profile.overwriteRules = value;
+          stringPickerOptions: GroupItemStringPickerOptions(
+            name: tcontext.meta.overwriteMethod,
+            selected: _profile.rulesOverwriteMethod.name,
+            tupleStrings: overwrite,
+            onPicker: (String? selected) async {
+              _profile.rulesOverwriteMethod = OverwriteMode.values.firstWhere(
+                (e) => e.name == selected,
+                orElse: () => OverwriteMode.overwrite,
+              );
               setState(() {});
             },
-          ),
-        ),
-        GroupItemOptions(
-          switchOptions: GroupItemSwitchOptions(
-            name: "${tcontext.meta.overwrite} [${tcontext.meta.proxyGroups}]",
-            switchValue: _profile.overwriteProxyGroups,
-            onSwitch: !_profile.overwriteRules
-                ? null
-                : (bool value) async {
-                    _profile.overwriteProxyGroups = value;
-                    setState(() {});
-                  },
           ),
         ),
       ];
       List<GroupItemOptions> options1 = [];
       final names = DiversionTemplateManager.getRuleTemplatesNames();
       for (var name in names) {
-        final target = _profile.overwriteProxyGroups
-            ? _profile.rulesForProxyGroups[name]
-            : _profile.rules[name];
+        final target = _profile.rules[name];
         options1.add(
           GroupItemOptions(
             pushOptions: GroupItemPushOptions(
               name: name,
               text: target,
-              onPush: !_profile.overwriteRules
-                  ? null
-                  : () async {
-                      onTapRule(name, setstate);
-                    },
+              onPush: () async {
+                onTapRule(name, setstate);
+              },
             ),
           ),
         );
@@ -445,7 +475,7 @@ class _ProfilesSettingsEditScreenState
     await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: GroupScreen.routSettings("rules"),
+        settings: GroupScreen.routeSettings("rules"),
         builder: (context) =>
             GroupScreen(title: tcontext.meta.rule, getOptions: getOptions),
       ),
@@ -468,17 +498,19 @@ class _ProfilesSettingsEditScreenState
       return;
     }
     if (!connected || current == null || current.id != _profile.id) {
-      DialogUtils.showAlertDialog(
+      final tcontext = Translations.of(context);
+      await DialogUtils.showAlertDialog(
         context,
-        "Please activate this profile and start the connection before trying again.",
+        tcontext.meta.profileNeedActive,
       );
       return;
     }
+
     if (_nodes.isEmpty) {
       _nodes = await getProxies();
     }
     var newNodes = _nodes.toList();
-    if (_profile.overwriteProxyGroups) {
+    if (_profile.proxyGroupsOverwriteMethod != OverwriteMode.noOverwrite) {
       newNodes.removeWhere((ClashProxiesNode node) {
         return ClashProtocolType.GroupToList().contains(node.type);
       });
@@ -493,7 +525,12 @@ class _ProfilesSettingsEditScreenState
       newNodes.insertAll(0, pgNodes);
     }
 
+    if (!mounted) {
+      return;
+    }
+
     var widgets = [];
+
     for (int i = 0; i < newNodes.length; ++i) {
       final node = newNodes[i];
       String subtitle = "";
@@ -520,19 +557,10 @@ class _ProfilesSettingsEditScreenState
                     Text(subtitle, style: TextStyle(color: color)),
                   ],
                 ),
-          selected:
-              (_profile.overwriteProxyGroups &&
-                  node.name == _profile.rulesForProxyGroups[ruleName]) ||
-              (!_profile.overwriteProxyGroups &&
-                  node.name == _profile.rules[ruleName]),
+          selected: node.name == _profile.rules[ruleName],
           selectedColor: ThemeDefine.kColorBlue,
           onTap: () async {
-            if (_profile.overwriteProxyGroups) {
-              _profile.rulesForProxyGroups[ruleName] = node.name;
-            } else {
-              _profile.rules[ruleName] = node.name;
-            }
-
+            _profile.rules[ruleName] = node.name;
             Navigator.of(context).pop();
             setstate?.call();
           },

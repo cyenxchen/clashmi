@@ -1,28 +1,62 @@
 // ignore_for_file: unused_catch_stack
+import 'dart:io';
+
+import 'package:dio/io.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:webdav_client_plus/webdav_client_plus.dart';
+import 'package:punycode_converter/punycode_converter.dart' as punycode;
 
-class WebdavUtils {
-  static const String _prefix = "clashmi/";
+class WebdavClientUtils {
+  static const String _prefix = "/clashmi/";
+  static bool isInnerError(String message) {
+    int? statusCode = message.contains("Status:") == true
+        ? int.tryParse(message.split("Status:")[1].split(" ")[1])
+        : null;
+    if (statusCode == 207 ||
+        statusCode == 422 ||
+        statusCode == 423 ||
+        statusCode == 424 ||
+        statusCode == 507 ||
+        statusCode == 401 ||
+        statusCode == 403 ||
+        statusCode == 404 ||
+        statusCode == 409 ||
+        statusCode == 412) {
+      return true;
+    }
+    return false;
+  }
+
   static Future<ReturnResult<WebdavClient>> connect(
-    int? proxyPort,
+    String? proxyUrl,
     String url,
     String user,
     String password,
   ) async {
+    Uri? uri = Uri.tryParse(url.trim());
+    try {
+      uri = uri?.punyEncoded;
+    } catch (err) {}
+    if (uri == null) {
+      return ReturnResult(
+        error: ReturnResultError("Invalid URL:${url.trim()}"),
+      );
+    }
     var client = WebdavClient(
-      url: url.trim(),
+      url: uri.toString(),
       auth: BasicAuth(user: user.trim(), pwd: password.trim()),
     );
-    /*if (proxyPort != null && proxyPort != 0) {
-      client.c.httpClientAdapter = IOHttpClientAdapter(
+    if (proxyUrl != null && proxyUrl.isNotEmpty) {
+      final adapter = IOHttpClientAdapter(
         createHttpClient: () {
           final client = HttpClient()..idleTimeout = const Duration(seconds: 3);
-          client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+          client.findProxy = (Uri uri) => proxyUrl;
           return client;
         },
       );
-    }*/
+      client.setHttpClientAdapter(adapter);
+    }
+    client.setFollowRedirects(true);
 
     client.setHeaders({'accept-charset': 'utf-8'});
 
@@ -39,12 +73,12 @@ class WebdavUtils {
     try {
       await client.ping();
     } catch (err, stacktrace) {
-      return ReturnResult(error: ReturnResultError(err.toString()));
+      return ReturnResult(error: ReturnResultError("ping:${err.toString()}"));
     }
     try {
       await client.mkdir(_prefix);
     } catch (err, stacktrace) {
-      return ReturnResult(error: ReturnResultError(err.toString()));
+      return ReturnResult(error: ReturnResultError("mkdir:${err.toString()}"));
     }
     return ReturnResult(data: client);
   }
@@ -54,12 +88,14 @@ class WebdavUtils {
       final list = await client.readDir(_prefix);
       final names = <String>[];
       for (final item in list) {
-        if (item.isDir) continue;
+        if (item.isDir) {
+          continue;
+        }
         names.add(item.name);
       }
       return ReturnResult(data: names);
     } catch (err, stacktrace) {
-      return ReturnResult(error: ReturnResultError(err.toString()));
+      return ReturnResult(error: ReturnResultError("list:${err.toString()}"));
     }
   }
 
@@ -71,7 +107,10 @@ class WebdavUtils {
     try {
       await client.writeFile(localPath, _prefix + relativePath);
     } catch (err, stacktrace) {
-      return ReturnResultError(err.toString());
+      return ReturnResultError(
+        "upload:${err.toString()}",
+        stacktrace: stacktrace,
+      );
     }
     return null;
   }
@@ -83,7 +122,10 @@ class WebdavUtils {
     try {
       await client.remove(_prefix + relativePath);
     } catch (err, stacktrace) {
-      return ReturnResultError(err.toString());
+      return ReturnResultError(
+        "delete:${err.toString()}",
+        stacktrace: stacktrace,
+      );
     }
     return null;
   }
@@ -96,7 +138,10 @@ class WebdavUtils {
     try {
       await client.readFile(_prefix + relativePath, localPath);
     } catch (err, stacktrace) {
-      return ReturnResultError(err.toString());
+      return ReturnResultError(
+        "download:${err.toString()}",
+        stacktrace: stacktrace,
+      );
     }
     return null;
   }

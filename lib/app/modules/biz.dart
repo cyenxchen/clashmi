@@ -6,6 +6,7 @@ import 'package:clashmi/app/modules/clash_setting_manager.dart';
 import 'package:clashmi/app/modules/profile_manager.dart';
 import 'package:clashmi/app/modules/profile_patch_manager.dart';
 import 'package:clashmi/app/modules/diversion_template_manager.dart';
+
 import 'package:clashmi/app/utils/app_lifecycle_state_notify.dart';
 import 'package:clashmi/app/utils/log.dart';
 
@@ -13,11 +14,15 @@ class Biz {
   static final List<void Function()> onEventInitFinish = [];
   static final List<void Function()> onEventInitHomeFinish = [];
   static final List<void Function()> onEventInitAllFinish = [];
+  static final List<Function(String traffic, String speed)>
+  onEventTrafficChanged = [];
+
   static bool _initFinish = false;
   static bool _initHomeFinish = false;
 
   static void Function()? onEventExit;
   static void Function(bool)? onEventVPNStateChanged;
+  static void Function(String)? onEventSingletonInstance;
 
   static Future<void> init(bool launchAtStartup) async {
     await ClashSettingManager.init();
@@ -78,6 +83,12 @@ class Biz {
   static void vpnStateChanged(bool isConnected) {
     if (onEventVPNStateChanged != null) {
       onEventVPNStateChanged!(isConnected);
+    }
+  }
+
+  static void trafficChanged(String traffic, String speed) {
+    for (var callback in onEventTrafficChanged) {
+      callback(traffic, speed);
     }
   }
 }

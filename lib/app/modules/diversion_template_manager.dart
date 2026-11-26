@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:clashmi/app/clash/clash_config.dart' show ClashProtocolType;
+import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:path/path.dart' as path;
@@ -157,9 +158,6 @@ class RuleTemplate {
   }
 
   void reorder(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= rules.length || newIndex >= rules.length) {
       return;
     }
@@ -176,15 +174,18 @@ class RuleTemplate {
       "RULE-SET",
       "GEOSITE",
       "GEOIP",
-      "IP-ASN",
+      if (!Platform.isIOS) "IP-ASN",
       "DOMAIN",
       "DOMAIN-SUFFIX",
       "DOMAIN-KEYWORD",
       "DOMAIN-REGEX",
       "IP-CIDR",
       "IP-CIDR6",
+      "IP-SUFFIX",
       "PROCESS-NAME",
       "PROCESS-NAME-REGEX",
+      "PROCESS-PATH",
+      "PROCESS-PATH-REGEX",
       "AND",
       "OR",
       "NOT",
@@ -204,8 +205,11 @@ class RuleTemplate {
       "DOMAIN-REGEX",
       "IP-CIDR",
       "IP-CIDR6",
+      "IP-SUFFIX",
       "PROCESS-NAME",
       "PROCESS-NAME-REGEX",
+      "PROCESS-PATH",
+      "PROCESS-PATH-REGEX",
       "AND",
       "OR",
       "NOT",
@@ -341,9 +345,10 @@ class DiversionTemplateManager {
   static final List<void Function(String)> onEventRuleTemplateRemove = [];
   static final List<void Function(String)> onEventProxyGroupAdd = [];
   static final List<void Function(String)> onEventProxyGroupRemove = [];
-  static bool _saving = false;
+  static final FileSaver _fileSaver = FileSaver();
 
   static Future<void> init() async {
+    _fileSaver.setSavePath(await PathUtils.diversionTemplateConfigFilePath());
     await load();
   }
 
@@ -356,21 +361,7 @@ class DiversionTemplateManager {
   }
 
   static Future<void> save() async {
-    if (_saving) {
-      return;
-    }
-    _saving = true;
-    String filePath = await PathUtils.diversionTemplateConfigFilePath();
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    String content = encoder.convert(_diversionTemplates);
-    try {
-      await File(filePath).writeAsString(content, flush: true);
-    } catch (err, stacktrace) {
-      Log.w(
-        "DiversionTemplateManager.save exception  $filePath ${err.toString()}",
-      );
-    }
-    _saving = false;
+    await _fileSaver.saveAsJson(_diversionTemplates);
   }
 
   static Future<void> load() async {
@@ -537,9 +528,6 @@ class DiversionTemplateManager {
   }
 
   static void reorderRuleProvider(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= _diversionTemplates.ruleProviders.length ||
         newIndex >= _diversionTemplates.ruleProviders.length) {
       return;
@@ -549,9 +537,6 @@ class DiversionTemplateManager {
   }
 
   static void reorderRuleTemplates(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= _diversionTemplates.ruleTemplates.length ||
         newIndex >= _diversionTemplates.ruleTemplates.length) {
       return;
@@ -561,9 +546,6 @@ class DiversionTemplateManager {
   }
 
   static void reorderProxyGroupTemplates(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= _diversionTemplates.proxyGroupTemplates.length ||
         newIndex >= _diversionTemplates.proxyGroupTemplates.length) {
       return;

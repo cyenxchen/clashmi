@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:clashmi/app/clash/clash_http_api.dart';
 import 'package:clashmi/app/local_services/vpn_service.dart';
+import 'package:clashmi/app/utils/http_utils.dart';
 import 'package:clashmi/app/utils/network_utils.dart';
 import 'package:clashmi/app/utils/system_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class NetCheckScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: 'NetCheckScreen');
   }
 
@@ -133,6 +134,10 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
         lines.add('A: <empty>');
       } else {
         for (var i in aList) {
+          if (!NetworkUtils.isIpv4(i) && !NetworkUtils.isIpv6(i)) {
+            lines.add('A: $i');
+            continue;
+          }
           if (NetworkUtils.isPublicIp(i)) {
             lines.add('A: $i');
           } else {
@@ -152,6 +157,10 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
         lines.add('AAAA: <empty>');
       } else {
         for (var i in aaaaList) {
+          if (!NetworkUtils.isIpv4(i) && !NetworkUtils.isIpv6(i)) {
+            lines.add('AAAA: $i');
+            continue;
+          }
           if (NetworkUtils.isPublicIp(i)) {
             lines.add('AAAA: $i');
           } else {
@@ -180,10 +189,11 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
     int? proxyPort,
   }) async {
     HttpClient? client;
+    String step = "";
     try {
       final uri = Uri(scheme: 'https', host: domain, path: '/');
       client = HttpClient();
-      const timeout = Duration(seconds: 10);
+      const timeout = Duration(seconds: 15);
       client.connectionTimeout = timeout;
 
       if (proxyPort == null) {
@@ -192,8 +202,13 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
         client.findProxy = (uri) => 'PROXY 127.0.0.1:$proxyPort';
       }
 
+      step = "getUrl";
       final request = await client.getUrl(uri).timeout(timeout);
-      request.headers.set(HttpHeaders.userAgentHeader, 'clashmi-net-check/1.0');
+      request.headers.set(
+        HttpHeaders.userAgentHeader,
+        await HttpUtils.getUserAgent(),
+      );
+      step = "close";
       final response = await request.close().timeout(timeout);
 
       final statusLine =
@@ -207,7 +222,7 @@ class _NetCheckScreenState extends LasyRenderingState<NetCheckScreen> {
       final lines = [tcontext.NetCheckScreen.failed, statusLine];
       return lines.join('\n');
     } catch (err) {
-      return err.toString();
+      return '$step: ${err.toString()}';
     } finally {
       client?.close(force: true);
     }

@@ -11,7 +11,7 @@ import 'package:clashmi/screens/widgets/framework.dart';
 import 'package:flutter/material.dart';
 
 class GroupScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings(String viewTag) {
+  static RouteSettings routeSettings(String viewTag) {
     return RouteSettings(name: "GroupScreen:$viewTag");
   }
 
@@ -187,13 +187,7 @@ class GroupScreenState extends LasyRenderingState<GroupScreen>
       if (!mounted) {
         return [];
       }
-      DialogUtils.showAlertDialog(
-        context,
-        "${err.toString()}\n${stacktrace.toString()}",
-        showCopy: true,
-        showFAQ: true,
-        withVersion: true,
-      );
+      DialogUtils.showExceptionDialog(context, err, stacktrace);
       return [];
     }
   }

@@ -4,9 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:clashmi/app/local_services/vpn_service.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/convert_utils.dart';
+import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
@@ -15,12 +16,102 @@ import 'package:clashmi/screens/widgets/text_field.dart';
 
 import 'package:clashmi_vpn_service/proxy_manager.dart';
 
+class SettingConfigItemUIScreen {
+  static const String backgroundTypeLocal = "local";
+  static const String backgroundTypeRemote = "remote";
+  static const String backgroundTypeDisable = "";
+  static bool fastCachedImageConfigInited = false;
+  List<String> widgets = [];
+  int widgetsAlpha = 255;
+
+  String backgroundImageType = backgroundTypeDisable;
+  String backgroundImageUrl = "";
+  String backgroundImageLocal = "";
+
+  Map<String, dynamic> toJson() => {
+    'widgets': widgets,
+    'widgets_alpha': widgetsAlpha,
+    'background_image_type': backgroundImageType,
+    'background_image': backgroundImageUrl,
+    'background_image_local': backgroundImageLocal,
+  };
+  void fromJson(Map<String, dynamic>? map) {
+    if (map == null) {
+      return;
+    }
+    widgets = ConvertUtils.getListStringFromDynamic(map["widgets"], true, [])!;
+    try {
+      widgetsAlpha = map['widgets_alpha'] ?? 255;
+    } catch (e) {
+      widgetsAlpha = 255;
+    }
+    if (widgetsAlpha < 0 || widgetsAlpha > 255) {
+      widgetsAlpha = 255;
+    }
+
+    final backgroundImageType_ = map["background_image_type"];
+    backgroundImageUrl = map["background_image"] ?? "";
+    backgroundImageLocal = map["background_image_local"] ?? "";
+    if (backgroundImageType_ == null) {
+      if (backgroundImageUrl.isNotEmpty) {
+        backgroundImageType = backgroundTypeRemote;
+      } else {
+        backgroundImageType = backgroundTypeDisable;
+      }
+    } else {
+      if ([
+        backgroundTypeLocal,
+        backgroundTypeRemote,
+        backgroundTypeDisable,
+      ].contains(backgroundImageType_)) {
+        backgroundImageType = backgroundImageType_;
+      }
+    }
+  }
+
+  static SettingConfigItemUIScreen fromJsonStatic(Map<String, dynamic>? map) {
+    SettingConfigItemUIScreen config = SettingConfigItemUIScreen();
+    config.fromJson(map);
+    return config;
+  }
+
+  static List<int> widgetsAlphaInt = [0, 20, 50, 100, 255];
+
+  int getWidgetAlpha() {
+    if (backgroundImageType == backgroundTypeDisable) {
+      return 255;
+    }
+    if (backgroundImageUrl.isEmpty && backgroundImageLocal.isEmpty) {
+      return 255;
+    }
+    if (widgetsAlphaInt.contains(widgetsAlpha)) {
+      return widgetsAlpha;
+    }
+    if (widgetsAlpha < 0 || widgetsAlpha > 255) {
+      return 255;
+    }
+    if (widgetsAlpha >= 0 && widgetsAlpha < 20) {
+      return 0;
+    }
+    if (widgetsAlpha >= 20 && widgetsAlpha < 50) {
+      return 20;
+    }
+    if (widgetsAlpha >= 50 && widgetsAlpha < 100) {
+      return 50;
+    }
+    if (widgetsAlpha >= 100 && widgetsAlpha < 255) {
+      return 100;
+    }
+    return 255;
+  }
+}
+
 class SettingConfigItemUI {
   String theme = ThemeDefine.kThemeLight;
-  bool autoOrientation = maybeTv();
+  bool autoOrientation = false;
   bool disableFontScaler = false;
   bool hideAfterLaunch = false;
-  bool tvMode = maybeTv();
+  bool tvMode = false;
   bool perAppHideSystemApp = true;
   bool perAppHideAppIcon = false;
   bool delayTestSort = false;
@@ -39,14 +130,14 @@ class SettingConfigItemUI {
       return;
     }
     theme = map["theme"] ?? "";
-    autoOrientation = map["auto_orientation"] ?? maybeTv();
+    autoOrientation = map["auto_orientation"] ?? false;
     disableFontScaler = map["disable_font_scaler"] ?? false;
     hideAfterLaunch = map["hide_after_launch"] ?? false;
     perAppHideSystemApp = map["perapp_hide_system_app"] ?? true;
     perAppHideAppIcon = map["perapp_hide_app_icon"] ?? false;
     delayTestSort = map["delay_test_sort"] ?? false;
     if (Platform.isAndroid) {
-      tvMode = map["tv_mode"] ?? maybeTv();
+      tvMode = map["tv_mode"] ?? false;
       TextFieldEx.popupEdit = tvMode;
     }
 
@@ -75,15 +166,50 @@ class SettingConfigItemUI {
     return config;
   }
 
-  static bool maybeTv() {
+  static Future<bool> maybeTv() async {
     if (Platform.isAndroid) {
-      final abis = VPNService.getABIs();
-      if (abis.length == 1 &&
-          (abis.contains("armeabi") || abis.contains("x86"))) {
-        return true;
+      final deviceInfo = await DeviceInfoPlugin().deviceInfo;
+      if (deviceInfo is AndroidDeviceInfo) {
+        final systemFeatures = deviceInfo.systemFeatures;
+        if (systemFeatures.contains("android.hardware.type.television") ||
+            systemFeatures.contains("android.software.leanback")) {
+          return true;
+        }
       }
     }
     return false;
+  }
+}
+
+class SettingConfigItemWindow {
+  static Size kMinWindowSize = Platform.isLinux
+      ? const Size(400, 740)
+      : const Size(400, 700);
+  double x = 0;
+  double y = 0;
+  double width = 0;
+  double height = 0;
+
+  Map<String, dynamic> toJson() => {
+    'x': x.toInt(),
+    'y': y.toInt(),
+    'width': width.toInt(),
+    'height': height.toInt(),
+  };
+  void fromJson(Map<String, dynamic>? map) {
+    if (map == null) {
+      return;
+    }
+    x = (map["x"] ?? 0).toDouble();
+    y = (map["y"] ?? 0).toDouble();
+    width = (map["width"] ?? 0).toDouble();
+    height = (map["height"] ?? 0).toDouble();
+  }
+
+  static SettingConfigItemWindow fromJsonStatic(Map<String, dynamic>? map) {
+    SettingConfigItemWindow config = SettingConfigItemWindow();
+    config.fromJson(map);
+    return config;
   }
 }
 
@@ -120,8 +246,15 @@ class SettingConfig {
       "https://www.gstatic.com/generate_204";
   String languageTag = "";
   SettingConfigItemUI ui = SettingConfigItemUI();
+  SettingConfigItemUIScreen uiScreen = SettingConfigItemUIScreen();
+  SettingConfigItemWindow window = SettingConfigItemWindow();
   SettingConfigItemWebDev webdav = SettingConfigItemWebDev();
+  bool devMode = false;
   bool alwayOn = false;
+  String logLevel = bool.fromEnvironment("dart.vm.product")
+      ? "warning"
+      : "info"; //trace, debug, info, warning, error
+  bool ignoreBadCertificate = true;
   String autoUpdateChannel = "stable"; //stable, beta
   bool autoDownloadUpdatePkg = true;
   bool autoConnectAfterLaunch = false;
@@ -134,6 +267,7 @@ class SettingConfig {
   String delayTestUrl = kDefaultDelayTestUrl;
   int delayTestTimeout = 5000;
   bool hideDockIcon = false; //macos
+  bool showTrayTraffic = false; //macos
   bool excludeFromRecent = false; //android
   bool wakeLock = false; //android
   bool autoConnectAtBoot = false; //android
@@ -142,8 +276,12 @@ class SettingConfig {
   Map<String, dynamic> toJson() => {
     'language_tag': languageTag,
     'ui': ui,
+    'screen': uiScreen,
+    'window': window,
     'webdav': webdav,
     'alway_on': alwayOn,
+    'log_level': logLevel,
+    'ignore_bad_certificate': ignoreBadCertificate,
     'auto_update_channel': autoUpdateChannel,
     'auto_download_udpate_pkg': autoDownloadUpdatePkg,
     'auto_connect_after_launch': autoConnectAfterLaunch,
@@ -156,6 +294,7 @@ class SettingConfig {
     'delay_test_url': delayTestUrl,
     'delay_test_url_timeout': delayTestTimeout,
     'hide_dock_icon': hideDockIcon,
+    'show_tray_traffic': showTrayTraffic,
     'exclude_from_recent': excludeFromRecent,
     'wake_lock': wakeLock,
     'auto_connect_at_boot': autoConnectAtBoot,
@@ -168,9 +307,15 @@ class SettingConfig {
 
     languageTag = map["language_tag"] ?? "";
     ui = SettingConfigItemUI.fromJsonStatic(map["ui"]);
+    uiScreen = SettingConfigItemUIScreen.fromJsonStatic(map["screen"]);
+    window = SettingConfigItemWindow.fromJsonStatic(map["window"]);
     webdav = SettingConfigItemWebDev.fromJsonStatic(map["webdav"]);
     alwayOn = map["alway_on"] ?? false;
-    autoUpdateChannel = map["auto_update_channel"] ?? "stable";
+    logLevel =
+        map["log_level"] ??
+        (bool.fromEnvironment("dart.vm.product") ? "warning" : "info");
+    ignoreBadCertificate = map["ignore_bad_certificate"] ?? true;
+    autoUpdateChannel = map["auto_update_channel"] ?? "";
     if (autoUpdateChannel.isEmpty) {
       autoUpdateChannel = "stable";
     }
@@ -185,13 +330,13 @@ class SettingConfig {
     )!;
 
     _userAgent = map["user_agent"] ?? "";
-
     boardOnline = map["board_online"] ?? false;
     boardUrl = map["board_url"] ?? kDefaultBoardUrl;
     boardLocalPort = map["board_port"] ?? kDefaultBoardPort;
     delayTestUrl = map["delay_test_url"] ?? kDefaultDelayTestUrl;
     delayTestTimeout = map["delay_test_url_timeout"] ?? 5000;
     hideDockIcon = map["hide_dock_icon"] ?? false;
+    showTrayTraffic = map["show_tray_traffic"] ?? false;
     excludeFromRecent = map["exclude_from_recent"] ?? false;
     wakeLock = map["wake_lock"] ?? false;
     autoConnectAtBoot = map["auto_connect_at_boot"] ?? false;
@@ -225,9 +370,10 @@ class SettingConfig {
 }
 
 class SettingManager {
-  static bool _saving = false;
+  static final FileSaver _fileSaver = FileSaver();
   static SettingConfig _config = SettingConfig();
   static Future<void> init({bool fromBackupRestore = false}) async {
+    _fileSaver.setSavePath(await PathUtils.settingFilePath());
     await load();
     bool needSave = await parseConfig();
     if (needSave) {
@@ -289,6 +435,9 @@ class SettingManager {
     var file = File(filePath);
     bool exists = await file.exists();
     if (!exists) {
+      _config.ui.autoOrientation = await SettingConfigItemUI.maybeTv();
+      _config.ui.tvMode = _config.ui.autoOrientation;
+      TextFieldEx.popupEdit = _config.ui.tvMode;
       return;
     }
     String content = "";
@@ -303,20 +452,8 @@ class SettingManager {
     }
   }
 
-  static void save() async {
-    if (_saving) {
-      return;
-    }
-    _saving = true;
-    String filePath = await PathUtils.settingFilePath();
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    String content = encoder.convert(_config.toJson());
-    try {
-      await File(filePath).writeAsString(content, flush: true);
-    } catch (err, stacktrace) {
-      Log.w("SettingManager.save exception  $filePath ${err.toString()}");
-    }
-    _saving = false;
+  static Future<void> save() async {
+    await _fileSaver.saveAsJson(_config);
   }
 
   static void reset() {

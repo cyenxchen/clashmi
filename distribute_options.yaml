@@ -22,10 +22,10 @@ releases:
           target: rpm
           dart-define:
             PACKAGE_TARGET: rpm
-      - name: macos-dmg
+      - name: macos-pkg
         package:
           platform: macos
-          target: dmg
+          target: pkg
       - name: windows-exe
         package:
           platform: windows

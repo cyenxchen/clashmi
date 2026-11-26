@@ -9,6 +9,9 @@ import 'package:clashmi/screens/theme_define.dart';
 class Themes with ChangeNotifier {
   String _theme = '';
   void setTheme(String theme, bool notify) {
+    if (_theme == theme) {
+      return;
+    }
     switch (theme) {
       case ThemeDefine.kThemeSystem:
       case ThemeDefine.kThemeLight:
@@ -42,19 +45,32 @@ class Themes with ChangeNotifier {
         : ThemeDataLight.theme(context);
   }
 
-  Color? getThemeIconColor(BuildContext context) {
+  Color? getThemeColor(BuildContext context) {
     var brightness = MediaQuery.platformBrightnessOf(context);
     switch (_theme) {
-      case ThemeDefine.kThemeSystem:
-        return brightness == Brightness.dark
-            ? Colors.white.withValues(alpha: 0.5)
-            : Colors.black.withValues(alpha: 0.5);
       case ThemeDefine.kThemeLight:
-        return Colors.black.withValues(alpha: 0.5);
+        return ThemeDataLight.mainBgColor;
       case ThemeDefine.kThemeDark:
-        return Colors.white.withValues(alpha: 0.5);
+        return ThemeDataDark.mainBgColor;
     }
-    return Colors.grey.withValues(alpha: 0.5);
+    // ThemeDefine.kThemeSystem:
+    return brightness == Brightness.dark
+        ? ThemeDataDark.mainBgColor
+        : ThemeDataLight.mainBgColor;
+  }
+
+  Color getThemeInvertColor(BuildContext context) {
+    var brightness = MediaQuery.platformBrightnessOf(context);
+    switch (_theme) {
+      case ThemeDefine.kThemeLight:
+        return ThemeDataDark.mainBgColor;
+      case ThemeDefine.kThemeDark:
+        return ThemeDataLight.mainBgColor;
+    }
+    // ThemeDefine.kThemeSystem:
+    return brightness == Brightness.dark
+        ? ThemeDataLight.mainBgColor
+        : ThemeDataDark.mainBgColor;
   }
 
   ThemeMode themeMode() {

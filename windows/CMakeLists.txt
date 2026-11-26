@@ -9,6 +9,13 @@ set(BINARY_NAME "clashmi")
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
+# Keep compatibility with plugins that still pass DEPENDS to
+# add_custom_command(TARGET ...). Guard in case older CMake does not know it.
+if(POLICY CMP0175)
+  cmake_policy(SET CMP0175 OLD)
+endif()
+# Ensure subdirectories (including plugin CMake projects) inherit this default.
+set(CMAKE_POLICY_DEFAULT_CMP0175 OLD)
 
 # Define build configuration option.
 get_property(IS_MULTICONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
@@ -111,7 +118,15 @@ install(CODE "
   file(REMOVE_RECURSE \"${INSTALL_BUNDLE_DATA_DIR}/${FLUTTER_ASSET_DIR_NAME}\")
   " COMPONENT Runtime)
 install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
-  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}" COMPONENT Runtime)
+  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
+  CONFIGURATIONS Debug
+  COMPONENT Runtime)
+
+install(DIRECTORY "${PROJECT_BUILD_DIR}/${FLUTTER_ASSET_DIR_NAME}"
+  DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
+  CONFIGURATIONS Profile;Release
+  COMPONENT Runtime
+  PATTERN "kernel_blob.bin" EXCLUDE)
 
 # Install the AOT library on non-Debug builds only.
 install(FILES "${AOT_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}"
