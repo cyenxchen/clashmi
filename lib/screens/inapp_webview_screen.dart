@@ -20,7 +20,7 @@ import 'package:clashmi_vpn_service/vpn_service.dart';
 import 'theme_define.dart';
 
 class InAppWebViewScreen extends StatefulWidget {
-  static RouteSettings routSettings(String viewTag) {
+  static RouteSettings routeSettings(String viewTag) {
     return RouteSettings(name: "InAppWebViewScreen:$viewTag");
   }
 
@@ -188,6 +188,7 @@ class InAppWebViewScreen extends StatefulWidget {
   final bool refreshWhenLoaded;
   final String injectJs;
   final bool appendKaringToUseragent;
+  final String jsObjectName;
   final String appendMoreKaringToUseragent;
   final Map<String, Function> javaScriptHandlers;
   final dynamic javaScriptHandlerArgument;
@@ -214,6 +215,7 @@ class InAppWebViewScreen extends StatefulWidget {
     this.injectJs = "",
     this.appendKaringToUseragent = false,
     this.appendMoreKaringToUseragent = "",
+    this.jsObjectName = "clashmi",
     this.javaScriptHandlers = const {},
     this.javaScriptHandlerArgument,
     this.clearAllCookies = false,
@@ -327,7 +329,7 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
       _scripts.add(
         UserScript(
           source:
-              "window.addEventListener('DOMContentLoaded', function(event) {window.clashmi = window.flutter_inappwebview;});",
+              "window.addEventListener('DOMContentLoaded', function(event) {window.${widget.jsObjectName} = window.flutter_inappwebview;});",
           injectionTime: UserScriptInjectionTime.AT_DOCUMENT_START,
         ),
       );
@@ -483,7 +485,9 @@ class _InAppWebViewScreenState extends State<InAppWebViewScreen> {
                         if (widget.showOpenExternal) ...[
                           InkWell(
                             onTap: () async {
-                              UrlLauncherUtils.loadUrl(widget.url);
+                              UrlLauncherUtils.loadUrl(
+                                _url.isNotEmpty ? _url : widget.url,
+                              );
                             },
                             child: const SizedBox(
                               width: 50,

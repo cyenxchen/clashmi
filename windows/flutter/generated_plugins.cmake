@@ -9,17 +9,17 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_secure_storage_windows
   hotkey_manager_windows
   open_dir_windows
+  permission_handler_windows
   protocol_handler
   screen_capturer_windows
   screen_retriever_windows
   share_plus
-  tray_manager
   url_launcher_windows
   window_manager
-  windows_single_instance
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
+  jni
 )
 
 set(PLUGIN_BUNDLED_LIBRARIES)

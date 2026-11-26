@@ -16,20 +16,21 @@ class TranslationsKo with BaseTranslations<AppLocale, Translations> implements T
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsKo({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.ko,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <ko>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final TranslationsKo _root = this; // ignore: unused_field
 
@@ -37,23 +38,26 @@ class TranslationsKo with BaseTranslations<AppLocale, Translations> implements T
 	TranslationsKo $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsKo(meta: meta ?? this.$meta);
 
 	// Translations
-	@override late final _TranslationsBackupAndSyncWebdavScreenKo BackupAndSyncWebdavScreen = _TranslationsBackupAndSyncWebdavScreenKo._(_root);
-	@override late final _TranslationsLaunchFailedScreenKo LaunchFailedScreen = _TranslationsLaunchFailedScreenKo._(_root);
-	@override late final _TranslationsPerAppAndroidScreenKo PerAppAndroidScreen = _TranslationsPerAppAndroidScreenKo._(_root);
-	@override late final _TranslationsUserAgreementScreenKo UserAgreementScreen = _TranslationsUserAgreementScreenKo._(_root);
-	@override late final _TranslationsNetCheckScreenKo NetCheckScreen = _TranslationsNetCheckScreenKo._(_root);
-	@override late final _TranslationsVersionUpdateScreenKo VersionUpdateScreen = _TranslationsVersionUpdateScreenKo._(_root);
-	@override late final _TranslationsLoginScreenKo loginScreen = _TranslationsLoginScreenKo._(_root);
-	@override late final _TranslationsMainKo main = _TranslationsMainKo._(_root);
-	@override late final _TranslationsMetaKo meta = _TranslationsMetaKo._(_root);
-	@override late final _TranslationsPermissionKo permission = _TranslationsPermissionKo._(_root);
-	@override late final _TranslationsTlsKo tls = _TranslationsTlsKo._(_root);
-	@override late final _TranslationsTunKo tun = _TranslationsTunKo._(_root);
-	@override late final _TranslationsDnsKo dns = _TranslationsDnsKo._(_root);
-	@override late final _TranslationsSnifferKo sniffer = _TranslationsSnifferKo._(_root);
-	@override late final _TranslationsProfilePatchModeKo profilePatchMode = _TranslationsProfilePatchModeKo._(_root);
+	@override late final _Translations$BackupAndSyncWebdavScreen$ko BackupAndSyncWebdavScreen = _Translations$BackupAndSyncWebdavScreen$ko._(_root);
+	@override late final _Translations$LaunchFailedScreen$ko LaunchFailedScreen = _Translations$LaunchFailedScreen$ko._(_root);
+	@override late final _Translations$PerAppAndroidScreen$ko PerAppAndroidScreen = _Translations$PerAppAndroidScreen$ko._(_root);
+	@override late final _Translations$UserAgreementScreen$ko UserAgreementScreen = _Translations$UserAgreementScreen$ko._(_root);
+	@override late final _Translations$NetCheckScreen$ko NetCheckScreen = _Translations$NetCheckScreen$ko._(_root);
+	@override late final _Translations$VersionUpdateScreen$ko VersionUpdateScreen = _Translations$VersionUpdateScreen$ko._(_root);
+	@override late final _Translations$loginScreen$ko loginScreen = _Translations$loginScreen$ko._(_root);
+	@override late final _Translations$main$ko main = _Translations$main$ko._(_root);
+	@override late final _Translations$meta$ko meta = _Translations$meta$ko._(_root);
+	@override late final _Translations$permission$ko permission = _Translations$permission$ko._(_root);
+	@override late final _Translations$tls$ko tls = _Translations$tls$ko._(_root);
+	@override late final _Translations$tun$ko tun = _Translations$tun$ko._(_root);
+	@override late final _Translations$dns$ko dns = _Translations$dns$ko._(_root);
+	@override late final _Translations$sniffer$ko sniffer = _Translations$sniffer$ko._(_root);
+	@override late final _Translations$profilePatchMode$ko profilePatchMode = _Translations$profilePatchMode$ko._(_root);
+	@override late final _Translations$overwriteMode$ko overwriteMode = _Translations$overwriteMode$ko._(_root);
 	@override String get protocolSniff => '프로토콜 스니핑';
 	@override String get protocolSniffOverrideDestination => '스니핑된 도메인 이름으로 연결 대상 주소 덮어쓰기';
+	@override String sendOrReceiveNotMatch({required Object p}) => '[${p}]를 사용하십시오';
+	@override String targetConnectFailed({required Object p}) => '[${p}] 연결 실패. 장치가 동일한 LAN에 있는지 확인하십시오';
 	@override String get edgeRuntimeNotInstalled => '현재 장치에 Edge WebView2 런타임이 설치되어 있지 않아 페이지를 표시할 수 없습니다. Edge WebView2 런타임(x64)을 다운로드하여 설치하고 앱을 다시 시작한 후 다시 시도하십시오。';
 	@override Map<String, String> get locales => {
 		'en': 'English',
@@ -69,8 +73,8 @@ class TranslationsKo with BaseTranslations<AppLocale, Translations> implements T
 }
 
 // Path: BackupAndSyncWebdavScreen
-class _TranslationsBackupAndSyncWebdavScreenKo implements TranslationsBackupAndSyncWebdavScreenEn {
-	_TranslationsBackupAndSyncWebdavScreenKo._(this._root);
+class _Translations$BackupAndSyncWebdavScreen$ko implements Translations$BackupAndSyncWebdavScreen$en {
+	_Translations$BackupAndSyncWebdavScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -82,8 +86,8 @@ class _TranslationsBackupAndSyncWebdavScreenKo implements TranslationsBackupAndS
 }
 
 // Path: LaunchFailedScreen
-class _TranslationsLaunchFailedScreenKo implements TranslationsLaunchFailedScreenEn {
-	_TranslationsLaunchFailedScreenKo._(this._root);
+class _Translations$LaunchFailedScreen$ko implements Translations$LaunchFailedScreen$en {
+	_Translations$LaunchFailedScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -96,8 +100,8 @@ class _TranslationsLaunchFailedScreenKo implements TranslationsLaunchFailedScree
 }
 
 // Path: PerAppAndroidScreen
-class _TranslationsPerAppAndroidScreenKo implements TranslationsPerAppAndroidScreenEn {
-	_TranslationsPerAppAndroidScreenKo._(this._root);
+class _Translations$PerAppAndroidScreen$ko implements Translations$PerAppAndroidScreen$en {
+	_Translations$PerAppAndroidScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -108,8 +112,8 @@ class _TranslationsPerAppAndroidScreenKo implements TranslationsPerAppAndroidScr
 }
 
 // Path: UserAgreementScreen
-class _TranslationsUserAgreementScreenKo implements TranslationsUserAgreementScreenEn {
-	_TranslationsUserAgreementScreenKo._(this._root);
+class _Translations$UserAgreementScreen$ko implements Translations$UserAgreementScreen$en {
+	_Translations$UserAgreementScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -119,8 +123,8 @@ class _TranslationsUserAgreementScreenKo implements TranslationsUserAgreementScr
 }
 
 // Path: NetCheckScreen
-class _TranslationsNetCheckScreenKo implements TranslationsNetCheckScreenEn {
-	_TranslationsNetCheckScreenKo._(this._root);
+class _Translations$NetCheckScreen$ko implements Translations$NetCheckScreen$en {
+	_Translations$NetCheckScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -142,8 +146,8 @@ class _TranslationsNetCheckScreenKo implements TranslationsNetCheckScreenEn {
 }
 
 // Path: VersionUpdateScreen
-class _TranslationsVersionUpdateScreenKo implements TranslationsVersionUpdateScreenEn {
-	_TranslationsVersionUpdateScreenKo._(this._root);
+class _Translations$VersionUpdateScreen$ko implements Translations$VersionUpdateScreen$en {
+	_Translations$VersionUpdateScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -154,8 +158,8 @@ class _TranslationsVersionUpdateScreenKo implements TranslationsVersionUpdateScr
 }
 
 // Path: loginScreen
-class _TranslationsLoginScreenKo implements TranslationsLoginScreenEn {
-	_TranslationsLoginScreenKo._(this._root);
+class _Translations$loginScreen$ko implements Translations$loginScreen$en {
+	_Translations$loginScreen$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -164,8 +168,8 @@ class _TranslationsLoginScreenKo implements TranslationsLoginScreenEn {
 	@override String get register => '계정 가입';
 	@override String get forgotPassword => '비밀번호 찾기';
 	@override String get provider => '서비스 제공자';
-	@override String get providerName => '${_root.loginScreen.provider} 이름';
-	@override String get providerNameRequired => '${_root.loginScreen.provider} 이름을 입력하세요';
+	@override String get providerName => '${_root.loginScreen.provider} 코드/별칭/URL';
+	@override String get providerNameRequired => '${_root.loginScreen.provider} 코드/별칭/URL을 입력하세요';
 	@override String get account => '계정';
 	@override String get accountRequired => '계정을 입력하세요';
 	@override String get email => '이메일';
@@ -176,21 +180,24 @@ class _TranslationsLoginScreenKo implements TranslationsLoginScreenEn {
 	@override String passwordMinLength({required Object minLength}) => '비밀번호 길이는 최소 ${minLength}자 이상이어야 합니다';
 	@override String get unsupportedProvider => '지원되지 않는 ${_root.loginScreen.provider}';
 	@override String get unsupportedProviderType => '지원되지 않는 ${_root.loginScreen.provider} 유형';
+	@override String get unActivedProvider => '로그인 기능이 활성화되어 있지 않습니다';
+	@override String providerLoginSupportRequired({required Object p}) => '공급자 코드/별칭은 ${_root.loginScreen.provider}에 문의해 주세요.\n${_root.loginScreen.provider} 연동은 다음을 참고하세요: ${p}';
+	@override String get providerDisclaimer => '면책 조항: ${_root.loginScreen.provider}는 제3자 서비스이며, 본 앱과는 무관합니다';
 }
 
 // Path: main
-class _TranslationsMainKo implements TranslationsMainEn {
-	_TranslationsMainKo._(this._root);
+class _Translations$main$ko implements Translations$main$en {
+	_Translations$main$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override late final _TranslationsMainTrayKo tray = _TranslationsMainTrayKo._(_root);
+	@override late final _Translations$main$tray$ko tray = _Translations$main$tray$ko._(_root);
 }
 
 // Path: meta
-class _TranslationsMetaKo implements TranslationsMetaEn {
-	_TranslationsMetaKo._(this._root);
+class _Translations$meta$ko implements Translations$meta$en {
+	_Translations$meta$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -228,6 +235,7 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get hours => '시간';
 	@override String get minutes => '분';
 	@override String get seconds => '초';
+	@override String get milliseconds => '밀리초';
 	@override String get protocol => '프로토콜';
 	@override String get search => '검색';
 	@override String get custom => '사용자 정의';
@@ -260,8 +268,10 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get user => '사용자';
 	@override String get account => '계정';
 	@override String get password => '비밀번호';
-	@override String get decryptPassword => '복호화 비밀번호';
+	@override String get decryptPasswordAES => 'AES 복호화 비밀번호';
+	@override String get decryptPasswordAGE => 'AGE 복호화 비밀번호';
 	@override String get required => '필수';
+	@override String get go => '계속';
 	@override String get sudoPassword => 'sudo 비밀번호 (TUN 모드에 필요)';
 	@override String get other => '기타';
 	@override String get dns => 'DNS';
@@ -274,7 +284,9 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get shareUrl => '링크 공유';
 	@override String get coreSettingTips => '참고: 설정을 수정한 후 적용하려면 다시 연결해야 합니다';
 	@override String get overwrite => '덮어쓰기';
+	@override String get overwriteMethod => '덮어쓰기 방식';
 	@override String get overwriteCustom => '사용자 정의 덮어쓰기';
+	@override String get overwriteAppend => '추가 덮어쓰기';
 	@override String get overwriteTips => '원본 프로필 <- 사용자 정의 덮어쓰기 <- 앱 덮어쓰기';
 	@override String get noOverwrite => '덮어쓰지 않음';
 	@override String get overwriteSettings => '덮어쓰기 설정';
@@ -307,7 +319,7 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get userAgent => 'UserAgent';
 	@override String get launchAtStartup => '시작 시 실행';
 	@override String get launchAtStartupRunAsAdmin => 'Clash Mi를 관리자 권한으로 다시 시작하십시오';
-	@override String get tunModeRunAsAdmin => 'TUN 모드는 시스템 관리자 권한이 필요합니다. 앱을 관리자 권한으로 다시 시작하십시오';
+	@override String get needRunAsAdmin => '이 기능은 시스템 관리자 권한이 필요합니다. 관리자 권한으로 앱을 다시 시작하십시오';
 	@override String get portableMode => '포터블 모드';
 	@override String get portableModeDisableTips => '포터블 모드를 종료해야 하는 경우 [clashmi]를 종료하고 [clashmi.exe]와 동일한 디렉토리에 있는 [portable] 폴더를 수동으로 삭제하십시오';
 	@override String get systemProxy => '시스템 프록시';
@@ -322,6 +334,7 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get hideVpn => 'VPN 아이콘 숨기기';
 	@override String get hideVpnTips => 'IPv6를 활성화하면 이 기능이 작동하지 않습니다';
 	@override String get hideDockIcon => 'Dock 아이콘 숨기기';
+	@override String get showTrayTraffic => '트레이에 트래픽 정보 표시';
 	@override String get website => '웹사이트';
 	@override String get homePage => '홈페이지';
 	@override String get rule => '규칙';
@@ -360,6 +373,7 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get boardOnline => '온라인 보드 사용';
 	@override String get boardOnlineUrl => '온라인 보드 URL';
 	@override String get boardLocalPort => '로컬 보드 포트';
+	@override String get alwayOnVPN => '상시 연결';
 	@override String get disableFontScaler => '글꼴 크기 조정 비활성화 (재시작 후 적용)';
 	@override String get autoOrientation => '화면 방향에 따라 회전';
 	@override String get restartTakesEffect => '재시작 후 적용';
@@ -370,7 +384,14 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get requestNeedsUserApproval => '1. [시스템 설정]-[개인정보 보호 및 보안]에서 Clash Mi의 시스템 확장 설치를 [허용]하십시오\n2. [시스템 설정]-[일반]-[로그인 항목 및 확장 프로그램]-[네트워크 확장 프로그램]에서 [clashmiServiceSE]를 활성화하십시오\n완료 후 다시 연결하십시오';
 	@override String get FullDiskAccessPermissionRequired => '[시스템 설정]-[개인정보 보호 및 보안]-[전체 디스크 액세스]에서 clashmiServiceSE 권한을 활성화하고 다시 연결하십시오.';
 	@override String get proxy => '프록시';
+	@override String get homeScreen => '홈 화면';
 	@override String get theme => '테마';
+	@override String get widgetsAlpha => '위젯 투명도';
+	@override String get widgetsEmpty => '사용 가능한 위젯 없음';
+	@override String get backgroundImage => '배경 이미지';
+	@override String get path => '경로';
+	@override String get local => '로컬';
+	@override String get remote => '원격';
 	@override String get tvMode => 'TV 모드';
 	@override String get autoUpdate => '자동 업데이트';
 	@override String get updateChannel => '자동 업데이트 채널';
@@ -415,17 +436,22 @@ class _TranslationsMetaKo implements TranslationsMetaEn {
 	@override String get addProfile => '프로필 추가';
 	@override String get myProfiles => '내 프로필';
 	@override String get profileEdit => '프로필 편집';
+	@override String get profileNeedActive => '먼저 이 프로필을 현재 프로필로 설정한 뒤 연결/재연결하세요';
+	@override String get profileDownloadBackupChannel => '백업 다운로드 채널 사용';
+	@override String get profileDownloadBackupChannelTips => 'Clash Mi에서 제공하는 프록시 다운로드 채널(어떤 정보도 저장하지 않음)';
 	@override String get profileEditReloadAfterProfileUpdate => '프로필 업데이트 후 다시 로드';
+	@override String get profileRulesAppendApplePush => 'Apple 푸시 알림 규칙 추가';
+	@override String get profileRulesAppendProxyTips => '규칙은 원본 설정의 [proxy-groups]에서 [url-test] 또는 [select] 유형의 첫 번째 프록시로 자동 설정됩니다';
 	@override String get profileImport => '프로필 파일 가져오기';
 	@override String get profileAddUrlOrContent => '프로필 링크 추가';
-	@override String get profileUrlOrContent => 'Clash 설정 링크';
-	@override String get profileUrlOrContentHit => 'Clash 설정 링크 [필수]';
+	@override String profileUrlOrContent({required Object p}) => '${p} 설정 링크';
+	@override String profileUrlOrContentHit({required Object p}) => '[필수], 주의: 링크가 ${_root.meta.profileUrlOrContent(p: p)}가 아닌 경우(V2Ray 또는 Sing-box 등) 먼저 Clash 온라인 변환 도구를 사용하여 ${_root.meta.profileUrlOrContent(p: p)}로 변환하세요';
 	@override String get profileUrlOrContentCannotEmpty => '프로필 링크는 비워둘 수 없습니다';
 }
 
 // Path: permission
-class _TranslationsPermissionKo implements TranslationsPermissionEn {
-	_TranslationsPermissionKo._(this._root);
+class _Translations$permission$ko implements Translations$permission$en {
+	_Translations$permission$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -438,21 +464,22 @@ class _TranslationsPermissionKo implements TranslationsPermissionEn {
 }
 
 // Path: tls
-class _TranslationsTlsKo implements TranslationsTlsEn {
-	_TranslationsTlsKo._(this._root);
+class _Translations$tls$ko implements Translations$tls$en {
+	_Translations$tls$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
 	@override String get insecure => '인증서 검증 건너뛰기';
+	@override String get ignoreBadCertificate => '인증서 오류 무시';
 	@override String get certificate => '인증서';
 	@override String get privateKey => '개인 키';
 	@override String get customTrustCert => '사용자 정의 인증서';
 }
 
 // Path: tun
-class _TranslationsTunKo implements TranslationsTunEn {
-	_TranslationsTunKo._(this._root);
+class _Translations$tun$ko implements Translations$tun$en {
+	_Translations$tun$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -470,8 +497,8 @@ class _TranslationsTunKo implements TranslationsTunEn {
 }
 
 // Path: dns
-class _TranslationsDnsKo implements TranslationsDnsEn {
-	_TranslationsDnsKo._(this._root);
+class _Translations$dns$ko implements Translations$dns$en {
+	_Translations$dns$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -496,8 +523,8 @@ class _TranslationsDnsKo implements TranslationsDnsEn {
 }
 
 // Path: sniffer
-class _TranslationsSnifferKo implements TranslationsSnifferEn {
-	_TranslationsSnifferKo._(this._root);
+class _Translations$sniffer$ko implements Translations$sniffer$en {
+	_Translations$sniffer$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -506,8 +533,8 @@ class _TranslationsSnifferKo implements TranslationsSnifferEn {
 }
 
 // Path: profilePatchMode
-class _TranslationsProfilePatchModeKo implements TranslationsProfilePatchModeEn {
-	_TranslationsProfilePatchModeKo._(this._root);
+class _Translations$profilePatchMode$ko implements Translations$profilePatchMode$en {
+	_Translations$profilePatchMode$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -517,9 +544,21 @@ class _TranslationsProfilePatchModeKo implements TranslationsProfilePatchModeEn 
 	@override String get noOverwrite => '내장 - 덮어쓰지 않음';
 }
 
+// Path: overwriteMode
+class _Translations$overwriteMode$ko implements Translations$overwriteMode$en {
+	_Translations$overwriteMode$ko._(this._root);
+
+	final TranslationsKo _root; // ignore: unused_field
+
+	// Translations
+	@override String get overwrite => '덮어쓰기';
+	@override String get noOverwrite => '덮어쓰지 않음';
+	@override String get overwriteAppendToHead => '덮어쓰기 - 맨 앞에 삽입';
+}
+
 // Path: main.tray
-class _TranslationsMainTrayKo implements TranslationsMainTrayEn {
-	_TranslationsMainTrayKo._(this._root);
+class _Translations$main$tray$ko implements Translations$main$tray$en {
+	_Translations$main$tray$ko._(this._root);
 
 	final TranslationsKo _root; // ignore: unused_field
 
@@ -571,8 +610,8 @@ extension on TranslationsKo {
 			'loginScreen.register' => '계정 가입',
 			'loginScreen.forgotPassword' => '비밀번호 찾기',
 			'loginScreen.provider' => '서비스 제공자',
-			'loginScreen.providerName' => '${_root.loginScreen.provider} 이름',
-			'loginScreen.providerNameRequired' => '${_root.loginScreen.provider} 이름을 입력하세요',
+			'loginScreen.providerName' => '${_root.loginScreen.provider} 코드/별칭/URL',
+			'loginScreen.providerNameRequired' => '${_root.loginScreen.provider} 코드/별칭/URL을 입력하세요',
 			'loginScreen.account' => '계정',
 			'loginScreen.accountRequired' => '계정을 입력하세요',
 			'loginScreen.email' => '이메일',
@@ -583,6 +622,9 @@ extension on TranslationsKo {
 			'loginScreen.passwordMinLength' => ({required Object minLength}) => '비밀번호 길이는 최소 ${minLength}자 이상이어야 합니다',
 			'loginScreen.unsupportedProvider' => '지원되지 않는 ${_root.loginScreen.provider}',
 			'loginScreen.unsupportedProviderType' => '지원되지 않는 ${_root.loginScreen.provider} 유형',
+			'loginScreen.unActivedProvider' => '로그인 기능이 활성화되어 있지 않습니다',
+			'loginScreen.providerLoginSupportRequired' => ({required Object p}) => '공급자 코드/별칭은 ${_root.loginScreen.provider}에 문의해 주세요.\n${_root.loginScreen.provider} 연동은 다음을 참고하세요: ${p}',
+			'loginScreen.providerDisclaimer' => '면책 조항: ${_root.loginScreen.provider}는 제3자 서비스이며, 본 앱과는 무관합니다',
 			'main.tray.menuOpen' => '열기',
 			'main.tray.menuExit' => '종료',
 			'meta.enable' => '활성화',
@@ -618,6 +660,7 @@ extension on TranslationsKo {
 			'meta.hours' => '시간',
 			'meta.minutes' => '분',
 			'meta.seconds' => '초',
+			'meta.milliseconds' => '밀리초',
 			'meta.protocol' => '프로토콜',
 			'meta.search' => '검색',
 			'meta.custom' => '사용자 정의',
@@ -650,8 +693,10 @@ extension on TranslationsKo {
 			'meta.user' => '사용자',
 			'meta.account' => '계정',
 			'meta.password' => '비밀번호',
-			'meta.decryptPassword' => '복호화 비밀번호',
+			'meta.decryptPasswordAES' => 'AES 복호화 비밀번호',
+			'meta.decryptPasswordAGE' => 'AGE 복호화 비밀번호',
 			'meta.required' => '필수',
+			'meta.go' => '계속',
 			'meta.sudoPassword' => 'sudo 비밀번호 (TUN 모드에 필요)',
 			'meta.other' => '기타',
 			'meta.dns' => 'DNS',
@@ -664,7 +709,9 @@ extension on TranslationsKo {
 			'meta.shareUrl' => '링크 공유',
 			'meta.coreSettingTips' => '참고: 설정을 수정한 후 적용하려면 다시 연결해야 합니다',
 			'meta.overwrite' => '덮어쓰기',
+			'meta.overwriteMethod' => '덮어쓰기 방식',
 			'meta.overwriteCustom' => '사용자 정의 덮어쓰기',
+			'meta.overwriteAppend' => '추가 덮어쓰기',
 			'meta.overwriteTips' => '원본 프로필 <- 사용자 정의 덮어쓰기 <- 앱 덮어쓰기',
 			'meta.noOverwrite' => '덮어쓰지 않음',
 			'meta.overwriteSettings' => '덮어쓰기 설정',
@@ -697,7 +744,7 @@ extension on TranslationsKo {
 			'meta.userAgent' => 'UserAgent',
 			'meta.launchAtStartup' => '시작 시 실행',
 			'meta.launchAtStartupRunAsAdmin' => 'Clash Mi를 관리자 권한으로 다시 시작하십시오',
-			'meta.tunModeRunAsAdmin' => 'TUN 모드는 시스템 관리자 권한이 필요합니다. 앱을 관리자 권한으로 다시 시작하십시오',
+			'meta.needRunAsAdmin' => '이 기능은 시스템 관리자 권한이 필요합니다. 관리자 권한으로 앱을 다시 시작하십시오',
 			'meta.portableMode' => '포터블 모드',
 			'meta.portableModeDisableTips' => '포터블 모드를 종료해야 하는 경우 [clashmi]를 종료하고 [clashmi.exe]와 동일한 디렉토리에 있는 [portable] 폴더를 수동으로 삭제하십시오',
 			'meta.systemProxy' => '시스템 프록시',
@@ -712,6 +759,7 @@ extension on TranslationsKo {
 			'meta.hideVpn' => 'VPN 아이콘 숨기기',
 			'meta.hideVpnTips' => 'IPv6를 활성화하면 이 기능이 작동하지 않습니다',
 			'meta.hideDockIcon' => 'Dock 아이콘 숨기기',
+			'meta.showTrayTraffic' => '트레이에 트래픽 정보 표시',
 			'meta.website' => '웹사이트',
 			'meta.homePage' => '홈페이지',
 			'meta.rule' => '규칙',
@@ -750,6 +798,7 @@ extension on TranslationsKo {
 			'meta.boardOnline' => '온라인 보드 사용',
 			'meta.boardOnlineUrl' => '온라인 보드 URL',
 			'meta.boardLocalPort' => '로컬 보드 포트',
+			'meta.alwayOnVPN' => '상시 연결',
 			'meta.disableFontScaler' => '글꼴 크기 조정 비활성화 (재시작 후 적용)',
 			'meta.autoOrientation' => '화면 방향에 따라 회전',
 			'meta.restartTakesEffect' => '재시작 후 적용',
@@ -760,7 +809,14 @@ extension on TranslationsKo {
 			'meta.requestNeedsUserApproval' => '1. [시스템 설정]-[개인정보 보호 및 보안]에서 Clash Mi의 시스템 확장 설치를 [허용]하십시오\n2. [시스템 설정]-[일반]-[로그인 항목 및 확장 프로그램]-[네트워크 확장 프로그램]에서 [clashmiServiceSE]를 활성화하십시오\n완료 후 다시 연결하십시오',
 			'meta.FullDiskAccessPermissionRequired' => '[시스템 설정]-[개인정보 보호 및 보안]-[전체 디스크 액세스]에서 clashmiServiceSE 권한을 활성화하고 다시 연결하십시오.',
 			'meta.proxy' => '프록시',
+			'meta.homeScreen' => '홈 화면',
 			'meta.theme' => '테마',
+			'meta.widgetsAlpha' => '위젯 투명도',
+			'meta.widgetsEmpty' => '사용 가능한 위젯 없음',
+			'meta.backgroundImage' => '배경 이미지',
+			'meta.path' => '경로',
+			'meta.local' => '로컬',
+			'meta.remote' => '원격',
 			'meta.tvMode' => 'TV 모드',
 			'meta.autoUpdate' => '자동 업데이트',
 			'meta.updateChannel' => '자동 업데이트 채널',
@@ -805,11 +861,16 @@ extension on TranslationsKo {
 			'meta.addProfile' => '프로필 추가',
 			'meta.myProfiles' => '내 프로필',
 			'meta.profileEdit' => '프로필 편집',
+			'meta.profileNeedActive' => '먼저 이 프로필을 현재 프로필로 설정한 뒤 연결/재연결하세요',
+			'meta.profileDownloadBackupChannel' => '백업 다운로드 채널 사용',
+			'meta.profileDownloadBackupChannelTips' => 'Clash Mi에서 제공하는 프록시 다운로드 채널(어떤 정보도 저장하지 않음)',
 			'meta.profileEditReloadAfterProfileUpdate' => '프로필 업데이트 후 다시 로드',
+			'meta.profileRulesAppendApplePush' => 'Apple 푸시 알림 규칙 추가',
+			'meta.profileRulesAppendProxyTips' => '규칙은 원본 설정의 [proxy-groups]에서 [url-test] 또는 [select] 유형의 첫 번째 프록시로 자동 설정됩니다',
 			'meta.profileImport' => '프로필 파일 가져오기',
 			'meta.profileAddUrlOrContent' => '프로필 링크 추가',
-			'meta.profileUrlOrContent' => 'Clash 설정 링크',
-			'meta.profileUrlOrContentHit' => 'Clash 설정 링크 [필수]',
+			'meta.profileUrlOrContent' => ({required Object p}) => '${p} 설정 링크',
+			'meta.profileUrlOrContentHit' => ({required Object p}) => '[필수], 주의: 링크가 ${_root.meta.profileUrlOrContent(p: p)}가 아닌 경우(V2Ray 또는 Sing-box 등) 먼저 Clash 온라인 변환 도구를 사용하여 ${_root.meta.profileUrlOrContent(p: p)}로 변환하세요',
 			'meta.profileUrlOrContentCannotEmpty' => '프로필 링크는 비워둘 수 없습니다',
 			'permission.camera' => '카메라',
 			'permission.screen' => '화면 녹화',
@@ -817,6 +878,7 @@ extension on TranslationsKo {
 			'permission.request' => ({required Object p}) => '[${p}] 권한 켜기',
 			'permission.requestNeed' => ({required Object p}) => '[${p}] 권한을 켜주십시오',
 			'tls.insecure' => '인증서 검증 건너뛰기',
+			'tls.ignoreBadCertificate' => '인증서 오류 무시',
 			'tls.certificate' => '인증서',
 			'tls.privateKey' => '개인 키',
 			'tls.customTrustCert' => '사용자 정의 인증서',
@@ -851,8 +913,13 @@ extension on TranslationsKo {
 			'profilePatchMode.currentSelected' => '현재 선택됨',
 			'profilePatchMode.overwrite' => '내장 - 덮어쓰기',
 			'profilePatchMode.noOverwrite' => '내장 - 덮어쓰지 않음',
+			'overwriteMode.overwrite' => '덮어쓰기',
+			'overwriteMode.noOverwrite' => '덮어쓰지 않음',
+			'overwriteMode.overwriteAppendToHead' => '덮어쓰기 - 맨 앞에 삽입',
 			'protocolSniff' => '프로토콜 스니핑',
 			'protocolSniffOverrideDestination' => '스니핑된 도메인 이름으로 연결 대상 주소 덮어쓰기',
+			'sendOrReceiveNotMatch' => ({required Object p}) => '[${p}]를 사용하십시오',
+			'targetConnectFailed' => ({required Object p}) => '[${p}] 연결 실패. 장치가 동일한 LAN에 있는지 확인하십시오',
 			'edgeRuntimeNotInstalled' => '현재 장치에 Edge WebView2 런타임이 설치되어 있지 않아 페이지를 표시할 수 없습니다. Edge WebView2 런타임(x64)을 다운로드하여 설치하고 앱을 다시 시작한 후 다시 시도하십시오。',
 			'locales.en' => 'English',
 			'locales.zh-CN' => '简体中文',

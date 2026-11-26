@@ -4,6 +4,7 @@ import 'package:clashmi/i18n/strings.g.dart';
 
 import 'package:clashmi/app/clash/clash_config.dart';
 import 'package:clashmi/app/clash/clash_http_api.dart';
+import 'package:clashmi/app/modules/profile_manager.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/screens/dialog_utils.dart';
 import 'package:clashmi/screens/theme_define.dart';
@@ -440,6 +441,10 @@ class _ProxyScreenProxiesNodeWidget
   Future<void> delayTest({String? groupName}) async {
     if (_refreshing || _nodesTesting.isNotEmpty) return;
     final setting = SettingManager.getConfig();
+    final profile = ProfileManager.getCurrent();
+    final delayTestUrl = profile?.delayTestUrl ?? setting.delayTestUrl;
+    final delayTestTimeout =
+        profile?.delayTestTimeout ?? setting.delayTestTimeout;
     final byName = {for (final node in _nodes) node.name: node};
     final targets = <(String?, String, String, String), ClashProxiesNode>{};
     final visited = <(String, String, String)>{};
@@ -470,7 +475,7 @@ class _ProxyScreenProxiesNodeWidget
     for (final node in _nodes) {
       if (node.isGroup &&
           (groupName == null ? !node.hidden : node.name == groupName)) {
-        addMembers(node, setting.delayTestUrl, '');
+        addMembers(node, delayTestUrl, '');
       }
     }
     if (targets.isEmpty) {
@@ -492,7 +497,7 @@ class _ProxyScreenProxiesNodeWidget
           providerName: node.providerName,
           url: key.$3,
           expectedStatus: key.$4,
-          timeout: Duration(milliseconds: setting.delayTestTimeout),
+          timeout: Duration(milliseconds: delayTestTimeout),
         );
         if (!mounted) return;
         node.delay = result.data;

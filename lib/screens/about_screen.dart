@@ -1,24 +1,20 @@
 // ignore_for_file: unused_catch_stack
 
-import 'dart:io';
-
-import 'package:clashmi/app/modules/remote_config_manager.dart';
+import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
-import 'package:clashmi/app/utils/url_launcher_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/group_item_creator.dart';
 import 'package:clashmi/screens/group_item_options.dart';
 import 'package:clashmi/screens/group_screen.dart';
 import 'package:clashmi/screens/theme_config.dart';
-import 'package:clashmi/screens/webview_helper.dart';
 import 'package:clashmi/screens/widgets/framework.dart';
 import 'package:flutter/material.dart';
 
 class AboutScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "AboutScreen");
   }
 
@@ -113,7 +109,6 @@ class AboutScreenState extends LasyRenderingState<AboutScreen> {
 
   Future<List<GroupItem>> getGroupOptions() async {
     final tcontext = Translations.of(context);
-    var remoteConfig = RemoteConfigManager.getConfig();
     final coreVersion = AppUtils.getCoreVersion();
     List<GroupItem> groupOptions = [];
 
@@ -140,39 +135,20 @@ class AboutScreenState extends LasyRenderingState<AboutScreen> {
 
     groupOptions.add(GroupItem(options: options));
 
-    if (!Platform.isIOS &&
-        !Platform.isMacOS &&
-        remoteConfig.donate.isNotEmpty) {
-      List<GroupItemOptions> options1 = [
-        GroupItemOptions(
-          pushOptions: GroupItemPushOptions(
-            name: tcontext.meta.donate,
-            onPush: () async {
-              String url = await UrlLauncherUtils.reorganizationUrlWithAnchor(
-                remoteConfig.donate,
-              );
-              if (!mounted) {
-                return;
-              }
-              await WebviewHelper.loadUrl(
-                context,
-                url,
-                "donate",
-                title: tcontext.meta.donate,
-              );
-            },
-          ),
-        ),
-      ];
-      groupOptions.add(GroupItem(options: options1));
-    }
     if (PlatformUtils.isPC()) {
       List<GroupItemOptions> options2 = [
         GroupItemOptions(
           pushOptions: GroupItemPushOptions(
-            name: tcontext.meta.devOptions,
+            name: SettingManager.getConfig().devMode
+                ? "${tcontext.meta.devOptions} (Dev Mode)"
+                : tcontext.meta.devOptions,
             onPush: () async {
               onTapDevOptions();
+            },
+            onLongPress: () async {
+              SettingManager.getConfig().devMode =
+                  !SettingManager.getConfig().devMode;
+              setState(() {});
             },
           ),
         ),
@@ -208,7 +184,7 @@ class AboutScreenState extends LasyRenderingState<AboutScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: GroupScreen.routSettings("devOptions"),
+        settings: GroupScreen.routeSettings("devOptions"),
         builder: (context) => GroupScreen(
           title: tcontext.meta.devOptions,
           getOptions: getOptions,

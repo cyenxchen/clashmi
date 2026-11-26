@@ -8,6 +8,7 @@ import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/auto_update_manager.dart';
 import 'package:clashmi/app/modules/biz.dart';
 import 'package:clashmi/app/modules/remote_config_manager.dart';
+import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/utils/app_lifecycle_state_notify.dart';
 import 'package:clashmi/app/utils/app_utils.dart';
 import 'package:clashmi/app/utils/error_reporter_utils.dart';
@@ -18,22 +19,26 @@ import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/dialog_utils.dart';
 import 'package:clashmi/screens/home_screen_widgets.dart';
 import 'package:clashmi/screens/language_settings_screen.dart';
+import 'package:clashmi/screens/local_image_provider.dart';
 import 'package:clashmi/screens/scheme_handler.dart';
 import 'package:clashmi/screens/theme_config.dart';
 import 'package:clashmi/screens/themes.dart';
 import 'package:clashmi/screens/user_agreement_screen.dart';
 import 'package:clashmi/screens/webview_helper.dart';
 import 'package:clashmi/screens/widgets/framework.dart';
+import 'package:fast_cached_network_image/fast_cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:clashmi_vpn_service/state.dart';
+import 'package:clashmi_vpn_service/vpn_service.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:window_manager/window_manager.dart';
 
 class HomeScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "/");
   }
 
@@ -50,13 +55,20 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
 
   bool _onInitAllFinished = false;
   String _initUrl = "";
-
+  String? _invalidBackgroundImageUrl;
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
     protocolHandler.addListener(this);
+    Biz.onEventSingletonInstance = (String url) {
+      Log.w("onEventSingletonInstance: $url");
+      if (!mounted) {
+        return;
+      }
+      SchemeHandler.handle(context, url);
+    };
     _initUrl = widget.launchUrl;
     _init();
   }
@@ -120,7 +132,7 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
         await Navigator.push(
             context,
             MaterialPageRoute(
-                settings: VersionUpdateScreen.routSettings(),
+                settings: VersionUpdateScreen.routeSettings(),
                 fullscreenDialog: true,
                 builder: (context) => const VersionUpdateScreen(
                       force: true,
@@ -132,7 +144,7 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
       await Navigator.push(
         context,
         MaterialPageRoute(
-          settings: UserAgreementScreen.routSettings(),
+          settings: UserAgreementScreen.routeSettings(),
           fullscreenDialog: true,
           builder: (context) => const UserAgreementScreen(),
         ),
@@ -143,7 +155,7 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
     await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: LanguageSettingsScreen.routSettings(),
+        settings: LanguageSettingsScreen.routeSettings(),
         fullscreenDialog: true,
         builder: (context) => LanguageSettingsScreen(
           canPop: false,
@@ -155,6 +167,16 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
         ),
       ),
     );
+    if (Platform.isAndroid) {
+      String version = await FlutterVpnService.getSystemVersion();
+      int? v = int.tryParse(version);
+      if (v != null && v >= 33) {
+        final status = await Permission.notification.status;
+        if (status != PermissionStatus.granted) {
+          await Permission.notification.request();
+        }
+      }
+    }
   }
 
   void _init() async {
@@ -179,12 +201,19 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
     };
     VPNService.onEventStateChanged.add(_onStateChanged);
 
-    if (Platform.isWindows) {
-      bool reg = SystemSchemeUtils.isRegistered(
+    if (Platform.isWindows || Platform.isLinux) {
+      final clashRegisterErr = await SystemSchemeUtils.register(
         SystemSchemeUtils.getClashScheme(),
       );
-      if (!reg) {
-        SystemSchemeUtils.register(SystemSchemeUtils.getClashScheme());
+      if (clashRegisterErr != null) {
+        Log.w("register clash scheme failed: $clashRegisterErr");
+      }
+
+      final clashMiRegisterErr = await SystemSchemeUtils.register(
+        SystemSchemeUtils.getClashMiScheme(),
+      );
+      if (clashMiRegisterErr != null) {
+        Log.w("register clashmi scheme failed: $clashMiRegisterErr");
       }
     }
 
@@ -241,63 +270,175 @@ class _HomeScreenState extends LasyRenderingState<HomeScreen>
   @override
   Widget build(BuildContext context) {
     var themes = Provider.of<Themes>(context, listen: false);
+    final theme = Theme.of(context);
+    Color? color;
+    final decoration = getBackgroundDecoration();
+    if (decoration != null) {
+      color = theme.colorScheme.surface;
+    }
 
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.zero,
         child: AppBar(
           systemOverlayStyle: SystemUiOverlayStyle(
-            systemNavigationBarIconBrightness: themes
-                .getStatusBarIconBrightness(context),
-            systemNavigationBarColor: Colors.transparent,
+            systemNavigationBarIconBrightness: decoration == null
+                ? themes.getStatusBarIconBrightness(context)
+                : Brightness
+                      .light, //must be light if has decoration, or transparent does not work if light theme on android
+            systemNavigationBarColor: decoration == null
+                ? color
+                : Colors.transparent,
             systemNavigationBarDividerColor: Colors.transparent,
+            statusBarColor: decoration == null ? color : Colors.transparent,
             statusBarBrightness: themes.getStatusBarBrightness(context),
             statusBarIconBrightness: themes.getStatusBarIconBrightness(context),
           ),
         ),
       ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Text(
-                        AppUtils.getName(),
-                        style: const TextStyle(
-                          fontWeight: ThemeConfig.kFontWeightTitle,
-                          fontSize: ThemeConfig.kFontSizeTitle,
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: decoration,
+        child: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(
+                          AppUtils.getName(),
+                          style: const TextStyle(
+                            fontWeight: ThemeConfig.kFontWeightTitle,
+                            fontSize: ThemeConfig.kFontSizeTitle,
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                    ],
-                  ),
-                ],
+                        SizedBox(height: 10),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      HomeScreenWidgetPart1(),
-                      SizedBox(height: 15),
-                      HomeScreenWidgetPart2(),
-                    ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 15, 20, 0),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        HomeScreenWidgetPart1(
+                          hasDecoration: hasBackgroundDecoration,
+                        ),
+                        SizedBox(height: 15),
+                        HomeScreenWidgetPart2(
+                          hasDecoration: hasBackgroundDecoration,
+                          onUpdate: () {
+                            setState(() {});
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  bool hasBackgroundDecoration() {
+    var settingConfig = SettingManager.getConfig();
+    if (settingConfig.uiScreen.backgroundImageType ==
+        SettingConfigItemUIScreen.backgroundTypeDisable) {
+      return false;
+    }
+    if (settingConfig.uiScreen.backgroundImageType ==
+            SettingConfigItemUIScreen.backgroundTypeRemote &&
+        settingConfig.uiScreen.backgroundImageUrl.isNotEmpty &&
+        SettingConfigItemUIScreen.fastCachedImageConfigInited) {
+      final backgroundImageUrl = settingConfig.uiScreen.backgroundImageUrl;
+      if (_invalidBackgroundImageUrl == backgroundImageUrl) {
+        return false;
+      }
+    }
+    if (settingConfig.uiScreen.backgroundImageType ==
+            SettingConfigItemUIScreen.backgroundTypeLocal &&
+        settingConfig.uiScreen.backgroundImageLocal.isNotEmpty) {
+      return true;
+    }
+    if (settingConfig.uiScreen.backgroundImageType ==
+            SettingConfigItemUIScreen.backgroundTypeRemote &&
+        settingConfig.uiScreen.backgroundImageUrl.isNotEmpty &&
+        SettingConfigItemUIScreen.fastCachedImageConfigInited) {
+      return true;
+    }
+    return false;
+  }
+
+  BoxDecoration? getBackgroundDecoration() {
+    var settingConfig = SettingManager.getConfig();
+    if (settingConfig.uiScreen.backgroundImageType ==
+        SettingConfigItemUIScreen.backgroundTypeDisable) {
+      return null;
+    }
+    if (settingConfig.uiScreen.backgroundImageType ==
+            SettingConfigItemUIScreen.backgroundTypeRemote &&
+        settingConfig.uiScreen.backgroundImageUrl.isNotEmpty &&
+        SettingConfigItemUIScreen.fastCachedImageConfigInited) {
+      final backgroundImageUrl = settingConfig.uiScreen.backgroundImageUrl;
+      if (_invalidBackgroundImageUrl == backgroundImageUrl) {
+        return null;
+      }
+    }
+    if (settingConfig.uiScreen.backgroundImageType ==
+            SettingConfigItemUIScreen.backgroundTypeLocal &&
+        settingConfig.uiScreen.backgroundImageLocal.isNotEmpty) {
+      return BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.fitHeight,
+          image: LocalImageProvider(
+            settingConfig.uiScreen.backgroundImageLocal,
+          ),
+        ),
+      );
+    }
+    if (settingConfig.uiScreen.backgroundImageType ==
+            SettingConfigItemUIScreen.backgroundTypeRemote &&
+        settingConfig.uiScreen.backgroundImageUrl.isNotEmpty &&
+        SettingConfigItemUIScreen.fastCachedImageConfigInited) {
+      final backgroundImageUrl = settingConfig.uiScreen.backgroundImageUrl;
+
+      return BoxDecoration(
+        image: DecorationImage(
+          fit: BoxFit.fitHeight,
+          image: FastCachedImageProvider(backgroundImageUrl),
+          onError: (Object error, StackTrace? stackTrace) {
+            Log.w(
+              "fast_cached_network_image background image: $backgroundImageUrl error:${error.toString()}",
+            );
+            unawaited(
+              FastCachedImageConfig.deleteCachedImage(
+                imageUrl: backgroundImageUrl,
+                showLog: false,
+              ),
+            );
+            if (_invalidBackgroundImageUrl == backgroundImageUrl || !mounted) {
+              return;
+            }
+            setState(() {
+              _invalidBackgroundImageUrl = backgroundImageUrl;
+            });
+          },
+        ),
+      );
+    }
+    return null;
   }
 }

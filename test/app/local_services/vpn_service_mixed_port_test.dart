@@ -56,13 +56,20 @@ void main() {
     );
   });
 
-  Future<Map<String, dynamic>> prepareProfile(String patch, int? port) async {
+  Future<Map<String, dynamic>> prepareProfile(
+    String patch,
+    int? port, {
+    String extraConfig = '',
+    void Function(ProfileSetting)? configure,
+  }) async {
     final file = File('${directory.path}/profile.yaml');
     await file.writeAsString(
-      'port: 7890\n${port == null ? '' : 'mixed-port: $port\n'}proxies: []\n',
+      'port: 7890\n${port == null ? '' : 'mixed-port: $port\n'}proxies: []\n$extraConfig',
     );
     expect(await ProfileManager.addLocal(file.path), isNull);
-    ProfileManager.getCurrent()!.patch = patch;
+    final profile = ProfileManager.getCurrent()!;
+    profile.patch = patch;
+    configure?.call(profile);
     await VPNService.init();
     final content = await File(
       '${directory.path}/service_core_patch_final.json',
@@ -97,10 +104,49 @@ void main() {
     expect(await VPNService.getPortsByPrefer(true), [7890, null]);
   });
 
+  test('custom YAML with built-in no-overwrite keeps its mixed-port', () async {
+    final file = File('${directory.path}/patch.yaml');
+    await file.writeAsString('mixed-port: 0\n');
+    expect(await ProfilePatchManager.addLocal(file.path), isNull);
+    final customPatch = ProfilePatchManager.getProfiles().last;
+    customPatch.appendPatchBuildin = kProfilePatchBuildinNoOverwrite;
+
+    final patch = await prepareProfile(customPatch.id, 7893);
+
+    expect(patch.containsKey('mixed-port'), isFalse);
+    expect(excludedPorts, [9090]);
+    expect(await VPNService.getPortsByPrefer(true), [null]);
+  });
+
   test('built-in overwrite uses the app mixed-port', () async {
     final patch = await prepareProfile(kProfilePatchBuildinOverwrite, 7893);
 
     expect(patch['mixed-port'], 7890);
     expect(excludedPorts, [9090, 7890]);
   });
+
+  test(
+    'prepends Apple Push rules in the YAML applied by the open bridge',
+    () async {
+      final patch = await prepareProfile(
+        kProfilePatchBuildinNoOverwrite,
+        7893,
+        extraConfig: '''
+rules:
+  - MATCH,DIRECT
+proxy-groups:
+  - name: Keep
+    type: select
+    proxies: [DIRECT]
+''',
+        configure: (profile) => profile.appendApplePushRules = true,
+      );
+
+      final rules = patch['rules'] as List;
+      expect(rules.first, 'DOMAIN-SUFFIX,push.apple.com,Keep');
+      expect(rules.last, 'MATCH,DIRECT');
+      expect(patch.containsKey('proxy-groups'), isFalse);
+      expect(patch.containsKey('mixed-port'), isFalse);
+    },
+  );
 }

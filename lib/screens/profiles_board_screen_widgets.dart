@@ -252,7 +252,7 @@ class _ProfilesBoardScreenWidget extends State<ProfilesBoardScreenWidget> {
         child: Scrollbar(
           child: ReorderableListView(
             children: widgets,
-            onReorder: (int oldIndex, int newIndex) {
+            onReorderItem: (int oldIndex, int newIndex) {
               ProfileManager.reorder(oldIndex, newIndex);
 
               setState(() {});
@@ -281,7 +281,7 @@ class _ProfilesBoardScreenWidget extends State<ProfilesBoardScreenWidget> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: FileViewScreen.routSettings(),
+              settings: FileViewScreen.routeSettings(),
               builder: (context) => FileViewScreen(
                 title: setting.getShowName(),
                 content: content,
@@ -331,7 +331,7 @@ class _ProfilesBoardScreenWidget extends State<ProfilesBoardScreenWidget> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                settings: QrcodeScreen.routSettings(),
+                settings: QrcodeScreen.routeSettings(),
                 builder: (context) => QrcodeScreen(content: setting.url),
               ),
             );
@@ -346,7 +346,7 @@ class _ProfilesBoardScreenWidget extends State<ProfilesBoardScreenWidget> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              settings: ProfilesSettingsEditScreen.routSettings(),
+              settings: ProfilesSettingsEditScreen.routeSettings(),
               builder: (context) =>
                   ProfilesSettingsEditScreen(profile: setting),
             ),

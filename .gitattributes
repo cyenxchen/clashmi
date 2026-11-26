@@ -1,1 +1,4 @@
 assets/datas/*.dat binary
+macos/packaging/**/scripts/* text eol=lf
+linux/packaging/**/scripts/* text eol=lf
+*.sh text eol=lf

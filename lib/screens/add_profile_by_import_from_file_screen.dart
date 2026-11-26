@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as path;
 
 class AddProfileByImportFromFileScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "AddProfileByImportFromFileScreen");
   }
 
@@ -196,7 +196,7 @@ class _AddProfileByImportFromFileScreenState
     extensions = ['yaml', 'yml'];
 
     try {
-      FilePickerResult? fresult = await FilePicker.platform.pickFiles(
+      FilePickerResult? fresult = await FilePicker.pickFiles(
         type: Platform.isAndroid ? FileType.any : FileType.custom,
         allowedExtensions: Platform.isAndroid ? null : extensions,
       );
@@ -225,13 +225,7 @@ class _AddProfileByImportFromFileScreenState
       if (!mounted) {
         return;
       }
-      DialogUtils.showAlertDialog(
-        context,
-        err.toString(),
-        showCopy: true,
-        showFAQ: true,
-        withVersion: true,
-      );
+      DialogUtils.showExceptionDialog(context, err, stacktrace);
     }
   }
 }

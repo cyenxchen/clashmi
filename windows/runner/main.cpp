@@ -1,48 +1,45 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
+#include <protocol_handler/protocol_handler_plugin.h>
 #include <windows.h>
 #include <winuser.h>
-#include <protocol_handler/protocol_handler_plugin.h>
 // #include <protocol_handler_windows/protocol_handler_windows_plugin_c_api.h>
 #include "flutter_window.h"
 #include "utils.h"
 
-LONG __stdcall UnhandledException(PEXCEPTION_POINTERS pExceptionInfo)
-{
+LONG __stdcall UnhandledException(PEXCEPTION_POINTERS pExceptionInfo) {
   TerminateProcess(GetCurrentProcess(), 1);
   return EXCEPTION_EXECUTE_HANDLER;
 }
-void uninitializeWindow(FlutterWindow *window)
-{
-  SetUnhandledExceptionFilter(UnhandledException);
-  __try
-  {
-    delete window;
+
+bool IsEnvironmentVariableTrue(const wchar_t* name) {
+  wchar_t value[8];
+  const DWORD value_length =
+      ::GetEnvironmentVariableW(name, value, ARRAYSIZE(value));
+  if (value_length == 0 || value_length >= ARRAYSIZE(value)) {
+    return false;
   }
-  __except (EXCEPTION_EXECUTE_HANDLER)
-  {
+  return _wcsicmp(value, L"1") == 0 || _wcsicmp(value, L"true") == 0 ||
+         _wcsicmp(value, L"yes") == 0;
+}
+
+void uninitializeWindow(FlutterWindow* window) {
+  SetUnhandledExceptionFilter(UnhandledException);
+  __try {
+    delete window;
+  } __except (EXCEPTION_EXECUTE_HANDLER) {
     TerminateProcess(GetCurrentProcess(), 1);
   }
 }
 
-int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
-                      _In_ wchar_t *command_line, _In_ int show_command)
-{
-
-  const wchar_t *kWindowName = L"Clash Mi";
-  HWND hwnd = ::FindWindow(L"FLUTTER_RUNNER_WIN32_WINDOW", kWindowName);
-  if (hwnd != NULL)
-  {
-    DispatchToProtocolHandler(hwnd);
-
-    ::ShowWindow(hwnd, SW_NORMAL);
-    ::SetForegroundWindow(hwnd);
-    return EXIT_FAILURE;
-  }
+int APIENTRY wWinMain(_In_ HINSTANCE instance,
+                      _In_opt_ HINSTANCE prev,
+                      _In_ wchar_t* command_line,
+                      _In_ int show_command) {
+  const wchar_t* kWindowName = L"Clash Mi";
   // Attach to console when present (e.g., 'flutter run') or create a
   // new console when running with a debugger.
-  if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent())
-  {
+  if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
     CreateAndAttachConsole();
   }
 
@@ -52,24 +49,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   flutter::DartProject project(L"data");
 
-  std::vector<std::string> command_line_arguments =
-      GetCommandLineArguments();
+  std::vector<std::string> command_line_arguments = GetCommandLineArguments();
 
   project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
+  project.set_impeller_switch(
+      IsEnvironmentVariableTrue(L"CLASHMI_ENABLE_IMPELLER")
+          ? flutter::ImpellerSwitch::Enabled
+          : flutter::ImpellerSwitch::Disabled);
 
-  FlutterWindow *window = new FlutterWindow(project);
+  FlutterWindow* window = new FlutterWindow(project);
   // FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(400, 700);
-  if (!window->Create(kWindowName, origin, size))
-  {
+  if (!window->Create(kWindowName, origin, size)) {
     return EXIT_FAILURE;
   }
-  ::ChangeWindowMessageFilterEx(window->GetHandle(), WM_COPYDATA, MSGFLT_ALLOW, NULL);
+  ::ChangeWindowMessageFilterEx(window->GetHandle(), WM_COPYDATA, MSGFLT_ALLOW,
+                                NULL);
   window->SetQuitOnClose(false);
   ::MSG msg;
-  while (::GetMessage(&msg, nullptr, 0, 0))
-  {
+  while (::GetMessage(&msg, nullptr, 0, 0)) {
     ::TranslateMessage(&msg);
     ::DispatchMessage(&msg);
   }

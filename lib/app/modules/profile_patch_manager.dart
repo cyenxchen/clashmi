@@ -2,13 +2,15 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ffi' as ffi;
+import 'dart:io';
 
 import 'package:clashmi/app/local_services/vpn_service.dart';
 import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
+import 'package:clashmi/app/utils/app_lifecycle_state_notify.dart';
 import 'package:clashmi/app/utils/download_utils.dart';
+import 'package:clashmi/app/utils/emoji_utils.dart';
 import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/http_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
@@ -16,9 +18,9 @@ import 'package:clashmi/app/utils/path_utils.dart';
 import 'package:clashmi/app/utils/platform_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:flutter/widgets.dart';
-import 'package:path/path.dart' as path;
 import 'package:flutter_js/flutter_js.dart';
-import 'package:clashmi/app/utils/emoji_utils.dart';
+import 'package:clashmi_vpn_service/state.dart';
+import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 import 'package:yaml_writer/yaml_writer.dart';
 
@@ -45,15 +47,24 @@ class ProfilePatchSetting {
     this.remark = "",
     this.updateInterval,
     this.update,
+    this.updateFailed,
     this.url = "",
     this.type = ProfilePatchFileType.yaml,
+    this.appendPatchBuildin = "",
   });
   String id = "";
   String remark = "";
   Duration? updateInterval;
   DateTime? update;
+  DateTime? updateFailed;
   String url;
   ProfilePatchFileType type = ProfilePatchFileType.yaml;
+  String appendPatchBuildin = "";
+
+  bool get appliesBuiltInOverwrite =>
+      id.isEmpty ||
+      id == kProfilePatchBuildinOverwrite ||
+      appendPatchBuildin == kProfilePatchBuildinOverwrite;
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -62,6 +73,7 @@ class ProfilePatchSetting {
     'update': update.toString(),
     'url': url,
     'type': type.name,
+    'append_patch_buildin': appendPatchBuildin,
   };
   void fromJson(Map<String, dynamic>? map) {
     if (map == null) {
@@ -86,6 +98,12 @@ class ProfilePatchSetting {
       (e) => e.name == map['type'],
       orElse: () => ProfilePatchFileType.yaml,
     );
+    appendPatchBuildin = map['append_patch_buildin'] ?? "";
+    if (appendPatchBuildin != "" &&
+        appendPatchBuildin != kProfilePatchBuildinNoOverwrite &&
+        appendPatchBuildin != kProfilePatchBuildinOverwrite) {
+      appendPatchBuildin = "";
+    }
   }
 
   String getType() {
@@ -127,8 +145,10 @@ class ProfilePatchSetting {
       remark: remark,
       updateInterval: updateInterval,
       update: update,
+      updateFailed: updateFailed,
       url: url,
       type: type,
+      appendPatchBuildin: appendPatchBuildin,
     );
   }
 }
@@ -170,10 +190,29 @@ class ProfilePatchManager {
   static final List<void Function(String, bool)> onEventUpdate = [];
   static final Set<String> updating = {};
   static Timer? _timerChecker;
-  static bool _saving = false;
+  static final FileSaver _fileSaver = FileSaver();
 
   static Future<void> init() async {
+    _fileSaver.setSavePath(await PathUtils.profilePatchsConfigFilePath());
     await load();
+    VPNService.onEventStateChanged.add((
+      FlutterVpnServiceState state,
+      Map<String, String> params,
+    ) async {
+      if (state == FlutterVpnServiceState.connected) {
+        Future.delayed(const Duration(seconds: 3), () async {
+          updateByTicker();
+        });
+      }
+    });
+    AppLifecycleStateNofity.onStateResumed(null, () {
+      Future.delayed(const Duration(seconds: 3), () async {
+        updateByTicker();
+      });
+    });
+    Future.delayed(const Duration(seconds: 30), () async {
+      updateByTicker();
+    });
     if (PlatformUtils.isPC()) {
       _timerChecker = Timer.periodic(const Duration(minutes: 30), (timer) {
         updateByTicker();
@@ -184,6 +223,23 @@ class ProfilePatchManager {
   static Future<void> uninit() async {
     _timerChecker?.cancel();
     _timerChecker = null;
+  }
+
+  static List<String> appendRulesApplePush(String target) {
+    return [
+      "DOMAIN-SUFFIX,push.apple.com,$target",
+      "DOMAIN-SUFFIX,akadns.net,$target",
+      "DOMAIN-KEYWORD,apple.com.edgekey.net,$target",
+      "IP-CIDR,17.249.0.0/16,$target,no-resolve",
+      "IP-CIDR,17.252.0.0/16,$target,no-resolve",
+      "IP-CIDR,17.57.144.0/22,$target,no-resolve",
+      "IP-CIDR,17.188.128.0/18,$target,no-resolve",
+      "IP-CIDR,17.188.20.0/23,$target,no-resolve",
+      "IP-CIDR6,2620:149:a44::/48,$target,no-resolve",
+      "IP-CIDR6,2403:300:a42::/48,$target,no-resolve",
+      "IP-CIDR6,2403:300:a51::/48,$target,no-resolve",
+      "IP-CIDR6,2a01:b740:a42::/48,$target,no-resolve",
+    ];
   }
 
   static Future<void> reload() async {
@@ -211,19 +267,7 @@ class ProfilePatchManager {
   }
 
   static Future<void> save() async {
-    if (_saving) {
-      return;
-    }
-    _saving = true;
-    String filePath = await PathUtils.profilePatchsConfigFilePath();
-    const JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    String content = encoder.convert(_config);
-    try {
-      await File(filePath).writeAsString(content, flush: true);
-    } catch (err, stacktrace) {
-      Log.w("ProfilePatchManager.save exception ${err.toString()} ");
-    }
-    _saving = false;
+    await _fileSaver.saveAsJson(_config);
   }
 
   static Future<void> load() async {
@@ -670,6 +714,10 @@ class ProfilePatchManager {
           profile.remark = result.data!;
         }
       }
+    } else {
+      Log.w(
+        "profile patch download failed :${profile.url}  ${result.error!.message.toString()}",
+      );
     }
     await save();
     updating.remove(id);
@@ -690,7 +738,11 @@ class ProfilePatchManager {
       if (profile.update == null ||
           now.difference(profile.update!).inSeconds >=
               profile.updateInterval!.inSeconds) {
-        update(profile.id);
+        if (profile.updateFailed == null ||
+            now.difference(profile.updateFailed!).inSeconds >=
+                profile.updateInterval!.inSeconds) {
+          update(profile.id);
+        }
       }
     }
   }
@@ -796,14 +848,17 @@ class ProfilePatchManager {
     }
     JavascriptRuntime flutterJs = getJavascriptRuntime();
     try {
-      fileCoreContent = EmojiUtils.unemojify(fileCoreContent);
-      var doc = loadYaml(fileCoreContent);
+      final result = EmojiUtils.unemojify(fileCoreContent);
+      var doc = loadYaml(result.item1);
       if (doc == null) {
         Log.w("evaluate ${patch.remark} loadYaml from $corePath failed");
         return corePath;
       }
 
-      final fileCoreContentArg = json.encode(doc);
+      var fileCoreContentArg = json.encode(doc);
+      if (result.item2) {
+        fileCoreContentArg = EmojiUtils.emojify(fileCoreContentArg);
+      }
       final res = await flutterJs.evaluateAsync('''
       $fileScriptContent
       main($fileCoreContentArg)
@@ -840,9 +895,6 @@ class ProfilePatchManager {
   }
 
   static void reorder(int oldIndex, int newIndex) {
-    if (oldIndex < newIndex) {
-      newIndex -= 1;
-    }
     if (oldIndex >= _config.profiles.length ||
         newIndex >= _config.profiles.length) {
       return;

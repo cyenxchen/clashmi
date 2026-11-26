@@ -16,7 +16,7 @@ import 'package:clashmi/screens/widgets/text_field.dart';
 import 'package:flutter/material.dart';
 
 class AddProfilePatchByUrlScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "AddProfilePatchByUrlScreen");
   }
 
@@ -188,10 +188,8 @@ class _AddProfilePatchByUrlScreenState
                                   maxLines: 5,
                                   controller: _textControllerLink,
                                   decoration: InputDecoration(
-                                    labelText:
-                                        tcontext.meta.profileUrlOrContent,
-                                    hintText:
-                                        tcontext.meta.profileUrlOrContentHit,
+                                    labelText: tcontext.meta
+                                        .profileUrlOrContent(p: "Clash"),
                                   ),
                                   onChanged: (text) {},
                                   onEditingComplete: () async {

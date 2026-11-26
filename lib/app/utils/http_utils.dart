@@ -3,20 +3,25 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:clashmi/app/utils/hwid_utils.dart';
-import 'package:http/io_client.dart';
-
+import 'package:clashmi/app/modules/setting_manager.dart';
 import 'package:clashmi/app/runtime/return_result.dart';
 //import 'package:http/http.dart' as http;
 import 'package:clashmi/app/utils/app_utils.dart';
+import 'package:clashmi/app/utils/hwid_utils.dart';
 import 'package:clashmi/app/utils/log.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/io_client.dart';
 import 'package:punycode_converter/punycode_converter.dart';
 import 'package:tuple/tuple.dart';
-import 'package:http/http.dart' as http;
 
 typedef DecodeCallback = String Function(String);
 
 abstract final class HttpUtils {
+  static const String kStatusError = "http statusCode:";
+  static bool isStatusError(ReturnResultError error) {
+    return error.message.contains(kStatusError);
+  }
+
   static Future<String> getUserAgent() async {
     String version = AppUtils.getBuildinVersion();
     final coreVersion = AppUtils.getCoreVersion();
@@ -26,14 +31,19 @@ abstract final class HttpUtils {
   static Future<ReturnResult<Tuple2<int, HttpHeaders>>> httpHeadRequest(
     Uri uri,
     int? proxyPort,
+    String? userAgent,
+    bool xhwid,
     Duration? timeout,
   ) async {
     timeout ??= const Duration(seconds: 20);
     var client = HttpClient();
-    client.userAgent = await getUserAgent();
+    client.badCertificateCallback = _certificateCheck;
+    client.userAgent = userAgent == null || userAgent.isEmpty
+        ? await getUserAgent()
+        : userAgent;
     client.connectionTimeout = timeout;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     try {
       uri = uri.punyEncoded;
@@ -41,6 +51,10 @@ abstract final class HttpUtils {
     try {
       HttpClientRequest request = await client.headUrl(uri).timeout(timeout);
       request.headers.set(HttpHeaders.acceptHeader, "*/*");
+      if (xhwid) {
+        final hwidHeaders = await HwidUtils.getHwidHeaders();
+        hwidHeaders.forEach((key, value) => request.headers.set(key, value));
+      }
       HttpClientResponse? response = await Future.any([
         waitResponseDone(request, null),
         waitResponseTimeout(request, timeout),
@@ -116,7 +130,7 @@ abstract final class HttpUtils {
         ? await getUserAgent()
         : userAgent;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     try {
       uri = uri.punyEncoded;
@@ -143,7 +157,7 @@ abstract final class HttpUtils {
       }
       if (response.statusCode != 200) {
         return ReturnResult(
-          error: ReturnResultError("http statusCode: ${response.statusCode}"),
+          error: ReturnResultError("$kStatusError ${response.statusCode}"),
         );
       }
       return ReturnResult(data: response.headers);
@@ -172,7 +186,7 @@ abstract final class HttpUtils {
         ? await getUserAgent()
         : userAgent;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
 
     try {
@@ -183,7 +197,7 @@ abstract final class HttpUtils {
       var response = await ioclient.send(request);
 
       if (response.statusCode != 200) {
-        return ReturnResultError("http statusCode:${response.statusCode}");
+        return ReturnResultError("$kStatusError ${response.statusCode}");
       }
     } catch (err, _) {
       Log.i('http Upload ${uri.toString()} exception: ${err.toString()}');
@@ -212,7 +226,7 @@ abstract final class HttpUtils {
         : userAgent;
     client.connectionTimeout = timeout;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     var uri = Uri.parse(url);
     try {
@@ -241,7 +255,7 @@ abstract final class HttpUtils {
       if (checkStatuscode == true) {
         if (response.statusCode != 200) {
           return ReturnResult(
-            error: ReturnResultError("http statusCode: ${response.statusCode}"),
+            error: ReturnResultError("$kStatusError ${response.statusCode}"),
           );
         }
       }
@@ -273,12 +287,13 @@ abstract final class HttpUtils {
   }) async {
     timeout ??= const Duration(seconds: 30);
     var client = HttpClient();
+    client.badCertificateCallback = _certificateCheck;
     client.userAgent = userAgent == null || userAgent.isEmpty
         ? await getUserAgent()
         : userAgent;
     client.connectionTimeout = timeout;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     var uri = Uri.parse(url);
     try {
@@ -319,8 +334,15 @@ abstract final class HttpUtils {
       }
       if (checkStatuscode == true) {
         if (response.statusCode != 200) {
+          String stringData = "";
+          try {
+            stringData = await response.transform(utf8.decoder).join();
+          } catch (err) {}
           return ReturnResult(
-            error: ReturnResultError("http statusCode: ${response.statusCode}"),
+            error: ReturnResultError("$kStatusError ${response.statusCode}"),
+            data: stringData.isNotEmpty
+                ? Tuple2(response.statusCode, stringData)
+                : null,
           );
         }
       }
@@ -354,12 +376,13 @@ abstract final class HttpUtils {
   ) async {
     timeout ??= const Duration(seconds: 20);
     var client = HttpClient();
+    client.badCertificateCallback = _certificateCheck;
     client.userAgent = userAgent == null || userAgent.isEmpty
         ? await getUserAgent()
         : userAgent;
     client.connectionTimeout = timeout;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     var uri = Uri.parse(url);
     try {
@@ -400,7 +423,7 @@ abstract final class HttpUtils {
       }
       if (response.statusCode != 200 && response.statusCode != 204) {
         return ReturnResult(
-          error: ReturnResultError("http statusCode:${response.statusCode}"),
+          error: ReturnResultError("$kStatusError ${response.statusCode}"),
         );
       }
       var stringData = await response.transform(utf8.decoder).join();
@@ -432,12 +455,13 @@ abstract final class HttpUtils {
   ) async {
     timeout ??= const Duration(seconds: 20);
     var client = HttpClient();
+    client.badCertificateCallback = _certificateCheck;
     client.userAgent = userAgent == null || userAgent.isEmpty
         ? await getUserAgent()
         : userAgent;
     client.connectionTimeout = timeout;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     var uri = Uri.parse(url);
     try {
@@ -483,7 +507,7 @@ abstract final class HttpUtils {
       }
       if (response.statusCode != 200 && response.statusCode != 204) {
         return ReturnResult(
-          error: ReturnResultError("http statusCode:${response.statusCode}"),
+          error: ReturnResultError("$kStatusError ${response.statusCode}"),
         );
       }
       var stringData = await response.transform(utf8.decoder).join();
@@ -509,12 +533,13 @@ abstract final class HttpUtils {
   ) async {
     timeout ??= const Duration(seconds: 20);
     var client = HttpClient();
+    client.badCertificateCallback = _certificateCheck;
     client.userAgent = userAgent == null || userAgent.isEmpty
         ? await getUserAgent()
         : userAgent;
     client.connectionTimeout = timeout;
     if ((proxyPort != null) && (proxyPort != 0)) {
-      client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+      setProxy(client, proxyPort);
     }
     var uri = Uri.parse(url);
     try {
@@ -559,7 +584,7 @@ abstract final class HttpUtils {
       }
       if (response.statusCode != 200 && response.statusCode != 204) {
         return ReturnResult(
-          error: ReturnResultError("http statusCode: ${response.statusCode}"),
+          error: ReturnResultError("$kStatusError ${response.statusCode}"),
         );
       }
       var stringData = await response.transform(utf8.decoder).join();
@@ -645,6 +670,11 @@ abstract final class HttpUtils {
     return null;
   }
 
-  static bool _certificateCheck(X509Certificate cert, String host, int port) =>
-      true;
+  static bool _certificateCheck(X509Certificate cert, String host, int port) {
+    return SettingManager.getConfig().ignoreBadCertificate;
+  }
+
+  static void setProxy(HttpClient client, int proxyPort) {
+    client.findProxy = (Uri uri) => "PROXY 127.0.0.1:$proxyPort";
+  }
 }

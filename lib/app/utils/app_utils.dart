@@ -33,7 +33,7 @@ abstract final class AppUtils {
     if (versionName.isNotEmpty && versionCode.isNotEmpty) {
       return "$versionName.$versionCode";
     }
-    return "1.0.24.1000";
+    return "1.0.33.1905";
   }
 
   static DateTime getBuildinVersionDate() {
@@ -67,6 +67,6 @@ abstract final class AppUtils {
   }
 
   static String getCoreVersion() {
-    return "1.19.25";
+    return "1.19.34";
   }
 }

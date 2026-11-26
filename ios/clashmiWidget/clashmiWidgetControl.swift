@@ -24,6 +24,7 @@ struct clashmiWidgetControl: ControlWidget {
         VpnServiceHandler.shared.uiServerAddress = "Clash Mi"
         VpnServiceHandler.shared.uiLocalizedDescription = "Clash Mi"
         VpnServiceHandler.shared.getState(result: {_ in })
+        registerDarwinNotificationListener()
     }
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(
@@ -42,6 +43,23 @@ struct clashmiWidgetControl: ControlWidget {
         .description("Start or Stop Clash Mi VPN service")
     }
 }
+
+extension clashmiWidgetControl {
+    private func registerDarwinNotificationListener() {
+        CFNotificationCenterAddObserver(
+            CFNotificationCenterGetDarwinNotifyCenter(),
+            nil,
+            { _, _, _, _, _ in
+                ControlCenter.shared.reloadControls(ofKind: clashmiWidgetControl.controlKind)
+                //WidgetCenter.shared.reloadAllTimelines()
+            },
+            "com.nebula.clashmi.vpn.statusChanged" as CFString,
+            nil,
+            .deliverImmediately
+        )
+    }
+}
+
 
 extension clashmiWidgetControl {
     struct Provider: ControlValueProvider {
@@ -69,15 +87,23 @@ struct StartVPNServiceIntent: SetValueIntent {
 
     func perform() async throws -> some IntentResult {
         if await FileManager.default.fileExists(atPath: clashmiWidgetControl.configFile.path()) {
-            if value {
-                VpnServiceHandler.shared.start(timeoutInSeconds: 30) { err in
-                }
-            } else {
-                VpnServiceHandler.shared.stop { err in
+            await withCheckedContinuation { continuation in
+                if value {
+                    VpnServiceHandler.shared.start(timeoutInSeconds: 30) { err in
+                        continuation.resume(returning: err == nil)
+                    }
+                } else {
+                    VpnServiceHandler.shared.stop { err in
+                         continuation.resume(returning: err == nil)
+                    }
                 }
             }
         }
-        
-        return .result()
+        let runing = await isRunning()
+        return .result(value: runing)
+    }
+    func isRunning() async -> Bool {
+        let status = await VpnServiceHandler.shared.getCurrentState()
+        return status == NEVPNStatus.connecting || status == NEVPNStatus.connected || status == NEVPNStatus.reasserting
     }
 }

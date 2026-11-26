@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/dialog_utils.dart';
@@ -6,17 +8,17 @@ import 'package:clashmi/screens/theme_define.dart';
 import 'package:clashmi/screens/widgets/framework.dart';
 
 class ListAddScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings(String viewTag) {
+  static RouteSettings routeSettings(String viewTag) {
     return RouteSettings(name: "ListAddScreen:$viewTag");
   }
 
   final String title;
-  final List<String> data;
+  List<String> data;
   final Set<String> invalidData;
   final String dialogTitle;
   final String dialogTextHit;
   final Future<String?> Function()? onTapAdd;
-  const ListAddScreen({
+  ListAddScreen({
     super.key,
     required this.title,
     required this.data,

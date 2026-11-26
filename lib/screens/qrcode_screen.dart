@@ -18,7 +18,7 @@ import 'package:path/path.dart' as path;
 import 'package:share_plus/share_plus.dart';
 
 class QrcodeScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "QrcodeScreen");
   }
 
@@ -218,16 +218,14 @@ class _QrcodeScreenState extends LasyRenderingState<QrcodeScreen> {
                                         sharePositionOrigin: rect,
                                       ),
                                     );
-                                  } catch (err) {
+                                  } catch (err, stacktrace) {
                                     if (!context.mounted) {
                                       return;
                                     }
-                                    DialogUtils.showAlertDialog(
+                                    DialogUtils.showExceptionDialog(
                                       context,
-                                      err.toString(),
-                                      showCopy: true,
-                                      showFAQ: true,
-                                      withVersion: true,
+                                      err,
+                                      stacktrace,
                                     );
                                   }
                                 },

@@ -9,7 +9,7 @@ import 'package:clashmi/app/runtime/return_result.dart';
 import 'package:clashmi/app/utils/backup_and_sync_utils.dart';
 import 'package:clashmi/app/utils/file_utils.dart';
 import 'package:clashmi/app/utils/path_utils.dart';
-import 'package:clashmi/app/utils/webdav_utils.dart';
+import 'package:clashmi/app/utils/webdav_client_utils.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/backup_helper.dart';
 import 'package:clashmi/screens/dialog_utils.dart';
@@ -24,7 +24,7 @@ import 'package:path/path.dart' as path;
 import 'package:webdav_client_plus/webdav_client_plus.dart';
 
 class BackupAndSyncWebdavScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "BackupAndSyncWebdavScreen");
   }
 
@@ -297,11 +297,12 @@ class _BackupAndSyncWebdavScreenState
     _webdavClient = null;
     _fileList.clear();
     setState(() {});
-    List<int?> ports = await VPNService.getPortsByPrefer(false);
+    final ports = await VPNService.getPortsByPrefer(false);
+
     late ReturnResult<WebdavClient> result;
-    for (var port in ports) {
-      result = await WebdavUtils.connect(
-        port,
+    for (final port in ports) {
+      result = await WebdavClientUtils.connect(
+        port == null ? null : "PROXY 127.0.0.1:$port",
         settingConfig.webdav.url,
         settingConfig.webdav.user,
         settingConfig.webdav.password,
@@ -312,6 +313,9 @@ class _BackupAndSyncWebdavScreenState
       if (result.error == null) {
         break;
       }
+      /*if (WebdavClientUtils.isInnerError(result.error!.message)) {
+        break;
+      }*/
     }
     if (!mounted) {
       return;
@@ -322,8 +326,7 @@ class _BackupAndSyncWebdavScreenState
       final tcontext = Translations.of(context);
       DialogUtils.showAlertDialog(
         context,
-        tcontext.BackupAndSyncWebdavScreen.webdavLoginFailed +
-            result.error!.message,
+        "${tcontext.BackupAndSyncWebdavScreen.webdavLoginFailed} ${result.error!.message}",
         showCopy: true,
         showFAQ: true,
         withVersion: true,
@@ -344,7 +347,7 @@ class _BackupAndSyncWebdavScreenState
     }
     _loading = true;
     setState(() {});
-    var result = await WebdavUtils.list(_webdavClient!);
+    var result = await WebdavClientUtils.list(_webdavClient!);
     if (!mounted) {
       return;
     }
@@ -388,7 +391,7 @@ class _BackupAndSyncWebdavScreenState
         filePath,
       );
       if (!mounted) {
-        FileUtils.deletePath(filePath);
+        await FileUtils.deletePath(filePath);
         return;
       }
       if (error != null) {
@@ -401,13 +404,13 @@ class _BackupAndSyncWebdavScreenState
         );
         return;
       }
-      error = await WebdavUtils.upload(
+      error = await WebdavClientUtils.upload(
         _webdavClient!,
         relativePath: path.basename(filePath),
         localPath: filePath,
       );
 
-      FileUtils.deletePath(filePath);
+      await FileUtils.deletePath(filePath);
       if (!mounted) {
         return;
       }
@@ -430,13 +433,7 @@ class _BackupAndSyncWebdavScreenState
       }
       _uploading = false;
       setState(() {});
-      DialogUtils.showAlertDialog(
-        context,
-        err.toString(),
-        showCopy: true,
-        showFAQ: true,
-        withVersion: true,
-      );
+      DialogUtils.showExceptionDialog(context, err, stacktrace);
     }
   }
 
@@ -452,7 +449,7 @@ class _BackupAndSyncWebdavScreenState
           textFormFieldOptions: GroupItemTextFieldOptions(
             name: tcontext.BackupAndSyncWebdavScreen.webdavServerUrl,
             keyboardType: TextInputType.url,
-            hint: "https://xxxx/webdav[${tcontext.meta.required}]",
+            hint: "${tcontext.meta.required}[https://xxxx/webdav]",
             textWidthPercent: 0.6,
             controller: _urlController,
             autoFocus: true,
@@ -504,7 +501,7 @@ class _BackupAndSyncWebdavScreenState
     bool? done = await Navigator.push(
       context,
       MaterialPageRoute(
-        settings: GroupScreen.routSettings("webdav"),
+        settings: GroupScreen.routeSettings("webdav"),
         builder: (context) => GroupScreen(
           title: tcontext.meta.webdav,
           getOptions: getOptions,
@@ -572,7 +569,7 @@ class _BackupAndSyncWebdavScreenState
     }
     String dir = await PathUtils.cacheDir();
     String filePath = path.join(dir, BackupAndSyncUtils.getZipFileName());
-    var error = await WebdavUtils.download(
+    var error = await WebdavClientUtils.download(
       _webdavClient!,
       relativePath: filename,
       localPath: filePath,
@@ -598,7 +595,7 @@ class _BackupAndSyncWebdavScreenState
     if (_webdavClient == null) {
       return;
     }
-    var error = await WebdavUtils.delete(_webdavClient!, filename);
+    var error = await WebdavClientUtils.delete(_webdavClient!, filename);
     if (!mounted) {
       return;
     }

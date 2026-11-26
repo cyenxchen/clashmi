@@ -21,7 +21,7 @@ class QrcodeScanResult {
 }
 
 class AddProfileByScanQrcodeScanScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "AddProfileByScanQrcodeScanScreen");
   }
 
@@ -163,13 +163,11 @@ class _AddProfileByScanQrcodeScanScreenState
                     onPressed: () async {
                       try {
                         await controller!.toggleFlash();
-                      } catch (err) {
-                        DialogUtils.showAlertDialog(
+                      } catch (err, stacktrace) {
+                        DialogUtils.showExceptionDialog(
                           context,
-                          err.toString(),
-                          showCopy: true,
-                          showFAQ: true,
-                          withVersion: true,
+                          err,
+                          stacktrace,
                         );
                       }
 
@@ -467,17 +465,11 @@ class _AddProfileByScanQrcodeScanScreenState
           setState(() {});
         }
       }
-    } catch (err, _) {
+    } catch (err, stacktrace) {
       if (!mounted) {
         return;
       }
-      DialogUtils.showAlertDialog(
-        context,
-        err.toString(),
-        showCopy: true,
-        showFAQ: true,
-        withVersion: true,
-      );
+      DialogUtils.showExceptionDialog(context, err, stacktrace);
     }
   }
 
@@ -489,7 +481,7 @@ class _AddProfileByScanQrcodeScanScreenState
 
     try {
       List<String> extensions = ['png', 'jpg'];
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      FilePickerResult? result = await FilePicker.pickFiles(
         type: Platform.isAndroid ? FileType.any : FileType.custom,
         allowedExtensions: Platform.isAndroid ? null : extensions,
       );
@@ -524,17 +516,11 @@ class _AddProfileByScanQrcodeScanScreenState
           }
         }
       }
-    } catch (err, _) {
+    } catch (err, stacktrace) {
       if (!mounted) {
         return;
       }
-      DialogUtils.showAlertDialog(
-        context,
-        err.toString(),
-        showCopy: true,
-        showFAQ: true,
-        withVersion: true,
-      );
+      DialogUtils.showExceptionDialog(context, err, stacktrace);
     }
   }
 
@@ -581,14 +567,8 @@ class _AddProfileByScanQrcodeScanScreenState
             setState(() {});
           }
         }
-      } catch (err, _) {
-        DialogUtils.showAlertDialog(
-          context,
-          err.toString(),
-          showCopy: true,
-          showFAQ: true,
-          withVersion: true,
-        );
+      } catch (err, stacktrace) {
+        DialogUtils.showExceptionDialog(context, err, stacktrace);
       }
     }
   }

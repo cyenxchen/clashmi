@@ -110,26 +110,27 @@ open class ExtensionProvider: NEPacketTunnelProvider {
             try await start()
         }
         catch let VpnError.Error(err) {
+            Task.detached {
+                try? await Task.sleep(nanoseconds: NSEC_PER_MSEC * 100)
+                exit(EXIT_FAILURE)
+            }
             throw NSError(domain: "VpnError:\(err),", code: 0)
         }
         catch let err {
+            Task.detached {
+                try? await Task.sleep(nanoseconds: NSEC_PER_MSEC * 100)
+                exit(EXIT_FAILURE)
+            }
             throw err
         }
-#if os(iOS)
-        if #available(iOS 18.0, *) {
-            ControlCenter.shared.reloadControls(ofKind: ExtensionProvider.controlKind)
-        }
-#endif
+        handleVPNStatusChanged()
+
     }
 
     override open func stopTunnel(
         with reason: NEProviderStopReason, completionHandler: @escaping () -> Void
     ) {
-#if os(iOS)
-        if #available(iOS 18.0, *) {
-            ControlCenter.shared.reloadControls(ofKind: ExtensionProvider.controlKind)
-        }
-#endif
+        handleVPNStatusChanged()
         completionHandler() // completionHandler faster than syn
         exit(EXIT_FAILURE)
     }
@@ -272,6 +273,19 @@ extension ExtensionProvider {
     }
 
     func postServiceClose() {
-       
+    }
+    func handleVPNStatusChanged() {
+#if os(iOS)
+        if #available(iOS 18.0, *) {
+            ControlCenter.shared.reloadControls(ofKind: ExtensionProvider.controlKind)
+            CFNotificationCenterPostNotification(
+                CFNotificationCenterGetDarwinNotifyCenter(),
+                CFNotificationName("com.nebula.clashmi.vpn.statusChanged" as CFString),
+                nil,
+                nil,
+                true
+            )
+        }
+#endif
     }
 }

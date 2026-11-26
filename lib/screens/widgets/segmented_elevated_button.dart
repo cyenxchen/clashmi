@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:clashmi/screens/theme_define.dart';
 import 'package:flutter/material.dart';
 
@@ -88,6 +90,9 @@ class _SegmentedElevatedButton extends State<SegmentedElevatedButton> {
                         return Colors.white;
                       }
                       if (states.contains(WidgetState.selected)) {
+                        if (widget.background != null) {
+                          return Colors.white.withValues(alpha: 0.8);
+                        }
                         return Colors.white;
                       }
                       return Colors.white.withValues(alpha: 0.3);

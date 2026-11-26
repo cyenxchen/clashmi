@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:clashmi/i18n/strings.g.dart';
 import 'package:clashmi/screens/dialog_utils.dart';
@@ -7,17 +9,17 @@ import 'package:clashmi/screens/widgets/framework.dart';
 import 'package:tuple/tuple.dart';
 
 class MapStringAndStringAddScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "MapStringAndStringAddScreen");
   }
 
   final String title;
-  final List<Tuple2<String, String>> data;
+  List<Tuple2<String, String>> data;
   final String dialogTitle1;
   final String dialogTextHit1;
   final String dialogTitle2;
   final String dialogTextHit2;
-  const MapStringAndStringAddScreen({
+  MapStringAndStringAddScreen({
     super.key,
     required this.title,
     required this.data,

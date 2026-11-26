@@ -16,20 +16,21 @@ class TranslationsEs with BaseTranslations<AppLocale, Translations> implements T
 	/// Constructing via the enum [AppLocale.build] is preferred.
 	TranslationsEs({Map<String, Node>? overrides, PluralResolver? cardinalResolver, PluralResolver? ordinalResolver, TranslationMetadata<AppLocale, Translations>? meta})
 		: assert(overrides == null, 'Set "translation_overrides: true" in order to enable this feature.'),
-		  $meta = meta ?? TranslationMetadata(
+		  _meta = meta ?? TranslationMetadata(
 		    locale: AppLocale.es,
 		    overrides: overrides ?? {},
 		    cardinalResolver: cardinalResolver,
 		    ordinalResolver: ordinalResolver,
 		  ) {
-		$meta.setFlatMapFunction(_flatMapFunction);
+		_meta.setFlatMapFunction(_flatMapFunction);
 	}
 
 	/// Metadata for the translations of <es>.
-	@override final TranslationMetadata<AppLocale, Translations> $meta;
+	final TranslationMetadata<AppLocale, Translations> _meta;
+	@override TranslationMetadata<AppLocale, Translations> get $meta => _meta;
 
 	/// Access flat map
-	@override dynamic operator[](String key) => $meta.getTranslation(key);
+	@override dynamic operator[](String key) => _meta.getTranslation(key);
 
 	late final TranslationsEs _root = this; // ignore: unused_field
 
@@ -37,23 +38,26 @@ class TranslationsEs with BaseTranslations<AppLocale, Translations> implements T
 	TranslationsEs $copyWith({TranslationMetadata<AppLocale, Translations>? meta}) => TranslationsEs(meta: meta ?? this.$meta);
 
 	// Translations
-	@override late final _TranslationsBackupAndSyncWebdavScreenEs BackupAndSyncWebdavScreen = _TranslationsBackupAndSyncWebdavScreenEs._(_root);
-	@override late final _TranslationsLaunchFailedScreenEs LaunchFailedScreen = _TranslationsLaunchFailedScreenEs._(_root);
-	@override late final _TranslationsPerAppAndroidScreenEs PerAppAndroidScreen = _TranslationsPerAppAndroidScreenEs._(_root);
-	@override late final _TranslationsUserAgreementScreenEs UserAgreementScreen = _TranslationsUserAgreementScreenEs._(_root);
-	@override late final _TranslationsVersionUpdateScreenEs VersionUpdateScreen = _TranslationsVersionUpdateScreenEs._(_root);
-	@override late final _TranslationsNetCheckScreenEs NetCheckScreen = _TranslationsNetCheckScreenEs._(_root);
-	@override late final _TranslationsLoginScreenEs loginScreen = _TranslationsLoginScreenEs._(_root);
-	@override late final _TranslationsMainEs main = _TranslationsMainEs._(_root);
-	@override late final _TranslationsMetaEs meta = _TranslationsMetaEs._(_root);
-	@override late final _TranslationsPermissionEs permission = _TranslationsPermissionEs._(_root);
-	@override late final _TranslationsTlsEs tls = _TranslationsTlsEs._(_root);
-	@override late final _TranslationsTunEs tun = _TranslationsTunEs._(_root);
-	@override late final _TranslationsDnsEs dns = _TranslationsDnsEs._(_root);
-	@override late final _TranslationsSnifferEs sniffer = _TranslationsSnifferEs._(_root);
-	@override late final _TranslationsProfilePatchModeEs profilePatchMode = _TranslationsProfilePatchModeEs._(_root);
+	@override late final _Translations$BackupAndSyncWebdavScreen$es BackupAndSyncWebdavScreen = _Translations$BackupAndSyncWebdavScreen$es._(_root);
+	@override late final _Translations$LaunchFailedScreen$es LaunchFailedScreen = _Translations$LaunchFailedScreen$es._(_root);
+	@override late final _Translations$PerAppAndroidScreen$es PerAppAndroidScreen = _Translations$PerAppAndroidScreen$es._(_root);
+	@override late final _Translations$UserAgreementScreen$es UserAgreementScreen = _Translations$UserAgreementScreen$es._(_root);
+	@override late final _Translations$VersionUpdateScreen$es VersionUpdateScreen = _Translations$VersionUpdateScreen$es._(_root);
+	@override late final _Translations$NetCheckScreen$es NetCheckScreen = _Translations$NetCheckScreen$es._(_root);
+	@override late final _Translations$loginScreen$es loginScreen = _Translations$loginScreen$es._(_root);
+	@override late final _Translations$main$es main = _Translations$main$es._(_root);
+	@override late final _Translations$meta$es meta = _Translations$meta$es._(_root);
+	@override late final _Translations$permission$es permission = _Translations$permission$es._(_root);
+	@override late final _Translations$tls$es tls = _Translations$tls$es._(_root);
+	@override late final _Translations$tun$es tun = _Translations$tun$es._(_root);
+	@override late final _Translations$dns$es dns = _Translations$dns$es._(_root);
+	@override late final _Translations$sniffer$es sniffer = _Translations$sniffer$es._(_root);
+	@override late final _Translations$profilePatchMode$es profilePatchMode = _Translations$profilePatchMode$es._(_root);
+	@override late final _Translations$overwriteMode$es overwriteMode = _Translations$overwriteMode$es._(_root);
 	@override String get protocolSniff => 'Sniff de Protocolo';
 	@override String get protocolSniffOverrideDestination => 'El nombre de dominio Sniff sobrescribe la dirección de destino de la conexión';
+	@override String sendOrReceiveNotMatch({required Object p}) => 'Utilice [${p}]';
+	@override String targetConnectFailed({required Object p}) => 'Error al conectar con [${p}]. Asegúrese de que los dispositivos estén en la misma LAN';
 	@override String get edgeRuntimeNotInstalled => 'El dispositivo actual no ha instalado el motor de ejecución Edge WebView2, por lo que la página no se puede mostrar. Descargue e instale el motor de ejecución Edge WebView2 (x64), reinicie la App e inténtelo de nuevo.';
 	@override Map<String, String> get locales => {
 		'en': 'English',
@@ -69,8 +73,8 @@ class TranslationsEs with BaseTranslations<AppLocale, Translations> implements T
 }
 
 // Path: BackupAndSyncWebdavScreen
-class _TranslationsBackupAndSyncWebdavScreenEs implements TranslationsBackupAndSyncWebdavScreenEn {
-	_TranslationsBackupAndSyncWebdavScreenEs._(this._root);
+class _Translations$BackupAndSyncWebdavScreen$es implements Translations$BackupAndSyncWebdavScreen$en {
+	_Translations$BackupAndSyncWebdavScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -82,8 +86,8 @@ class _TranslationsBackupAndSyncWebdavScreenEs implements TranslationsBackupAndS
 }
 
 // Path: LaunchFailedScreen
-class _TranslationsLaunchFailedScreenEs implements TranslationsLaunchFailedScreenEn {
-	_TranslationsLaunchFailedScreenEs._(this._root);
+class _Translations$LaunchFailedScreen$es implements Translations$LaunchFailedScreen$en {
+	_Translations$LaunchFailedScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -96,8 +100,8 @@ class _TranslationsLaunchFailedScreenEs implements TranslationsLaunchFailedScree
 }
 
 // Path: PerAppAndroidScreen
-class _TranslationsPerAppAndroidScreenEs implements TranslationsPerAppAndroidScreenEn {
-	_TranslationsPerAppAndroidScreenEs._(this._root);
+class _Translations$PerAppAndroidScreen$es implements Translations$PerAppAndroidScreen$en {
+	_Translations$PerAppAndroidScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -108,8 +112,8 @@ class _TranslationsPerAppAndroidScreenEs implements TranslationsPerAppAndroidScr
 }
 
 // Path: UserAgreementScreen
-class _TranslationsUserAgreementScreenEs implements TranslationsUserAgreementScreenEn {
-	_TranslationsUserAgreementScreenEs._(this._root);
+class _Translations$UserAgreementScreen$es implements Translations$UserAgreementScreen$en {
+	_Translations$UserAgreementScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -119,8 +123,8 @@ class _TranslationsUserAgreementScreenEs implements TranslationsUserAgreementScr
 }
 
 // Path: VersionUpdateScreen
-class _TranslationsVersionUpdateScreenEs implements TranslationsVersionUpdateScreenEn {
-	_TranslationsVersionUpdateScreenEs._(this._root);
+class _Translations$VersionUpdateScreen$es implements Translations$VersionUpdateScreen$en {
+	_Translations$VersionUpdateScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -131,8 +135,8 @@ class _TranslationsVersionUpdateScreenEs implements TranslationsVersionUpdateScr
 }
 
 // Path: NetCheckScreen
-class _TranslationsNetCheckScreenEs implements TranslationsNetCheckScreenEn {
-	_TranslationsNetCheckScreenEs._(this._root);
+class _Translations$NetCheckScreen$es implements Translations$NetCheckScreen$en {
+	_Translations$NetCheckScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -154,8 +158,8 @@ class _TranslationsNetCheckScreenEs implements TranslationsNetCheckScreenEn {
 }
 
 // Path: loginScreen
-class _TranslationsLoginScreenEs implements TranslationsLoginScreenEn {
-	_TranslationsLoginScreenEs._(this._root);
+class _Translations$loginScreen$es implements Translations$loginScreen$en {
+	_Translations$loginScreen$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -164,8 +168,8 @@ class _TranslationsLoginScreenEs implements TranslationsLoginScreenEn {
 	@override String get register => 'Registrar cuenta';
 	@override String get forgotPassword => 'Olvidé mi contraseña';
 	@override String get provider => 'Proveedor';
-	@override String get providerName => 'Nombre del ${_root.loginScreen.provider}';
-	@override String get providerNameRequired => 'Por favor, introduzca el nombre del ${_root.loginScreen.provider}';
+	@override String get providerName => 'Código, alias o URL del ${_root.loginScreen.provider}';
+	@override String get providerNameRequired => 'Por favor, introduzca el código, alias o URL del ${_root.loginScreen.provider}';
 	@override String get account => 'Cuenta';
 	@override String get accountRequired => 'Por favor, introduzca la cuenta';
 	@override String get email => 'Correo electrónico';
@@ -176,21 +180,24 @@ class _TranslationsLoginScreenEs implements TranslationsLoginScreenEn {
 	@override String passwordMinLength({required Object minLength}) => 'La contraseña debe tener al menos ${minLength} caracteres';
 	@override String get unsupportedProvider => '${_root.loginScreen.provider} no compatible';
 	@override String get unsupportedProviderType => 'Tipo de ${_root.loginScreen.provider} no compatible';
+	@override String get unActivedProvider => 'La función de inicio de sesión no está activada';
+	@override String providerLoginSupportRequired({required Object p}) => 'Solicita el código/alias del proveedor a tu ${_root.loginScreen.provider}.\nPara la integración con ${_root.loginScreen.provider}, consulta: ${p}';
+	@override String get providerDisclaimer => 'Aviso legal: ${_root.loginScreen.provider} es un servicio de terceros y no está relacionado con esta aplicación';
 }
 
 // Path: main
-class _TranslationsMainEs implements TranslationsMainEn {
-	_TranslationsMainEs._(this._root);
+class _Translations$main$es implements Translations$main$en {
+	_Translations$main$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
-	@override late final _TranslationsMainTrayEs tray = _TranslationsMainTrayEs._(_root);
+	@override late final _Translations$main$tray$es tray = _Translations$main$tray$es._(_root);
 }
 
 // Path: meta
-class _TranslationsMetaEs implements TranslationsMetaEn {
-	_TranslationsMetaEs._(this._root);
+class _Translations$meta$es implements Translations$meta$en {
+	_Translations$meta$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -228,6 +235,7 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get hours => 'Horas';
 	@override String get minutes => 'Minutos';
 	@override String get seconds => 'Segundos';
+	@override String get milliseconds => 'Milisegundos';
 	@override String get protocol => 'Protocolo';
 	@override String get search => 'Buscar';
 	@override String get custom => 'Personalizado';
@@ -260,8 +268,10 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get user => 'Usuario';
 	@override String get account => 'Cuenta';
 	@override String get password => 'Contraseña';
-	@override String get decryptPassword => 'Descifrar Contraseña';
+	@override String get decryptPasswordAES => 'AES Descifrar Contraseña';
+	@override String get decryptPasswordAGE => 'AGE Descifrar Contraseña';
 	@override String get required => 'Requerido';
+	@override String get go => 'Continuar';
 	@override String get sudoPassword => 'contraseña sudo (requerida para el modo TUN)';
 	@override String get other => 'Otro';
 	@override String get dns => 'DNS';
@@ -274,7 +284,9 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get shareUrl => 'Compartir Enlace';
 	@override String get coreSettingTips => 'Nota: Después de modificar la configuración, debe volver a conectar para que surta efecto';
 	@override String get overwrite => 'Sobrescribir';
+	@override String get overwriteMethod => 'Método de sobrescritura';
 	@override String get overwriteCustom => 'Sobrescritura Personalizada';
+	@override String get overwriteAppend => 'Sobrescritura adicional';
 	@override String get overwriteTips => 'Perfil Original <- Sobrescritura Personalizada <- Sobrescritura de App';
 	@override String get noOverwrite => 'No sobrescribir';
 	@override String get overwriteSettings => 'Ajustes de Sobrescritura';
@@ -307,7 +319,7 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get userAgent => 'UserAgent';
 	@override String get launchAtStartup => 'Ejecutar al Inicio';
 	@override String get launchAtStartupRunAsAdmin => 'Por favor, reinicie Clash Mi como administrador';
-	@override String get tunModeRunAsAdmin => 'El modo TUN requiere permisos de administrador del sistema, por favor reinicie la aplicación como administrador';
+	@override String get needRunAsAdmin => 'Esta función requiere permisos de administrador del sistema, reinicie la aplicación como administrador';
 	@override String get portableMode => 'Modo Portátil';
 	@override String get portableModeDisableTips => 'Si necesita salir del modo portátil, cierre [clashmi] y elimine manualmente la carpeta [portable] en el mismo directorio que [clashmi.exe]';
 	@override String get systemProxy => 'Proxy del Sistema';
@@ -322,6 +334,7 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get hideVpn => 'Ocultar Icono VPN';
 	@override String get hideVpnTips => 'Habilitar IPv6 causará que esta función falle';
 	@override String get hideDockIcon => 'Ocultar Icono del Dock';
+	@override String get showTrayTraffic => 'Mostrar información de tráfico en la bandeja';
 	@override String get website => 'Sitio Web';
 	@override String get homePage => 'Página principal';
 	@override String get rule => 'Regla';
@@ -360,6 +373,7 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get boardOnline => 'Usar Tablero en Línea';
 	@override String get boardOnlineUrl => 'URL del Tablero en Línea';
 	@override String get boardLocalPort => 'Puerto del Tablero Local';
+	@override String get alwayOnVPN => 'Conexión permanente';
 	@override String get disableFontScaler => 'Deshabilitar escala de fuente (el reinicio surte efecto)';
 	@override String get autoOrientation => 'Girar con la pantalla';
 	@override String get restartTakesEffect => 'El reinicio surte efecto';
@@ -370,7 +384,14 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get requestNeedsUserApproval => '1. Por favor [Permitir] que Clash Mi instale extensiones del sistema en [Ajustes del Sistema]-[Privacidad y Seguridad]\n2. [Ajustes del Sistema]-[General]-[Extensiones de Ítems de Inicio]-[Extensión de Red] habilite [clashmiServiceSE]\nreconnecte después de completar';
 	@override String get FullDiskAccessPermissionRequired => 'Por favor, habilite el permiso clashmiServiceSE en [Ajustes del Sistema]-[Privacidad y Seguridad]-[Acceso Total al Disco] y vuelva a conectar.';
 	@override String get proxy => 'Proxy';
+	@override String get homeScreen => 'Pantalla de inicio';
 	@override String get theme => 'Tema';
+	@override String get widgetsAlpha => 'Transparencia de widgets';
+	@override String get widgetsEmpty => 'No hay widgets disponibles';
+	@override String get backgroundImage => 'Imagen de fondo';
+	@override String get path => 'Ruta';
+	@override String get local => 'Local';
+	@override String get remote => 'Remoto';
 	@override String get tvMode => 'Modo TV';
 	@override String get autoUpdate => 'Actualización Automática';
 	@override String get updateChannel => 'Canal de Actualización Automática';
@@ -415,17 +436,22 @@ class _TranslationsMetaEs implements TranslationsMetaEn {
 	@override String get addProfile => 'Añadir Perfil';
 	@override String get myProfiles => 'Mis Perfiles';
 	@override String get profileEdit => 'Editar Perfil';
+	@override String get profileNeedActive => 'Primero establece este perfil como perfil actual y luego inicia/reconecta';
+	@override String get profileDownloadBackupChannel => 'Habilitar canal de descarga de respaldo';
+	@override String get profileDownloadBackupChannelTips => 'Canal de descarga por proxy proporcionado por Clash Mi (no se almacena ninguna información)';
 	@override String get profileEditReloadAfterProfileUpdate => 'Recargar tras actualización del Perfil';
+	@override String get profileRulesAppendApplePush => 'Añadir reglas de notificaciones Push de Apple';
+	@override String get profileRulesAppendProxyTips => 'Las reglas se establecerán automáticamente en el primer proxy de tipo [url-test] o [select] en [proxy-groups] de la configuración original';
 	@override String get profileImport => 'Importar Archivo de Perfil';
 	@override String get profileAddUrlOrContent => 'Añadir Enlace de Perfil';
-	@override String get profileUrlOrContent => 'Enlace de Perfil Clash';
-	@override String get profileUrlOrContentHit => 'Enlace de Perfil Clash [Requerido]';
+	@override String profileUrlOrContent({required Object p}) => 'Enlace de Perfil ${p}';
+	@override String profileUrlOrContentHit({required Object p}) => '[Obligatorio]. Nota: Si tu enlace no es un ${_root.meta.profileUrlOrContent(p: p)} (por ejemplo, V2Ray o Sing-box), usa la herramienta de conversión en línea de Clash para convertirlo en un ${_root.meta.profileUrlOrContent(p: p)}';
 	@override String get profileUrlOrContentCannotEmpty => 'El enlace del perfil no puede estar vacío';
 }
 
 // Path: permission
-class _TranslationsPermissionEs implements TranslationsPermissionEn {
-	_TranslationsPermissionEs._(this._root);
+class _Translations$permission$es implements Translations$permission$en {
+	_Translations$permission$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -438,21 +464,22 @@ class _TranslationsPermissionEs implements TranslationsPermissionEn {
 }
 
 // Path: tls
-class _TranslationsTlsEs implements TranslationsTlsEn {
-	_TranslationsTlsEs._(this._root);
+class _Translations$tls$es implements Translations$tls$en {
+	_Translations$tls$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
 	// Translations
 	@override String get insecure => 'Omitir Verificación de Certificado';
+	@override String get ignoreBadCertificate => 'Ignorar errores de certificado';
 	@override String get certificate => 'Certificado';
 	@override String get privateKey => 'Clave Privada';
 	@override String get customTrustCert => 'Certificados Personalizados';
 }
 
 // Path: tun
-class _TranslationsTunEs implements TranslationsTunEn {
-	_TranslationsTunEs._(this._root);
+class _Translations$tun$es implements Translations$tun$en {
+	_Translations$tun$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -470,8 +497,8 @@ class _TranslationsTunEs implements TranslationsTunEn {
 }
 
 // Path: dns
-class _TranslationsDnsEs implements TranslationsDnsEn {
-	_TranslationsDnsEs._(this._root);
+class _Translations$dns$es implements Translations$dns$en {
+	_Translations$dns$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -496,8 +523,8 @@ class _TranslationsDnsEs implements TranslationsDnsEn {
 }
 
 // Path: sniffer
-class _TranslationsSnifferEs implements TranslationsSnifferEn {
-	_TranslationsSnifferEs._(this._root);
+class _Translations$sniffer$es implements Translations$sniffer$en {
+	_Translations$sniffer$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -506,8 +533,8 @@ class _TranslationsSnifferEs implements TranslationsSnifferEn {
 }
 
 // Path: profilePatchMode
-class _TranslationsProfilePatchModeEs implements TranslationsProfilePatchModeEn {
-	_TranslationsProfilePatchModeEs._(this._root);
+class _Translations$profilePatchMode$es implements Translations$profilePatchMode$en {
+	_Translations$profilePatchMode$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -517,9 +544,21 @@ class _TranslationsProfilePatchModeEs implements TranslationsProfilePatchModeEn 
 	@override String get noOverwrite => 'Integrado - sin sobrescritura';
 }
 
+// Path: overwriteMode
+class _Translations$overwriteMode$es implements Translations$overwriteMode$en {
+	_Translations$overwriteMode$es._(this._root);
+
+	final TranslationsEs _root; // ignore: unused_field
+
+	// Translations
+	@override String get overwrite => 'Sobrescribir';
+	@override String get noOverwrite => 'No sobrescribir';
+	@override String get overwriteAppendToHead => 'Sobrescribir - insertar al principio';
+}
+
 // Path: main.tray
-class _TranslationsMainTrayEs implements TranslationsMainTrayEn {
-	_TranslationsMainTrayEs._(this._root);
+class _Translations$main$tray$es implements Translations$main$tray$en {
+	_Translations$main$tray$es._(this._root);
 
 	final TranslationsEs _root; // ignore: unused_field
 
@@ -571,8 +610,8 @@ extension on TranslationsEs {
 			'loginScreen.register' => 'Registrar cuenta',
 			'loginScreen.forgotPassword' => 'Olvidé mi contraseña',
 			'loginScreen.provider' => 'Proveedor',
-			'loginScreen.providerName' => 'Nombre del ${_root.loginScreen.provider}',
-			'loginScreen.providerNameRequired' => 'Por favor, introduzca el nombre del ${_root.loginScreen.provider}',
+			'loginScreen.providerName' => 'Código, alias o URL del ${_root.loginScreen.provider}',
+			'loginScreen.providerNameRequired' => 'Por favor, introduzca el código, alias o URL del ${_root.loginScreen.provider}',
 			'loginScreen.account' => 'Cuenta',
 			'loginScreen.accountRequired' => 'Por favor, introduzca la cuenta',
 			'loginScreen.email' => 'Correo electrónico',
@@ -583,6 +622,9 @@ extension on TranslationsEs {
 			'loginScreen.passwordMinLength' => ({required Object minLength}) => 'La contraseña debe tener al menos ${minLength} caracteres',
 			'loginScreen.unsupportedProvider' => '${_root.loginScreen.provider} no compatible',
 			'loginScreen.unsupportedProviderType' => 'Tipo de ${_root.loginScreen.provider} no compatible',
+			'loginScreen.unActivedProvider' => 'La función de inicio de sesión no está activada',
+			'loginScreen.providerLoginSupportRequired' => ({required Object p}) => 'Solicita el código/alias del proveedor a tu ${_root.loginScreen.provider}.\nPara la integración con ${_root.loginScreen.provider}, consulta: ${p}',
+			'loginScreen.providerDisclaimer' => 'Aviso legal: ${_root.loginScreen.provider} es un servicio de terceros y no está relacionado con esta aplicación',
 			'main.tray.menuOpen' => 'Abrir',
 			'main.tray.menuExit' => 'Salir',
 			'meta.enable' => 'Habilitar',
@@ -618,6 +660,7 @@ extension on TranslationsEs {
 			'meta.hours' => 'Horas',
 			'meta.minutes' => 'Minutos',
 			'meta.seconds' => 'Segundos',
+			'meta.milliseconds' => 'Milisegundos',
 			'meta.protocol' => 'Protocolo',
 			'meta.search' => 'Buscar',
 			'meta.custom' => 'Personalizado',
@@ -650,8 +693,10 @@ extension on TranslationsEs {
 			'meta.user' => 'Usuario',
 			'meta.account' => 'Cuenta',
 			'meta.password' => 'Contraseña',
-			'meta.decryptPassword' => 'Descifrar Contraseña',
+			'meta.decryptPasswordAES' => 'AES Descifrar Contraseña',
+			'meta.decryptPasswordAGE' => 'AGE Descifrar Contraseña',
 			'meta.required' => 'Requerido',
+			'meta.go' => 'Continuar',
 			'meta.sudoPassword' => 'contraseña sudo (requerida para el modo TUN)',
 			'meta.other' => 'Otro',
 			'meta.dns' => 'DNS',
@@ -664,7 +709,9 @@ extension on TranslationsEs {
 			'meta.shareUrl' => 'Compartir Enlace',
 			'meta.coreSettingTips' => 'Nota: Después de modificar la configuración, debe volver a conectar para que surta efecto',
 			'meta.overwrite' => 'Sobrescribir',
+			'meta.overwriteMethod' => 'Método de sobrescritura',
 			'meta.overwriteCustom' => 'Sobrescritura Personalizada',
+			'meta.overwriteAppend' => 'Sobrescritura adicional',
 			'meta.overwriteTips' => 'Perfil Original <- Sobrescritura Personalizada <- Sobrescritura de App',
 			'meta.noOverwrite' => 'No sobrescribir',
 			'meta.overwriteSettings' => 'Ajustes de Sobrescritura',
@@ -697,7 +744,7 @@ extension on TranslationsEs {
 			'meta.userAgent' => 'UserAgent',
 			'meta.launchAtStartup' => 'Ejecutar al Inicio',
 			'meta.launchAtStartupRunAsAdmin' => 'Por favor, reinicie Clash Mi como administrador',
-			'meta.tunModeRunAsAdmin' => 'El modo TUN requiere permisos de administrador del sistema, por favor reinicie la aplicación como administrador',
+			'meta.needRunAsAdmin' => 'Esta función requiere permisos de administrador del sistema, reinicie la aplicación como administrador',
 			'meta.portableMode' => 'Modo Portátil',
 			'meta.portableModeDisableTips' => 'Si necesita salir del modo portátil, cierre [clashmi] y elimine manualmente la carpeta [portable] en el mismo directorio que [clashmi.exe]',
 			'meta.systemProxy' => 'Proxy del Sistema',
@@ -712,6 +759,7 @@ extension on TranslationsEs {
 			'meta.hideVpn' => 'Ocultar Icono VPN',
 			'meta.hideVpnTips' => 'Habilitar IPv6 causará que esta función falle',
 			'meta.hideDockIcon' => 'Ocultar Icono del Dock',
+			'meta.showTrayTraffic' => 'Mostrar información de tráfico en la bandeja',
 			'meta.website' => 'Sitio Web',
 			'meta.homePage' => 'Página principal',
 			'meta.rule' => 'Regla',
@@ -750,6 +798,7 @@ extension on TranslationsEs {
 			'meta.boardOnline' => 'Usar Tablero en Línea',
 			'meta.boardOnlineUrl' => 'URL del Tablero en Línea',
 			'meta.boardLocalPort' => 'Puerto del Tablero Local',
+			'meta.alwayOnVPN' => 'Conexión permanente',
 			'meta.disableFontScaler' => 'Deshabilitar escala de fuente (el reinicio surte efecto)',
 			'meta.autoOrientation' => 'Girar con la pantalla',
 			'meta.restartTakesEffect' => 'El reinicio surte efecto',
@@ -760,7 +809,14 @@ extension on TranslationsEs {
 			'meta.requestNeedsUserApproval' => '1. Por favor [Permitir] que Clash Mi instale extensiones del sistema en [Ajustes del Sistema]-[Privacidad y Seguridad]\n2. [Ajustes del Sistema]-[General]-[Extensiones de Ítems de Inicio]-[Extensión de Red] habilite [clashmiServiceSE]\nreconnecte después de completar',
 			'meta.FullDiskAccessPermissionRequired' => 'Por favor, habilite el permiso clashmiServiceSE en [Ajustes del Sistema]-[Privacidad y Seguridad]-[Acceso Total al Disco] y vuelva a conectar.',
 			'meta.proxy' => 'Proxy',
+			'meta.homeScreen' => 'Pantalla de inicio',
 			'meta.theme' => 'Tema',
+			'meta.widgetsAlpha' => 'Transparencia de widgets',
+			'meta.widgetsEmpty' => 'No hay widgets disponibles',
+			'meta.backgroundImage' => 'Imagen de fondo',
+			'meta.path' => 'Ruta',
+			'meta.local' => 'Local',
+			'meta.remote' => 'Remoto',
 			'meta.tvMode' => 'Modo TV',
 			'meta.autoUpdate' => 'Actualización Automática',
 			'meta.updateChannel' => 'Canal de Actualización Automática',
@@ -805,11 +861,16 @@ extension on TranslationsEs {
 			'meta.addProfile' => 'Añadir Perfil',
 			'meta.myProfiles' => 'Mis Perfiles',
 			'meta.profileEdit' => 'Editar Perfil',
+			'meta.profileNeedActive' => 'Primero establece este perfil como perfil actual y luego inicia/reconecta',
+			'meta.profileDownloadBackupChannel' => 'Habilitar canal de descarga de respaldo',
+			'meta.profileDownloadBackupChannelTips' => 'Canal de descarga por proxy proporcionado por Clash Mi (no se almacena ninguna información)',
 			'meta.profileEditReloadAfterProfileUpdate' => 'Recargar tras actualización del Perfil',
+			'meta.profileRulesAppendApplePush' => 'Añadir reglas de notificaciones Push de Apple',
+			'meta.profileRulesAppendProxyTips' => 'Las reglas se establecerán automáticamente en el primer proxy de tipo [url-test] o [select] en [proxy-groups] de la configuración original',
 			'meta.profileImport' => 'Importar Archivo de Perfil',
 			'meta.profileAddUrlOrContent' => 'Añadir Enlace de Perfil',
-			'meta.profileUrlOrContent' => 'Enlace de Perfil Clash',
-			'meta.profileUrlOrContentHit' => 'Enlace de Perfil Clash [Requerido]',
+			'meta.profileUrlOrContent' => ({required Object p}) => 'Enlace de Perfil ${p}',
+			'meta.profileUrlOrContentHit' => ({required Object p}) => '[Obligatorio]. Nota: Si tu enlace no es un ${_root.meta.profileUrlOrContent(p: p)} (por ejemplo, V2Ray o Sing-box), usa la herramienta de conversión en línea de Clash para convertirlo en un ${_root.meta.profileUrlOrContent(p: p)}',
 			'meta.profileUrlOrContentCannotEmpty' => 'El enlace del perfil no puede estar vacío',
 			'permission.camera' => 'Cámara',
 			'permission.screen' => 'Grabación de Pantalla',
@@ -817,6 +878,7 @@ extension on TranslationsEs {
 			'permission.request' => ({required Object p}) => 'Activar permiso de [${p}]',
 			'permission.requestNeed' => ({required Object p}) => 'Por favor, active el permiso de [${p}]',
 			'tls.insecure' => 'Omitir Verificación de Certificado',
+			'tls.ignoreBadCertificate' => 'Ignorar errores de certificado',
 			'tls.certificate' => 'Certificado',
 			'tls.privateKey' => 'Clave Privada',
 			'tls.customTrustCert' => 'Certificados Personalizados',
@@ -851,8 +913,13 @@ extension on TranslationsEs {
 			'profilePatchMode.currentSelected' => 'Seleccionado Actual',
 			'profilePatchMode.overwrite' => 'Sobrescritura Integrada',
 			'profilePatchMode.noOverwrite' => 'Integrado - sin sobrescritura',
+			'overwriteMode.overwrite' => 'Sobrescribir',
+			'overwriteMode.noOverwrite' => 'No sobrescribir',
+			'overwriteMode.overwriteAppendToHead' => 'Sobrescribir - insertar al principio',
 			'protocolSniff' => 'Sniff de Protocolo',
 			'protocolSniffOverrideDestination' => 'El nombre de dominio Sniff sobrescribe la dirección de destino de la conexión',
+			'sendOrReceiveNotMatch' => ({required Object p}) => 'Utilice [${p}]',
+			'targetConnectFailed' => ({required Object p}) => 'Error al conectar con [${p}]. Asegúrese de que los dispositivos estén en la misma LAN',
 			'edgeRuntimeNotInstalled' => 'El dispositivo actual no ha instalado el motor de ejecución Edge WebView2, por lo que la página no se puede mostrar. Descargue e instale el motor de ejecución Edge WebView2 (x64), reinicie la App e inténtelo de nuevo.',
 			'locales.en' => 'English',
 			'locales.zh-CN' => '简体中文',

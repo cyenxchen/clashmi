@@ -7,9 +7,10 @@ import 'package:clashmi/screens/theme_config.dart';
 import 'package:clashmi/screens/widgets/framework.dart';
 import 'package:clashmi/screens/widgets/text_field.dart';
 import 'package:flutter/material.dart';
+import 'package:tuple/tuple.dart';
 
 class ProfilesPatchSettingsEditScreen extends LasyRenderingStatefulWidget {
-  static RouteSettings routSettings() {
+  static RouteSettings routeSettings() {
     return const RouteSettings(name: "ProfilesPatchSettingsEditScreen");
   }
 
@@ -27,6 +28,7 @@ class _ProfilesPatchSettingsEditScreenState
   final _textControllerUrl = TextEditingController();
   Duration? _updateInterval = const Duration(hours: 24);
   ProfilePatchFileType _type = ProfilePatchFileType.yaml;
+  String _appendPatchBuildin = "";
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _ProfilesPatchSettingsEditScreenState
     );
     _updateInterval = profile.updateInterval;
     _type = profile.type;
+    _appendPatchBuildin = profile.appendPatchBuildin;
     super.initState();
   }
 
@@ -183,6 +186,7 @@ class _ProfilesPatchSettingsEditScreenState
     profile.url = urlText;
     profile.updateInterval = _updateInterval;
     profile.type = _type;
+    profile.appendPatchBuildin = _appendPatchBuildin;
     Navigator.pop(context);
   }
 
@@ -233,7 +237,22 @@ class _ProfilesPatchSettingsEditScreenState
         ),
       ],
     ];
-
+    String currentSelectedAppend = "";
+    if (_appendPatchBuildin == kProfilePatchBuildinOverwrite) {
+      currentSelectedAppend = tcontext.profilePatchMode.overwrite;
+    } else {
+      currentSelectedAppend = tcontext.profilePatchMode.noOverwrite;
+    }
+    List<Tuple2<String?, String>> overwrite = [
+      Tuple2(
+        kProfilePatchBuildinOverwrite,
+        tcontext.profilePatchMode.overwrite,
+      ),
+      Tuple2(
+        kProfilePatchBuildinNoOverwrite,
+        tcontext.profilePatchMode.noOverwrite,
+      ),
+    ];
     List<GroupItemOptions> options1 = [
       GroupItemOptions(
         stringPickerOptions: GroupItemStringPickerOptions(
@@ -245,6 +264,17 @@ class _ProfilesPatchSettingsEditScreenState
               (e) => e.name == selected,
               orElse: () => ProfilePatchFileType.yaml,
             );
+            setState(() {});
+          },
+        ),
+      ),
+      GroupItemOptions(
+        stringPickerOptions: GroupItemStringPickerOptions(
+          name: tcontext.meta.overwriteAppend,
+          selected: currentSelectedAppend,
+          tupleStrings: overwrite,
+          onPicker: (String? selected) async {
+            _appendPatchBuildin = selected ?? "";
             setState(() {});
           },
         ),

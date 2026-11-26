@@ -55,14 +55,16 @@ class VPNService {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     if (Platform.isWindows) {
       _runAsAdmin = await FlutterVpnService.isRunAsAdmin();
-      FlutterVpnService.firewallAddApp(
-        Platform.resolvedExecutable,
-        PathUtils.getExeName(),
-      );
-      FlutterVpnService.firewallAddApp(
-        PathUtils.serviceExePath(),
-        PathUtils.serviceExeName(),
-      );
+      if (_runAsAdmin) {
+        FlutterVpnService.firewallAddApp(
+          Platform.resolvedExecutable,
+          PathUtils.getExeName(),
+        );
+        FlutterVpnService.firewallAddApp(
+          PathUtils.serviceExePath(),
+          PathUtils.serviceExeName(),
+        );
+      }
     }
 
     launchAtStartup.setup(
@@ -160,20 +162,22 @@ class VPNService {
     final appSetting = SettingManager.getConfig();
     final controlPort = ClashSettingManager.getControlPort();
 
-    bool overwriteFinal =
-        patch.id.isEmpty || patch.id == kProfilePatchBuildinOverwrite;
-    final profileMixedPort = await getProfileMixedPort(corePath, patch.id);
+    final overwriteFinal = patch.appliesBuiltInOverwrite;
+    final (patchedCorePath, corePatchPath) = await _getCorePaths(
+      corePath,
+      patch,
+    );
+    final profileMixedPort = await _getProfileMixedPort(
+      patchedCorePath,
+      patch,
+      corePatchPath,
+    );
     final mixedPort = profileMixedPort ?? ClashSettingManager.getMixedPort();
-
     final patchError = await ClashSettingManager.saveCorePatchFinal(
-      profile.id,
-      overwriteFinal,
-      profile.overwriteRules
-          ? (profile.overwriteProxyGroups
-                ? profile.rulesForProxyGroups
-                : profile.rules)
-          : null,
-      profile.overwriteProxyGroups ? profile.proxyGroups : null,
+      profile,
+      patch,
+      corePath: patchedCorePath,
+      corePatchPath: corePatchPath,
       preserveMixedPort: profileMixedPort != null,
     );
     if (patchError != null) {
@@ -192,19 +196,11 @@ class VPNService {
     config.base_dir = await PathUtils.profileDir();
     config.work_dir = PathUtils.appAssetsDir();
     config.cache_dir = await PathUtils.cacheDir();
-    if (patch.type == ProfilePatchFileType.yaml) {
-      config.core_path = await _prepareRuntimeCoreProfile(corePath);
-      config.core_path_patch = await ProfilePatchManager.getProfilePatchPath(
-        profile.patch,
-      );
-    } else {
-      final patchedCorePath =
-          await ProfilePatchManager.getProfilePatchScriptPath(
-            corePath,
-            profile.patch,
-          );
-      config.core_path = await _prepareRuntimeCoreProfile(patchedCorePath);
+    config.core_path = await _prepareRuntimeCoreProfile(patchedCorePath);
+    if (corePatchPath.isNotEmpty) {
+      config.core_path_patch = corePatchPath;
     }
+
     config.core_path_patch_final = await PathUtils.serviceCorePatchFinalPath();
     config.log_path = await PathUtils.serviceLogFilePath();
     config.err_path = await PathUtils.serviceStdErrorFilePath();
@@ -285,14 +281,66 @@ class VPNService {
     return reinstall;
   }
 
-  static Future<int?> getProfileMixedPort(
+  static Future<(String, String)> _getCorePaths(
     String corePath,
-    String patchId,
+    ProfilePatchSetting patch,
   ) async {
-    if (patchId != kProfilePatchBuildinNoOverwrite) {
+    if (patch.type == ProfilePatchFileType.yaml) {
+      return (
+        corePath,
+        await ProfilePatchManager.getProfilePatchPath(patch.id),
+      );
+    }
+    return (
+      await ProfilePatchManager.getProfilePatchScriptPath(corePath, patch.id),
+      '',
+    );
+  }
+
+  static Future<ReturnResult<String>> getFinalPatchPreview() async {
+    final profile = ProfileManager.getCurrent();
+    final patch = ProfilePatchManager.getProfilePatch(profile?.patch ?? '');
+    if (profile == null) {
+      return ClashSettingManager.getPatchContent(null, patch);
+    }
+    final corePath = await ProfileManager.getProfilePath(profile.id);
+    final corePatchPath = patch.type == ProfilePatchFileType.yaml
+        ? await ProfilePatchManager.getProfilePatchPath(patch.id)
+        : '';
+    final profileMixedPort = await _getProfileMixedPort(
+      corePath,
+      patch,
+      corePatchPath,
+    );
+    return ClashSettingManager.getPatchContent(
+      profile,
+      patch,
+      corePath: corePath,
+      corePatchPath: corePatchPath,
+      preserveMixedPort: profileMixedPort != null,
+    );
+  }
+
+  static Future<int?> _getProfileMixedPort(
+    String corePath,
+    ProfilePatchSetting patch,
+    String corePatchPath,
+  ) async {
+    if (patch.id != kProfilePatchBuildinNoOverwrite &&
+        patch.appendPatchBuildin != kProfilePatchBuildinNoOverwrite) {
       return null;
     }
     try {
+      if (corePatchPath.isNotEmpty) {
+        final patchFile = File(corePatchPath);
+        if (await patchFile.exists()) {
+          final doc = loadYaml(await patchFile.readAsString());
+          if (doc is YamlMap && doc.containsKey('mixed-port')) {
+            final port = doc['mixed-port'];
+            return port is int ? port : null;
+          }
+        }
+      }
       final doc = loadYaml(await File(corePath).readAsString());
       final port = doc is YamlMap ? doc['mixed-port'] : null;
       return port is int ? port : null;
@@ -456,7 +504,7 @@ class VPNService {
       return ReturnResultError(err.toString());
     }
     var setting = SettingManager.getConfig();
-    if (Platform.isWindows) {
+    if (Platform.isWindows && _runAsAdmin) {
       final controlPort = ClashSettingManager.getControlPort();
       final mixedPort = getMixedPort();
       final ports = [controlPort, if (mixedPort > 0) mixedPort];
@@ -519,7 +567,7 @@ class VPNService {
       return ReturnResultError(err.toString());
     }
     var setting = SettingManager.getConfig();
-    if (Platform.isWindows) {
+    if (Platform.isWindows && _runAsAdmin) {
       final controlPort = ClashSettingManager.getControlPort();
       final mixedPort = getMixedPort();
       final ports = [controlPort, if (mixedPort > 0) mixedPort];
