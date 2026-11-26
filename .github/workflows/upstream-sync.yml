@@ -89,9 +89,13 @@ jobs:
               sed 's/^/- `/' ../upstream-sync-debug/conflicts.txt | sed 's/$/`/'
             } >> "${GITHUB_STEP_SUMMARY}"
 
-            echo "::warning::Upstream merge has conflicts: ${conflicts//$'\n'/, }"
+            if [[ -n "${conflicts}" ]]; then
+              echo "::error::Upstream merge has conflicts: ${conflicts//$'\n'/, }"
+            else
+              echo "::error::Upstream merge failed. See the job log for details."
+            fi
             echo "result=conflict" >> "${GITHUB_OUTPUT}"
-            exit 0
+            exit 1
           fi
 
           merged_sha="$(git rev-parse HEAD)"
@@ -143,7 +147,7 @@ jobs:
           } >> "${GITHUB_STEP_SUMMARY}"
 
       - name: Upload conflict diagnostics
-        if: steps.sync.outputs.result == 'conflict'
+        if: failure() && steps.sync.outputs.result == 'conflict'
         uses: actions/upload-artifact@v6
         with:
           name: upstream-sync-conflicts

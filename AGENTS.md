@@ -59,7 +59,9 @@ Release signing loads keystore from `../private/clashmi/android/sign/clashmi.rel
 
 `.github/workflows/android-release.yml` builds the signed Android arm64-v8a APK and publishes GitHub Releases. It can be triggered by production tags (`v*`), `repository_dispatch` from `clashmi-vpn-service`, manual `workflow_dispatch`, or the scheduled upstream sync. Non-tag releases auto-generate a monotonically increasing `v<build-name>+<build-number>` tag so Android updates can install over the previous build.
 
-The workflow runs `flutter analyze`, builds with explicit `--build-name` / `--build-number`, signs with `ANDROID_KEYSTORE_BASE64`, and uploads both the APK and a `.sha256` sidecar. Scheduled upstream sync merges `KaringX/clashmi@main`; merge conflicts stop the release and create an issue.
+The workflow runs `flutter analyze`, builds with explicit `--build-name` / `--build-number`, signs with `ANDROID_KEYSTORE_BASE64`, and uploads both the APK and a `.sha256` sidecar.
+
+The `Upstream Sync` workflow fails if the automatic merge fails. The run summary lists any conflicted files and the workflow uploads `upstream-sync-conflicts` diagnostics.
 
 ## AI Tool Configs
 
