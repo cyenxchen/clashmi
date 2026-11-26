@@ -57,12 +57,14 @@ Release signing loads keystore from `../private/clashmi/android/sign/clashmi.rel
 
 ## CI / Release
 
-`.github/workflows/android-release.yml` builds the signed Android arm64-v8a APK and publishes GitHub Releases. It can be triggered by production tags (`v*`), `repository_dispatch` from `clashmi-vpn-service`, manual `workflow_dispatch`, or the scheduled upstream sync. Non-tag releases auto-generate a monotonically increasing `v<build-name>+<build-number>` tag so Android updates can install over the previous build.
+`.github/workflows/android-release.yml` builds the signed Android arm64-v8a APK and publishes GitHub Releases. It can be triggered by production tags (`v*`), `repository_dispatch` (`mihomo-updated` / `vpn-service-updated`), or manual `workflow_dispatch`. Non-tag releases auto-generate a monotonically increasing `v<build-name>+<build-number>` tag so Android updates can install over the previous build.
 
 The workflow runs `flutter analyze`, builds with explicit `--build-name` / `--build-number`, signs with `ANDROID_KEYSTORE_BASE64`, and uploads both the APK and a `.sha256` sidecar.
+
+`.github/workflows/upstream-sync.yml` runs every 6 hours (or on `upstream-clashmi-updated` dispatch / manual run), merges `KaringX/clashmi@main` into `main`'s tip and force-pushes the result to `sync/upstream-main`; the push triggers `android-validate.yml`. Pull requests are disabled on all `cyenxchen` repos, so after validation passes merge the branch into `main` locally and push.
 
 The `Upstream Sync` workflow fails if the automatic merge fails. The run summary lists any conflicted files and the workflow uploads `upstream-sync-conflicts` diagnostics.
 
 ## AI Tool Configs
 
-`AGENTS.md` at the project root is a symlink to this file — edit `CLAUDE.md` only. `analysis_options.yaml` is the Dart/Flutter lint config.
+`AGENTS.md` is the canonical agent guide. `analysis_options.yaml` is the Dart/Flutter lint config.

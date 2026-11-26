@@ -22,7 +22,6 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: write
-      pull-requests: write
 
     defaults:
       run:
@@ -40,7 +39,6 @@ jobs:
       - name: Merge upstream into sync branch
         id: sync
         env:
-          GH_TOKEN: ${{ secrets.CLASHMI_DISPATCH_TOKEN || github.token }}
           SYNC_BRANCH: sync/upstream-main
         run: |
           set -euo pipefail
@@ -101,46 +99,17 @@ jobs:
           merged_sha="$(git rev-parse HEAD)"
           git push origin "HEAD:${SYNC_BRANCH}" --force
 
-          pr_json="$(gh pr list \
-            --repo "${GITHUB_REPOSITORY}" \
-            --head "${SYNC_BRANCH}" \
-            --state open \
-            --json number,url \
-            --jq '.[0] // empty')"
-          if [[ -n "${pr_json}" ]]; then
-            pr_number="$(jq -r '.number' <<< "${pr_json}")"
-            pr_url="$(jq -r '.url' <<< "${pr_json}")"
-            gh pr edit "${pr_number}" \
-              --repo "${GITHUB_REPOSITORY}" \
-              --title "Sync upstream Clash Mi" \
-              --body "Automated sync from KaringX/clashmi@main.
-
-          Base: ${base_sha}
-          Upstream: ${upstream_sha}
-          Merged: ${merged_sha}
-
-          Validate this PR before merging; Android Release no longer runs upstream sync directly."
-          else
-            pr_url="$(gh pr create \
-              --repo "${GITHUB_REPOSITORY}" \
-              --base main \
-              --head "${SYNC_BRANCH}" \
-              --title "Sync upstream Clash Mi" \
-              --body "Automated sync from KaringX/clashmi@main.
-
-          Base: ${base_sha}
-          Upstream: ${upstream_sha}
-          Merged: ${merged_sha}
-
-          Validate this PR before merging; Android Release no longer runs upstream sync directly.")"
-          fi
-
-          echo "result=pr_ready" >> "${GITHUB_OUTPUT}"
-          echo "pr_url=${pr_url}" >> "${GITHUB_OUTPUT}"
+          echo "result=branch_ready" >> "${GITHUB_OUTPUT}"
           {
-            echo "## Upstream sync PR ready"
+            echo "## Upstream sync branch ready"
             echo ""
-            echo "- PR: ${pr_url}"
+            echo "Pushed \`${SYNC_BRANCH}\`. Android Validate runs on this push; after it passes, merge locally:"
+            echo ""
+            echo '```bash'
+            echo "git fetch origin && git checkout main && git merge --no-ff origin/${SYNC_BRANCH} && git push origin main"
+            echo '```'
+            echo ""
+            echo "- Branch: \`${SYNC_BRANCH}\`"
             echo "- Base: \`${base_sha}\`"
             echo "- Upstream: \`${upstream_sha}\`"
             echo "- Merged: \`${merged_sha}\`"
